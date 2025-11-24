@@ -1,0 +1,7 @@
+name = "nightly-recap"
+version = "0.1.0"
+description = "Draft nightly recaps with highlights, blockers, and approvals needed."
+entry_instructions = "instructions.md"
+required_tools = ["context.run_summary", "context.conversation_history", "telemetry.errors.list", "verification.contract.check"]
+required_scopes = []
+resources = ["checklist.md"]
