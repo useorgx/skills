@@ -1,7 +1,7 @@
 name = "morning-briefing"
 version = "1.0.0"
-description = "Get your daily OrgX briefing - pending decisions, blocked work, agent status"
+description = "Get your daily OrgX briefing - pending decisions, blocked work, and agent status"
 entry_instructions = "instructions.md"
-required_tools = ["mcp__orgx__get_pending_decisions", "mcp__orgx__get_agent_status", "mcp__orgx__list_entities"]
+required_tools = ["mcp__orgx__get_pending_decisions", "mcp__orgx__get_agent_status", "mcp__orgx__list_entities", "mcp__orgx__get_initiative_pulse"]
 required_scopes = []
 resources = []
