@@ -1,0 +1,7 @@
+name = "task-protocol"
+version = "1.0.0"
+description = "Individual task execution protocol for OrgX. Handles task lifecycle from start through completion with consistent status reporting. Use when executing individual tasks within a workstream."
+entry_instructions = "SKILL.md"
+required_tools = ["mcp__orgx__complete_entity", "mcp__orgx__create_entity", "mcp__orgx__launch_entity", "mcp__orgx__list_entities", "mcp__orgx__orgx_apply_changeset", "mcp__orgx__orgx_emit_activity", "mcp__orgx__pause_entity", "mcp__orgx__spawn_agent_task", "mcp__orgx__verify_entity_completion"]
+required_scopes = []
+resources = []

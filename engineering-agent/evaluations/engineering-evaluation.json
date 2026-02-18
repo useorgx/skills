@@ -1,0 +1,126 @@
+{
+  "evaluation_id": "engineering-agent-001",
+  "skill": "orgx-engineering-agent",
+  "description": "Evaluate RFC, code review, and technical documentation quality",
+  "scenarios": [
+    {
+      "id": "rfc-database-migration",
+      "query": "Write an RFC for migrating from PostgreSQL to CockroachDB for our multi-region deployment",
+      "context": {
+        "current_setup": "Single-region PostgreSQL, 500GB data",
+        "target": "Multi-region with automatic failover",
+        "constraints": ["Zero downtime", "< 50ms latency increase"],
+        "timeline": "Q2"
+      },
+      "expected_behaviors": [
+        "Includes data on current PostgreSQL limitations",
+        "Proposes phased migration with dual-write period",
+        "Documents at least 2 alternatives (Aurora Global, Spanner, etc.)",
+        "Has rollback plan for each phase",
+        "Identifies data consistency risks",
+        "Includes latency benchmarks in success metrics"
+      ],
+      "quality_gates": [
+        "validate_engineering.py returns exit code 0",
+        "Background has quantified problem data",
+        "Alternatives >= 2 with pros/cons/why_not",
+        "Migration plan has rollback for each phase",
+        "Risks >= 2 with mitigations",
+        "Success metrics include latency targets"
+      ]
+    },
+    {
+      "id": "code-review-auth",
+      "query": "Review this PR that adds OAuth2 authentication to our API",
+      "context": {
+        "pr_url": "https://github.com/org/repo/pull/1234",
+        "changes": "Adds OAuth2 flow with Google and GitHub providers",
+        "files_changed": 12,
+        "lines_added": 450
+      },
+      "expected_behaviors": [
+        "Checks for OWASP Top 10 vulnerabilities",
+        "Verifies token storage security",
+        "Reviews rate limiting on auth endpoints",
+        "Checks for proper error handling (no info leakage)",
+        "Validates test coverage for auth flows",
+        "Provides specific line comments"
+      ],
+      "quality_gates": [
+        "Security review section present",
+        "OWASP considerations documented",
+        "Test coverage assessment included",
+        "Comments reference specific files/lines",
+        "Verdict is justified"
+      ]
+    },
+    {
+      "id": "postmortem-outage",
+      "query": "Write a post-mortem for a 2-hour production outage caused by a database connection pool exhaustion",
+      "context": {
+        "duration": "2 hours",
+        "impact": "All users affected, 100% error rate",
+        "cause": "Connection pool exhausted due to slow queries",
+        "trigger": "Marketing campaign caused 10x traffic spike"
+      },
+      "expected_behaviors": [
+        "Creates detailed timeline with timestamps",
+        "Identifies root cause (pool exhaustion) and trigger (traffic spike)",
+        "Quantifies customer impact",
+        "Proposes action items with owners",
+        "Includes lessons learned",
+        "No blame, focuses on systems"
+      ],
+      "quality_gates": [
+        "Timeline has >= 5 events with timestamps",
+        "Root cause >= 100 chars",
+        "Impact is quantified",
+        "Action items >= 3 with owners",
+        "Lessons learned >= 2"
+      ]
+    },
+    {
+      "id": "adr-state-management",
+      "query": "Write an ADR for choosing between Redux and Zustand for our React application state management",
+      "context": {
+        "application": "Enterprise dashboard with complex state",
+        "team_size": 8,
+        "existing_code": "Mix of local state and Context API"
+      },
+      "expected_behaviors": [
+        "Evaluates both options objectively",
+        "Considers team experience and learning curve",
+        "Documents decision rationale",
+        "Lists consequences (positive and negative)",
+        "References relevant documentation"
+      ],
+      "quality_gates": [
+        "Status is valid (proposed|accepted|deprecated|superseded)",
+        "Context >= 100 chars",
+        "Decision >= 50 chars",
+        "Consequences >= 2"
+      ]
+    }
+  ],
+  "baseline_without_skill": {
+    "common_failures": [
+      "RFCs missing alternatives section",
+      "No data in background/problem statement",
+      "Migration plans without rollback strategies",
+      "Code reviews missing security analysis",
+      "Post-mortems without quantified impact",
+      "No validation before completing"
+    ],
+    "pass_rate": "30%"
+  },
+  "target_with_skill": {
+    "expected_pass_rate": "92%",
+    "key_improvements": [
+      "Data-driven problem statements",
+      "Comprehensive alternative analysis",
+      "Security-first code reviews",
+      "Blameless post-mortems with action items",
+      "Validation gate enforcement"
+    ]
+  }
+}

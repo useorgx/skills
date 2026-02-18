@@ -1,0 +1,94 @@
+{
+  "evaluation_id": "product-agent-prd-001",
+  "skill": "orgx-product-agent",
+  "description": "Evaluate PRD generation quality and completeness",
+  "scenarios": [
+    {
+      "id": "prd-basic-feature",
+      "query": "Create a PRD for adding dark mode to the application",
+      "context": {
+        "product": "SaaS dashboard application",
+        "users": "B2B enterprise users",
+        "existing_features": ["light theme", "custom branding"]
+      },
+      "expected_behaviors": [
+        "Generates problem statement with user pain points",
+        "Includes at least 3 user stories with proper format",
+        "Defines measurable success metrics with baselines and targets",
+        "Lists acceptance criteria in Given/When/Then format",
+        "Identifies technical requirements and dependencies",
+        "Runs validation script before completing"
+      ],
+      "quality_gates": [
+        "validate_artifact.py returns exit code 0",
+        "Problem statement > 100 characters",
+        "User stories >= 3",
+        "Acceptance criteria >= 5",
+        "Success metrics have numeric targets"
+      ]
+    },
+    {
+      "id": "prd-complex-feature",
+      "query": "Create a PRD for real-time collaboration features like Google Docs",
+      "context": {
+        "product": "Document editing platform",
+        "scale": "10,000+ concurrent users",
+        "constraints": ["Must work offline", "Mobile support required"]
+      },
+      "expected_behaviors": [
+        "Addresses technical complexity in requirements",
+        "Includes scalability considerations",
+        "Defines offline sync behavior",
+        "Identifies risks related to conflict resolution",
+        "Proposes phased rollout approach"
+      ],
+      "quality_gates": [
+        "Technical requirements section present",
+        "Risks section has >= 3 identified risks",
+        "Out of scope section clearly defines boundaries",
+        "Timeline includes beta/staged rollout"
+      ]
+    },
+    {
+      "id": "prd-compliance-feature",
+      "query": "Create a PRD for GDPR data export functionality",
+      "context": {
+        "product": "CRM platform",
+        "regulations": ["GDPR", "CCPA"],
+        "data_types": ["user profiles", "activity logs", "communications"]
+      },
+      "expected_behaviors": [
+        "References specific regulatory requirements",
+        "Includes compliance-focused acceptance criteria",
+        "Defines data retention and deletion requirements",
+        "Addresses audit logging needs",
+        "Considers performance for large data exports"
+      ],
+      "quality_gates": [
+        "Mentions specific regulation articles/sections",
+        "Includes security considerations",
+        "Defines maximum export time SLA",
+        "Audit log requirements specified"
+      ]
+    }
+  ],
+  "baseline_without_skill": {
+    "common_failures": [
+      "Missing acceptance criteria entirely",
+      "Vague success metrics without numbers",
+      "No technical requirements section",
+      "User stories missing 'so that' benefit",
+      "No validation before completing"
+    ],
+    "pass_rate": "40%"
+  },
+  "target_with_skill": {
+    "expected_pass_rate": "95%",
+    "key_improvements": [
+      "Structured output following template",
+      "Validation gate enforcement",
+      "Measurable metrics with baselines",
+      "Complete acceptance criteria coverage"
+    ]
+  }
+}

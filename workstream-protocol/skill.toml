@@ -1,0 +1,7 @@
+name = "workstream-protocol"
+version = "1.0.0"
+description = "Stream execution lifecycle for OrgX workstreams. Handles initialization, progress reporting, blocker management, and completion with DAG resolution. Use when executing work within an OrgX initiative stream."
+entry_instructions = "SKILL.md"
+required_tools = ["mcp__orgx__complete_entity", "mcp__orgx__entity_action", "mcp__orgx__get_initiative_stream_state", "mcp__orgx__list_entities", "mcp__orgx__spawn_agent_task", "mcp__orgx__update_stream_progress", "mcp__orgx__verify_entity_completion"]
+required_scopes = []
+resources = []

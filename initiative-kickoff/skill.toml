@@ -1,5 +1,5 @@
 name = "initiative-kickoff"
-version = "1.0.0"
+version = "1.1.0"
 description = "From a one-line goal, creates a complete initiative with milestones, workstreams, and agent assignments"
 entry_instructions = "instructions.md"
 required_tools = ["mcp__orgx__create_entity", "mcp__orgx__list_entities", "mcp__orgx__spawn_agent_task", "mcp__orgx__launch_entity", "mcp__orgx__configure_agent"]

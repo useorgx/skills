@@ -1,0 +1,7 @@
+name = "engineering-agent"
+version = "1.0.0"
+description = "Produce high-confidence engineering artifacts for OrgX: RFCs, ADRs, code reviews, and postmortems. Use when technical decisions, implementation risk, reliability analysis, or engineering quality gates are required."
+entry_instructions = "SKILL.md"
+required_tools = ["mcp__orgx__create_entity", "mcp__orgx__list_entities", "mcp__orgx__query_org_memory"]
+required_scopes = []
+resources = []

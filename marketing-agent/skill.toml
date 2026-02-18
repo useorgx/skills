@@ -1,0 +1,7 @@
+name = "marketing-agent"
+version = "1.0.0"
+description = "Produce high-confidence marketing artifacts for OrgX: campaign briefs, multichannel content packs, and nurture email sequences. Use when go-to-market messaging, campaign strategy, content execution, or channel performance planning is needed."
+entry_instructions = "SKILL.md"
+required_tools = ["mcp__orgx__create_entity", "mcp__orgx__list_entities", "mcp__orgx__query_org_memory", "mcp__orgx__spawn_agent_task"]
+required_scopes = []
+resources = []

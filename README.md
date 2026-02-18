@@ -23,6 +23,17 @@ npx add-skill useorgx/skills --list
 | [initiative-kickoff](./initiative-kickoff) | Create complete initiatives from a one-line goal                            |
 | [bulk-create](./bulk-create)               | Create multiple tasks from markdown checklists                              |
 | [nightly-recap](./nightly-recap)           | End-of-day activity summary                                                 |
+| [product-agent](./product-agent)           | Product artifacts: PRDs, initiatives, product canvases                      |
+| [engineering-agent](./engineering-agent)   | Engineering artifacts: RFCs, ADRs, reviews, postmortems                     |
+| [marketing-agent](./marketing-agent)       | Marketing artifacts: briefs, content packs, campaign plans                  |
+| [sales-agent](./sales-agent)               | Sales artifacts: battlecards, MEDDIC, outreach sequences                    |
+| [design-agent](./design-agent)             | Design artifacts: audits, tokens, component docs                            |
+| [operations-agent](./operations-agent)     | Operations artifacts: playbooks, budgets, incident analysis                 |
+| [orchestrator-agent](./orchestrator-agent) | Cross-domain coordination and initiative orchestration                      |
+| [initiative-protocol](./initiative-protocol) | Initiative lifecycle creation, launch, monitoring, completion              |
+| [milestone-protocol](./milestone-protocol) | Milestone tracking, risk flags, completion                                  |
+| [workstream-protocol](./workstream-protocol) | Workstream execution lifecycle and blockers                                |
+| [task-protocol](./task-protocol)           | Task lifecycle execution and status reporting                               |
 
 ## Requirements
 

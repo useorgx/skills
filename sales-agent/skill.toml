@@ -1,0 +1,7 @@
+name = "sales-agent"
+version = "1.0.0"
+description = "Produce high-confidence sales artifacts for OrgX: competitive battlecards, MEDDIC deal scorecards, and outreach sequences. Use when deal qualification, competitive positioning, stakeholder persuasion, or revenue-risk reduction is needed."
+entry_instructions = "SKILL.md"
+required_tools = ["mcp__orgx__create_entity", "mcp__orgx__list_entities", "mcp__orgx__query_org_memory", "mcp__orgx__spawn_agent_task"]
+required_scopes = []
+resources = []

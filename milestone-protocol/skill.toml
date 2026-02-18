@@ -1,0 +1,7 @@
+name = "milestone-protocol"
+version = "1.0.0"
+description = "Milestone tracking and checkpoint management for OrgX initiatives. Handles milestone creation, progress tracking, risk flagging, and completion. Use when working with initiative milestones and delivery checkpoints."
+entry_instructions = "SKILL.md"
+required_tools = ["mcp__orgx__complete_entity", "mcp__orgx__create_entity", "mcp__orgx__launch_entity", "mcp__orgx__list_entities", "mcp__orgx__pause_entity", "mcp__orgx__verify_entity_completion"]
+required_scopes = []
+resources = []

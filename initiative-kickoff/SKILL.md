@@ -12,6 +12,13 @@ description: |
 
 Transform a goal into a structured OrgX initiative with milestones, workstreams, and initial tasks.
 
+## Quick Start
+
+1. Confirm the goal, scope, and any timeline hints.
+2. Check for existing initiatives to avoid duplicates.
+3. Create the initiative, milestones, workstreams, and starter tasks.
+4. Launch the initiative if the user asks to start execution immediately.
+
 ## Workflow
 
 1. **Parse the goal** to extract:
@@ -113,3 +120,8 @@ Detect domains from goal keywords:
 - "design", "UI", "UX" → design
 - "process", "workflow", "automate" → operations
 - "spec", "requirements", "feature" → product
+
+## Failure Handling
+
+- If a similar initiative exists, pause and ask whether to update or create a new one.
+- If required OrgX tools are unavailable, explain what is missing and stop rather than guessing.

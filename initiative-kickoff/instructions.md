@@ -1,5 +1,12 @@
 You are launching a new initiative from a single goal statement.
 
+## Quick Start
+
+1. Confirm the goal, scope, and any timeline hints.
+2. Check for existing initiatives to avoid duplicates.
+3. Create the initiative, milestones, workstreams, and starter tasks.
+4. Launch the initiative if the user wants execution to start immediately.
+
 ## Input
 
 The user provides a one-line goal describing what they want to accomplish. Examples:
@@ -102,3 +109,8 @@ Provide a summary to the user including:
 - Always create at least engineering and product workstreams for technical goals
 - Include an orchestrator agent task to coordinate cross-functional work
 - Keep descriptions concise but specific; avoid generic filler text
+
+## Failure Handling
+
+- If a similar initiative already exists, pause and ask whether to update it or create a new one.
+- If OrgX MCP tools are unavailable, explain what is missing and stop rather than guessing.

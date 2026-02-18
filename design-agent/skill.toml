@@ -1,0 +1,7 @@
+name = "design-agent"
+version = "1.0.0"
+description = "Produce high-confidence design artifacts for OrgX: WCAG accessibility audits, design token packages, and component documentation. Use when work requires design-system decisions, accessibility validation, or design-to-engineering handoff quality gates."
+entry_instructions = "SKILL.md"
+required_tools = ["mcp__orgx__create_entity", "mcp__orgx__list_entities", "mcp__orgx__query_org_memory"]
+required_scopes = []
+resources = []

@@ -1,0 +1,130 @@
+{
+  "evaluation_id": "marketing-agent-001",
+  "skill": "orgx-marketing-agent",
+  "description": "Evaluate campaign brief and content generation quality",
+  "scenarios": [
+    {
+      "id": "campaign-product-launch",
+      "query": "Create a campaign brief for launching our new AI-powered analytics feature to enterprise customers",
+      "context": {
+        "product": "B2B analytics platform",
+        "target_market": "Enterprise (1000+ employees)",
+        "feature": "AI-powered insights dashboard",
+        "budget": "$75,000",
+        "timeline": "8 weeks"
+      },
+      "expected_behaviors": [
+        "Creates SMART objective with specific numeric targets",
+        "Defines detailed ICP with job titles and pain points",
+        "Includes at least 3 messaging pillars with proof points",
+        "Specifies channels appropriate for enterprise (LinkedIn, email, webinar)",
+        "Includes measurable success metrics with baselines",
+        "Defines testable hypotheses",
+        "Runs validation script before completing"
+      ],
+      "quality_gates": [
+        "validate_marketing.py returns exit code 0",
+        "Objective contains numeric target and deadline",
+        "Target audience has company size and pain points",
+        "Messaging pillars >= 3 with proof points",
+        "Success metrics >= 3 with numeric targets",
+        "Timeline has >= 4 milestones"
+      ]
+    },
+    {
+      "id": "content-pack-feature",
+      "query": "Create a content pack for our new collaboration feature targeting startup CTOs",
+      "context": {
+        "feature": "Real-time collaboration for remote teams",
+        "target_audience": "CTOs at Series A-B startups",
+        "channels": ["LinkedIn", "Twitter", "Email"]
+      },
+      "expected_behaviors": [
+        "LinkedIn post is professional and under 3000 chars",
+        "Twitter content is thread format (numbered)",
+        "Email has compelling subject line and clear CTA",
+        "All content aligned to startup CTO pain points",
+        "Each piece has distinct CTA appropriate to channel"
+      ],
+      "quality_gates": [
+        "Content items >= 3 for specified channels",
+        "LinkedIn post <= 3000 characters",
+        "Twitter has thread format (1/, 2/, etc.)",
+        "All content items have CTA",
+        "No generic/templated messaging"
+      ]
+    },
+    {
+      "id": "email-sequence-trial",
+      "query": "Create a 5-email nurture sequence for trial users who haven't converted after 7 days",
+      "context": {
+        "product": "Project management SaaS",
+        "trial_length": "14 days",
+        "conversion_goal": "Paid subscription",
+        "segment": "Users who created project but no team invites"
+      },
+      "expected_behaviors": [
+        "Email 1 addresses specific user behavior (no invites)",
+        "Progression from education to urgency over sequence",
+        "Includes personalization variables ({{first_name}}, {{project_name}})",
+        "Each email has single, clear CTA",
+        "Final emails include urgency (trial ending)"
+      ],
+      "quality_gates": [
+        "Emails >= 5",
+        "All emails have subject line and body",
+        "Contains personalization tokens ({{}})",
+        "CTAs progress in urgency",
+        "Timing/day specified for each email"
+      ]
+    },
+    {
+      "id": "battlecard-competitor",
+      "query": "Create a competitive battlecard for our CRM against Salesforce for mid-market deals",
+      "context": {
+        "our_product": "Modern CRM for growing companies",
+        "competitor": "Salesforce",
+        "segment": "Mid-market (100-1000 employees)",
+        "our_strengths": [
+          "Ease of use",
+          "Faster implementation",
+          "Better pricing"
+        ]
+      },
+      "expected_behaviors": [
+        "Clear differentiation points highlighted",
+        "Objection handlers for common Salesforce advantages",
+        "Specific landmine questions to set",
+        "Proof points with customer examples",
+        "Win strategies tailored to mid-market"
+      ],
+      "quality_gates": [
+        "Differentiation points >= 3",
+        "Objection handlers >= 4",
+        "Landmine questions >= 3",
+        "Includes win/loss insights"
+      ]
+    }
+  ],
+  "baseline_without_skill": {
+    "common_failures": [
+      "Vague objectives without numbers",
+      "Generic ICP (just 'marketers')",
+      "Missing messaging pillars or proof points",
+      "Same content copy-pasted across channels",
+      "No CTAs or weak CTAs",
+      "No validation before completing"
+    ],
+    "pass_rate": "35%"
+  },
+  "target_with_skill": {
+    "expected_pass_rate": "90%",
+    "key_improvements": [
+      "SMART objectives with specific targets",
+      "Detailed ICP with pain points and triggers",
+      "Channel-appropriate content formatting",
+      "Validation gate enforcement",
+      "Measurable hypotheses included"
+    ]
+  }
+}
