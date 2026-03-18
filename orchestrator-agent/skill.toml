@@ -1,7 +1,7 @@
 name = "orchestrator-agent"
-version = "1.0.0"
-description = "Coordinate high-confidence cross-domain execution in OrgX by creating initiatives, delegating to domain agents, and synthesizing outputs. Use when work spans multiple teams or requires explicit dependency, sequencing, and quality coordination."
+version = "2.0.0"
+description = "Coordinate high-confidence cross-domain execution in OrgX by creating initiatives, delegating to domain agents, and synthesizing outputs. Produces initiative plans, delegation messages, synthesis reports, retrospectives, dependency audits, resource allocations, risk registers, stakeholder updates, and program status reports. Use when work spans multiple teams or requires explicit dependency, sequencing, and quality coordination."
 entry_instructions = "SKILL.md"
-required_tools = ["mcp__orgx__complete_entity", "mcp__orgx__create_entity", "mcp__orgx__get_initiative_pulse", "mcp__orgx__launch_entity", "mcp__orgx__list_entities", "mcp__orgx__orgx_apply_changeset", "mcp__orgx__orgx_emit_activity", "mcp__orgx__query_org_memory", "mcp__orgx__spawn_agent_task"]
+required_tools = ["mcp__orgx__create_entity", "mcp__orgx__entity_action", "mcp__orgx__get_decision_history", "mcp__orgx__get_initiative_pulse", "mcp__orgx__get_relevant_learnings", "mcp__orgx__list_entities", "mcp__orgx__orgx_apply_changeset", "mcp__orgx__orgx_emit_activity", "mcp__orgx__query_org_memory", "mcp__orgx__record_outcome", "mcp__orgx__record_quality_score", "mcp__orgx__spawn_agent_task", "mcp__orgx__submit_learning"]
 required_scopes = []
-resources = []
+resources = ["examples/initiative-plan.md", "examples/delegation-message.md", "reference/orchestration-frameworks-cheatsheet.md", "reference/delegation-template.md", "reference/raci-template.md", "evaluations/orchestrator-evaluation.json"]

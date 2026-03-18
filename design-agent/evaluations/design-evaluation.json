@@ -1,0 +1,397 @@
+{
+  "name": "design-agent-evaluation",
+  "version": "1.0.0",
+  "description": "Evaluation scenarios for the OrgX Design Agent skill. Each scenario tests a different artifact type with realistic inputs and expected quality gates.",
+  "scenarios": [
+    {
+      "id": "accessibility-audit-checkout",
+      "name": "Accessibility Audit — Checkout Flow",
+      "description": "Audit the checkout flow (cart review through order confirmation) for WCAG AA compliance. Tests the agent's ability to identify real accessibility barriers, map them to specific WCAG criteria, and provide actionable remediation with effort estimates.",
+      "artifact_type": "audit",
+      "inputs": {
+        "artifact_type": "audit",
+        "scope": "Checkout flow: cart review, shipping address, payment, order confirmation",
+        "wcag_level": "AA",
+        "platform": "web",
+        "context_signal": "scaling",
+        "evidence": {
+          "screenshots": [
+            "checkout-cart-review.png",
+            "checkout-shipping.png",
+            "checkout-payment.png",
+            "checkout-confirmation.png"
+          ],
+          "known_issues": [
+            "Users report difficulty tabbing through the payment form",
+            "Error messages disappear after 3 seconds"
+          ],
+          "tech_stack": "Next.js, Tailwind CSS, Radix UI primitives"
+        }
+      },
+      "expected_output": {
+        "required_fields": [
+          "scope",
+          "wcag_level",
+          "summary.total_issues",
+          "summary.critical_count",
+          "summary.major_count",
+          "summary.minor_count",
+          "issues",
+          "testing_notes.screen_readers_tested",
+          "testing_notes.browsers_tested",
+          "testing_notes.tools_used",
+          "recommendations",
+          "pass_criteria"
+        ],
+        "quality_checks": [
+          {
+            "check": "issues_minimum_count",
+            "description": "Must identify at least 5 issues given the known problems",
+            "threshold": 5
+          },
+          {
+            "check": "critical_issues_present",
+            "description": "Payment form tab order and disappearing errors should surface as critical or major",
+            "threshold": 2
+          },
+          {
+            "check": "wcag_criteria_coverage",
+            "description": "Issues should reference at least 4 distinct WCAG success criteria",
+            "threshold": 4
+          },
+          {
+            "check": "remediation_specificity",
+            "description": "Every remediation must include either a code snippet, CSS property, or ARIA attribute — not just prose",
+            "validation": "All issues[].remediation contain technical specifics"
+          },
+          {
+            "check": "effort_estimates_present",
+            "description": "Every issue must have an effort field",
+            "validation": "All issues[].effort in ['low', 'medium', 'high']"
+          },
+          {
+            "check": "recommendations_ordered",
+            "description": "Recommendations are ordered by impact (critical fixes first)",
+            "validation": "First recommendation addresses a critical-severity issue"
+          },
+          {
+            "check": "screen_reader_tested",
+            "description": "At least one screen reader listed",
+            "threshold": 1
+          }
+        ]
+      },
+      "scoring": {
+        "pass_threshold": 0.85,
+        "weights": {
+          "completeness": 0.25,
+          "accuracy": 0.30,
+          "actionability": 0.25,
+          "accessibility_depth": 0.20
+        }
+      }
+    },
+    {
+      "id": "design-tokens-v2",
+      "name": "Design Tokens — v2 System Migration",
+      "description": "Author a v2 design token package that migrates from flat tokens to a three-layer architecture (primitive, semantic, component). Tests the agent's understanding of token architecture, naming conventions, and multi-platform considerations.",
+      "artifact_type": "tokens",
+      "inputs": {
+        "artifact_type": "tokens",
+        "context_signal": "scaling",
+        "platform": "web",
+        "evidence": {
+          "existing_tokens": {
+            "primary": "#0057B8",
+            "secondary": "#6C757D",
+            "success": "#198754",
+            "danger": "#DC3545",
+            "background": "#FFFFFF",
+            "text": "#212529",
+            "spacing_unit": "8px",
+            "font_family": "Inter"
+          },
+          "known_issues": [
+            "Current tokens are flat — no semantic layer",
+            "Dark mode requires manual overrides in 47 places",
+            "iOS app uses different token names than web"
+          ],
+          "requirements": [
+            "Support light and dark themes",
+            "Target platforms: web (CSS custom properties), iOS (Swift), Android (XML)",
+            "Must be backwards-compatible with existing component usage"
+          ]
+        }
+      },
+      "expected_output": {
+        "required_fields": [
+          "version",
+          "meta.generated_by",
+          "meta.target_platforms",
+          "tokens.color",
+          "tokens.spacing",
+          "tokens.typography"
+        ],
+        "quality_checks": [
+          {
+            "check": "three_layer_architecture",
+            "description": "Color tokens must have primitive and semantic layers",
+            "validation": "tokens.color has 'primitive' and 'semantic' keys"
+          },
+          {
+            "check": "dark_mode_mapping",
+            "description": "Must include dark mode token values or a dark_mode_mapping section",
+            "validation": "dark_mode_mapping is present OR tokens include dark variants"
+          },
+          {
+            "check": "semantic_naming",
+            "description": "Semantic tokens use purpose-based names (text-primary, surface-default) not color-based names (blue-500)",
+            "validation": "All semantic token names describe function, not appearance"
+          },
+          {
+            "check": "spacing_grid_adherence",
+            "description": "All spacing values are multiples of 4px",
+            "validation": "Every spacing value mod 4 equals 0"
+          },
+          {
+            "check": "typography_completeness",
+            "description": "Typography tokens include fontFamily, fontSize, lineHeight, and fontWeight",
+            "validation": "All typography entries have all four properties"
+          },
+          {
+            "check": "color_format_valid",
+            "description": "All color values are valid hex or rgb format",
+            "validation": "All primitive color values match #RRGGBB or rgb(...) pattern"
+          },
+          {
+            "check": "backwards_compatibility",
+            "description": "Migration notes or alias mappings from old tokens to new are present",
+            "validation": "A migration or alias section exists"
+          }
+        ]
+      },
+      "scoring": {
+        "pass_threshold": 0.85,
+        "weights": {
+          "completeness": 0.20,
+          "architecture": 0.30,
+          "naming_quality": 0.25,
+          "platform_readiness": 0.25
+        }
+      }
+    },
+    {
+      "id": "interaction-spec-modal",
+      "name": "Interaction Spec — Multi-step Configuration Modal",
+      "description": "Produce a complete interaction specification for a 3-step modal that collects initiative configuration. Tests the agent's ability to map all states, transitions, keyboard behavior, responsive adaptations, and error handling.",
+      "artifact_type": "interaction",
+      "inputs": {
+        "artifact_type": "interaction",
+        "context_signal": "web_app",
+        "platform": "web",
+        "evidence": {
+          "flow_description": "User clicks 'New Initiative' button. Modal opens with 3 steps: 1) Name and description, 2) Assign workstreams, 3) Review and launch. Each step validates before proceeding. User can go back. Escape or backdrop click closes with unsaved changes confirmation.",
+          "technical_constraints": {
+            "framework": "React with Radix Dialog primitive",
+            "animation_library": "Framer Motion",
+            "max_modal_height": "80vh",
+            "form_library": "React Hook Form with Zod validation"
+          },
+          "user_context": "Engineering managers creating initiatives 2-3 times per week"
+        }
+      },
+      "expected_output": {
+        "required_fields": [
+          "name",
+          "description",
+          "states",
+          "transitions",
+          "micro_interactions",
+          "keyboard_behavior",
+          "keyboard_behavior.tab_order",
+          "keyboard_behavior.shortcuts",
+          "keyboard_behavior.escape_handling",
+          "keyboard_behavior.focus_trap",
+          "responsive_behavior",
+          "error_states"
+        ],
+        "quality_checks": [
+          {
+            "check": "state_coverage",
+            "description": "Must define at least 5 states: closed, open-step-1, open-step-2, open-step-3, confirming-close",
+            "threshold": 5
+          },
+          {
+            "check": "transition_coverage",
+            "description": "Every state pair reachable in the flow has a defined transition",
+            "validation": "No orphan states — every state has at least one entry and one exit transition"
+          },
+          {
+            "check": "keyboard_completeness",
+            "description": "Tab order, Escape, Enter, and back-navigation shortcuts are specified",
+            "validation": "keyboard_behavior covers Tab, Escape, Enter, and Shift+Tab at minimum"
+          },
+          {
+            "check": "focus_management",
+            "description": "Focus trap is true and focus restoration on close is specified",
+            "validation": "focus_trap is true and escape_handling mentions focus restoration"
+          },
+          {
+            "check": "responsive_breakpoints",
+            "description": "Behavior defined for at least mobile, tablet, and desktop",
+            "threshold": 3
+          },
+          {
+            "check": "error_recovery",
+            "description": "At least 2 error states with clear recovery paths",
+            "threshold": 2
+          },
+          {
+            "check": "unsaved_changes_handling",
+            "description": "Dismissal with unsaved changes triggers confirmation",
+            "validation": "A confirming-close or similar state handles the unsaved changes case"
+          },
+          {
+            "check": "animation_specs",
+            "description": "Transitions include duration and easing values",
+            "validation": "All transitions[] have duration and easing fields"
+          }
+        ]
+      },
+      "scoring": {
+        "pass_threshold": 0.85,
+        "weights": {
+          "completeness": 0.20,
+          "state_accuracy": 0.25,
+          "accessibility": 0.25,
+          "implementation_readiness": 0.30
+        }
+      }
+    },
+    {
+      "id": "dark-mode-audit",
+      "name": "Dark Mode Audit — Live Dashboard",
+      "description": "Audit the OrgX Live Dashboard for dark mode readiness, including palette mapping, contrast verification, elevation strategy, and image handling. Tests the agent's understanding of dark mode design constraints and common pitfalls.",
+      "artifact_type": "dark-mode",
+      "inputs": {
+        "artifact_type": "dark-mode",
+        "context_signal": "agent_first_ui",
+        "platform": "web",
+        "evidence": {
+          "current_state": "Light mode only. No dark mode support. Users have requested dark mode for extended monitoring sessions.",
+          "components_to_audit": [
+            "Navigation sidebar",
+            "Initiative cards with status badges",
+            "Agent activity feed with streaming indicators",
+            "Mission control graph visualization",
+            "Decision approval banners",
+            "Modal dialogs",
+            "Data tables with inline actions"
+          ],
+          "current_palette": {
+            "background": "#FFFFFF",
+            "surface": "#F9FAFB",
+            "surface_raised": "#FFFFFF",
+            "text_primary": "#111827",
+            "text_secondary": "#6B7280",
+            "border": "#E5E7EB",
+            "primary": "#2563EB",
+            "success": "#22C55E",
+            "warning": "#F59E0B",
+            "error": "#EF4444",
+            "info": "#3B82F6"
+          },
+          "tech_stack": "React, Tailwind CSS with CSS custom properties, next-themes"
+        }
+      },
+      "expected_output": {
+        "required_fields": [
+          "palette_mapping",
+          "elevation_strategy",
+          "issues",
+          "image_handling",
+          "contrast_verification",
+          "testing_checklist"
+        ],
+        "quality_checks": [
+          {
+            "check": "palette_coverage",
+            "description": "Every color in the current palette has a dark mode mapping",
+            "validation": "All 11 current palette colors have corresponding dark values"
+          },
+          {
+            "check": "no_pure_black",
+            "description": "Dark background must not be #000000",
+            "validation": "No dark mode surface value is #000000"
+          },
+          {
+            "check": "elevation_levels",
+            "description": "At least 3 elevation levels defined with progressively lighter surfaces",
+            "threshold": 3
+          },
+          {
+            "check": "status_color_contrast",
+            "description": "All status colors (success, warning, error, info) verified against dark surfaces",
+            "validation": "contrast_verification includes entries for all 4 status colors"
+          },
+          {
+            "check": "agent_ui_patterns",
+            "description": "Streaming indicators and activity feed have dark mode specifications (agent-first UI signal)",
+            "validation": "Issues or adaptations mention streaming/activity patterns"
+          },
+          {
+            "check": "contrast_ratios_computed",
+            "description": "Contrast ratios are actual numbers, not estimates",
+            "validation": "All contrast_verification entries have numeric ratio values"
+          },
+          {
+            "check": "testing_steps_actionable",
+            "description": "Testing checklist has at least 5 specific, executable steps",
+            "threshold": 5
+          },
+          {
+            "check": "image_strategy_complete",
+            "description": "Image handling covers photos, illustrations, icons, and logos",
+            "validation": "image_handling has entries for at least 3 image categories"
+          }
+        ]
+      },
+      "scoring": {
+        "pass_threshold": 0.85,
+        "weights": {
+          "completeness": 0.20,
+          "contrast_accuracy": 0.30,
+          "practical_guidance": 0.25,
+          "agent_ui_awareness": 0.25
+        }
+      }
+    }
+  ],
+  "global_checks": [
+    {
+      "check": "validator_passes",
+      "description": "Every output artifact must pass validate_design.py with zero errors",
+      "applies_to": "all"
+    },
+    {
+      "check": "no_placeholders",
+      "description": "No TODO, TBD, FIXME, or [fill in] text in any output",
+      "applies_to": "all"
+    },
+    {
+      "check": "learning_recorded",
+      "description": "At least one learning submitted via mcp__orgx__submit_learning per artifact",
+      "applies_to": "all"
+    },
+    {
+      "check": "next_steps_present",
+      "description": "Summary includes exactly 3 actionable next steps",
+      "applies_to": "all"
+    },
+    {
+      "check": "evidence_backed",
+      "description": "Every recommendation references specific evidence or design principle, not opinion",
+      "applies_to": "all"
+    }
+  ]
+}

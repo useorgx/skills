@@ -1,0 +1,188 @@
+{
+  "evaluation_id": "operations-agent-001",
+  "skill": "orgx-operations-agent",
+  "description": "Evaluate incident analysis, playbook, SLO proposal, and capacity plan quality",
+  "scenarios": [
+    {
+      "id": "incident-p1-database",
+      "query": "Write a blameless postmortem for a P1 database outage. Our primary PostgreSQL database ran out of connections at 2:47 AM UTC causing complete service unavailability for 47 minutes. The database connection pool was exhausted by a batch job that opened connections without releasing them. 100% of users were affected. The on-call engineer was paged at 2:52 AM and identified the issue by 3:05 AM. Service was restored at 3:34 AM by killing the batch job and restarting the connection pool.",
+      "context": {
+        "service": "core-api",
+        "database": "PostgreSQL 15, RDS, db.r6g.2xlarge",
+        "connection_pool": "PgBouncer, max 200 connections",
+        "batch_job": "nightly-analytics-export, runs at 2:30 AM UTC",
+        "monitoring": "Datadog APM + PagerDuty",
+        "users_affected": "all (12,400 active at time of incident)",
+        "revenue_impact": "estimated $8,200 in failed transactions"
+      },
+      "expected_behaviors": [
+        "Creates detailed timeline with at least 7 timestamped events",
+        "Identifies root cause as connection leak in batch job, not the batch job itself",
+        "Applies Five Whys to get past surface cause",
+        "Maps contributing factors using Swiss Cheese model",
+        "Quantifies impact in users and revenue",
+        "Includes MTTD and MTTR metrics",
+        "Proposes at least 4 action items with owners and due dates",
+        "Uses blameless language throughout — no 'should have' or 'failed to'",
+        "Includes detection analysis (why was detection delayed 5 minutes)",
+        "References prior learnings if available"
+      ],
+      "quality_gates": [
+        "validate_ops.py --type incident returns exit code 0",
+        "Timeline has >= 5 events with ISO timestamps",
+        "Root cause description >= 100 characters",
+        "root_cause.category is set to a valid category",
+        "contributing_factors has >= 2 entries",
+        "action_items >= 3 with owner and due_date on each",
+        "lessons_learned >= 2",
+        "No blame words detected (fault, blame, failed to, should have)",
+        "detection block present with method and MTTD",
+        "response_metrics block present with MTTD and MTTR"
+      ]
+    },
+    {
+      "id": "playbook-deployment-rollback",
+      "query": "Create an operational playbook for rolling back a failed production deployment. Our deployment pipeline uses GitHub Actions to build Docker images, push to ECR, and deploy to EKS via ArgoCD. Rollbacks should target the previous known-good image tag. The playbook should cover both automatic rollback (ArgoCD health check failure) and manual rollback (engineer-initiated after observing degraded metrics).",
+      "context": {
+        "deployment_tool": "ArgoCD with GitHub Actions",
+        "infrastructure": "EKS (3 clusters, us-east-1, eu-west-1, ap-southeast-1)",
+        "rollback_mechanism": "ArgoCD revision rollback or manual kubectl set image",
+        "monitoring": "Datadog APM, Sentry for errors",
+        "on_call": "Platform team, 24/7 rotation",
+        "slo": "99.9% availability, p99 latency < 500ms"
+      },
+      "expected_behaviors": [
+        "Includes both automatic and manual rollback procedures",
+        "Steps are executable by someone at 3 AM with no prior context",
+        "Includes verification steps after rollback",
+        "Covers multi-region rollback coordination",
+        "Has escalation path with time thresholds",
+        "Includes communication templates for internal and external stakeholders",
+        "Defines when to escalate from rollback to full incident response",
+        "References specific monitoring dashboards and alert names"
+      ],
+      "quality_gates": [
+        "validate_ops.py --type playbook returns exit code 0",
+        "name, version, owner present",
+        "trigger.conditions >= 1 with specific observable signals",
+        "steps >= 5 with action and expected_outcome",
+        ">= 50% of steps have if_fails handling",
+        "escalation block present with contact chain",
+        "communication.templates >= 1",
+        "rollback.steps >= 1",
+        "verification block present"
+      ]
+    },
+    {
+      "id": "slo-proposal-api",
+      "query": "Propose SLOs for our core REST API service. The API handles user authentication, CRUD operations for the main product entities, and webhook delivery. Current performance: p50 latency 45ms, p99 latency 280ms, error rate 0.08%, availability 99.95% over the past 90 days. Our enterprise customers expect high reliability but we have no formal SLOs today. We have 3 enterprise customers with SLA requirements and 200+ self-serve customers.",
+      "context": {
+        "service": "core-api",
+        "current_metrics": {
+          "p50_latency": "45ms",
+          "p99_latency": "280ms",
+          "error_rate": "0.08%",
+          "availability_90d": "99.95%"
+        },
+        "customer_segments": {
+          "enterprise": 3,
+          "self_serve": 200
+        },
+        "monitoring_stack": "Datadog APM, custom Prometheus metrics",
+        "deployment_frequency": "5-10 deploys per week"
+      },
+      "expected_behaviors": [
+        "Defines SLIs for availability, latency, and error rate",
+        "Sets SLO targets based on current performance with headroom",
+        "Does not over-engineer (no 99.99% unless customer requires it)",
+        "Includes error budget calculation in concrete units",
+        "Defines fast-burn and slow-burn alerting rules",
+        "Includes error budget policy with deploy freeze criteria",
+        "Separates read and write latency SLIs if appropriate",
+        "Considers webhook delivery as a separate SLI (delivery rate, latency)"
+      ],
+      "quality_gates": [
+        "validate_ops.py --type slo returns exit code 0 (when validator is extended)",
+        "slis >= 3 with metric, measurement_method, good_threshold",
+        "slos >= 3 with target, window, and rationale",
+        "error_budget_policy present with thresholds and actions",
+        "alerting_rules present with fast_burn and slow_burn",
+        "Targets are achievable (not 99.99% on a service currently at 99.95%)",
+        "review_cadence specified",
+        "escalation_path specified"
+      ]
+    },
+    {
+      "id": "capacity-plan-q3",
+      "query": "Create a capacity plan for Q3. We are launching a major new feature (real-time collaboration) that will increase WebSocket connections by an estimated 3-5x. Current infrastructure handles 10,000 concurrent WebSocket connections. The feature launches July 15. We also expect organic growth of 15% per quarter based on the past 4 quarters.",
+      "context": {
+        "current_infrastructure": {
+          "websocket_servers": "4x c5.2xlarge in us-east-1",
+          "max_connections_per_instance": "3,000",
+          "current_peak_connections": "10,000",
+          "database": "RDS PostgreSQL r6g.2xlarge, 60% CPU at peak",
+          "redis": "ElastiCache r6g.large, 40% memory utilization"
+        },
+        "growth_data": {
+          "q4_2025": 8200,
+          "q1_2026": 9100,
+          "q2_2026": 10000,
+          "organic_growth_rate": "15% per quarter"
+        },
+        "feature_launch": {
+          "name": "Real-time Collaboration",
+          "date": "2026-07-15",
+          "estimated_multiplier": "3-5x WebSocket connections",
+          "additional_requirements": "Redis pub/sub for room state"
+        },
+        "budget_constraint": "Infrastructure budget increase limited to 40% for Q3"
+      },
+      "expected_behaviors": [
+        "Calculates projected load combining organic growth and feature multiplier",
+        "Identifies WebSocket server capacity as the primary bottleneck",
+        "Proposes scaling strategy with cost estimates",
+        "Includes load test plan with specific scenarios",
+        "Considers database and Redis capacity alongside WebSocket servers",
+        "Addresses the budget constraint and proposes alternatives if over budget",
+        "Includes timeline with milestones before July 15 launch",
+        "Has a contingency plan if actual multiplier exceeds 5x"
+      ],
+      "quality_gates": [
+        "validate_ops.py --type capacity returns exit code 0 (when validator is extended)",
+        "services[] present with current_load, peak_load, headroom_percentage",
+        "growth_forecast present with methodology and projected_load",
+        "bottleneck_analysis present identifying first constraint",
+        "scaling_strategy specified per service",
+        "load_test_plan present with target_load and success_criteria",
+        "recommendations present with timeline and cost_estimate",
+        "review_cadence specified"
+      ]
+    }
+  ],
+  "baseline_without_skill": {
+    "common_failures": [
+      "Incident reports that name individuals instead of systems",
+      "Playbooks with steps that assume context the reader doesn't have",
+      "SLO proposals that copy-paste 99.99% without justification",
+      "Capacity plans without load test criteria",
+      "Missing rollback procedures",
+      "No connection to organizational learning (prior incidents not referenced)",
+      "Action items without owners or due dates",
+      "No error budget policy despite proposing SLOs"
+    ],
+    "pass_rate": "25%"
+  },
+  "target_with_skill": {
+    "expected_pass_rate": "90%",
+    "key_improvements": [
+      "Blameless language enforced by validator",
+      "Swiss Cheese model applied to every incident",
+      "SLO targets justified by customer need, not vanity",
+      "Error budget policy with concrete deploy-freeze criteria",
+      "Capacity plans include load test and growth forecast",
+      "All action items have named owners and due dates",
+      "Cross-agent handoffs triggered when appropriate",
+      "Prior learnings incorporated into new artifacts"
+    ]
+  }
+}

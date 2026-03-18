@@ -23,13 +23,13 @@ npx add-skill useorgx/skills --list
 | [initiative-kickoff](./initiative-kickoff) | Create complete initiatives from a one-line goal                            |
 | [bulk-create](./bulk-create)               | Create multiple tasks from markdown checklists                              |
 | [nightly-recap](./nightly-recap)           | End-of-day activity summary                                                 |
-| [product-agent](./product-agent)           | Product artifacts: PRDs, initiatives, product canvases                      |
-| [engineering-agent](./engineering-agent)   | Engineering artifacts: RFCs, ADRs, reviews, postmortems                     |
-| [marketing-agent](./marketing-agent)       | Marketing artifacts: briefs, content packs, campaign plans                  |
-| [sales-agent](./sales-agent)               | Sales artifacts: battlecards, MEDDIC, outreach sequences                    |
-| [design-agent](./design-agent)             | Design artifacts: audits, tokens, component docs                            |
-| [operations-agent](./operations-agent)     | Operations artifacts: playbooks, budgets, incident analysis                 |
-| [orchestrator-agent](./orchestrator-agent) | Cross-domain coordination and initiative orchestration                      |
+| [product-agent](./product-agent)           | 100x product domain expert: PRDs, initiatives, canvases, research briefs, competitive analyses, prioritization matrices, pivot evaluations, dashboard specs, launch readiness |
+| [engineering-agent](./engineering-agent)   | 100x engineering domain expert: RFCs, ADRs, code reviews, postmortems, tech debt inventories, capacity plans, runbooks, migration playbooks, dependency audits, perf budgets |
+| [marketing-agent](./marketing-agent)       | 100x marketing domain expert: campaign briefs, content packs, nurture sequences, positioning docs, messaging matrices, competitive narratives, launch plans, analyst briefs, community strategies |
+| [sales-agent](./sales-agent)               | 100x sales domain expert: battlecards, MEDDIC scorecards, outreach sequences, territory plans, QBR decks, deal reviews, win/loss analyses, pricing proposals, partner pitches |
+| [design-agent](./design-agent)             | 100x design domain expert: WCAG audits, design tokens, component docs, interaction specs, UX research plans, critiques, motion specs, dark mode audits, breakpoint maps |
+| [operations-agent](./operations-agent)     | 100x operations domain expert: incident analyses, playbooks, budget controls, capacity plans, vendor evaluations, SLO proposals, chaos test plans, migration checklists, on-call audits |
+| [orchestrator-agent](./orchestrator-agent) | 100x orchestration expert: initiative plans, delegations, synthesis reports, retrospectives, dependency audits, resource allocations, risk registers, stakeholder updates, program status |
 | [initiative-protocol](./initiative-protocol) | Initiative lifecycle creation, launch, monitoring, completion              |
 | [milestone-protocol](./milestone-protocol) | Milestone tracking, risk flags, completion                                  |
 | [workstream-protocol](./workstream-protocol) | Workstream execution lifecycle and blockers                                |

@@ -1,7 +1,7 @@
 {
-  "evaluation_id": "product-agent-prd-001",
+  "evaluation_id": "product-agent-001",
   "skill": "orgx-product-agent",
-  "description": "Evaluate PRD generation quality and completeness",
+  "description": "Evaluate product artifact generation quality and completeness across all artifact types",
   "scenarios": [
     {
       "id": "prd-basic-feature",
@@ -12,19 +12,23 @@
         "existing_features": ["light theme", "custom branding"]
       },
       "expected_behaviors": [
-        "Generates problem statement with user pain points",
-        "Includes at least 3 user stories with proper format",
+        "Generates problem statement with user pain points (not solution-first)",
+        "Includes at least 3 user stories with proper format and specific personas",
         "Defines measurable success metrics with baselines and targets",
         "Lists acceptance criteria in Given/When/Then format",
         "Identifies technical requirements and dependencies",
-        "Runs validation script before completing"
+        "Runs validation script before completing",
+        "Applies product thinking checklist",
+        "Checks flywheel learnings before drafting"
       ],
       "quality_gates": [
         "validate_artifact.py returns exit code 0",
-        "Problem statement > 100 characters",
-        "User stories >= 3",
-        "Acceptance criteria >= 5",
-        "Success metrics have numeric targets"
+        "Problem statement > 100 characters and describes user pain",
+        "User stories >= 3 with specific personas (not 'as a user')",
+        "Acceptance criteria >= 5 and machine-testable",
+        "Success metrics have numeric targets with baselines",
+        "Health-check metric paired with each primary metric",
+        "Risks include at least one user-behavior risk"
       ]
     },
     {
@@ -40,13 +44,16 @@
         "Includes scalability considerations",
         "Defines offline sync behavior",
         "Identifies risks related to conflict resolution",
-        "Proposes phased rollout approach"
+        "Proposes phased rollout approach",
+        "Applies context adaptation for platform product type",
+        "References relevant frameworks (MVP spectrum for phasing)"
       ],
       "quality_gates": [
         "Technical requirements section present",
-        "Risks section has >= 3 identified risks",
-        "Out of scope section clearly defines boundaries",
-        "Timeline includes beta/staged rollout"
+        "Risks section has >= 3 identified risks including user-behavior risks",
+        "Out of scope section clearly defines boundaries with genuinely tempting items",
+        "Timeline includes beta/staged rollout",
+        "Acceptance criteria address offline and mobile scenarios"
       ]
     },
     {
@@ -62,13 +69,118 @@
         "Includes compliance-focused acceptance criteria",
         "Defines data retention and deletion requirements",
         "Addresses audit logging needs",
-        "Considers performance for large data exports"
+        "Considers performance for large data exports",
+        "Applies context adaptation for enterprise signal"
       ],
       "quality_gates": [
         "Mentions specific regulation articles/sections",
         "Includes security considerations",
         "Defines maximum export time SLA",
-        "Audit log requirements specified"
+        "Audit log requirements specified",
+        "Compliance gate included in any launch readiness reference"
+      ]
+    },
+    {
+      "id": "competitive-analysis-devtools",
+      "query": "Create a competitive analysis for our AI code assistant tool in the developer tools market",
+      "context": {
+        "product": "AI-powered code assistant (VS Code extension)",
+        "market": "AI developer tools",
+        "competitors_known": ["GitHub Copilot", "Cursor", "Codeium", "Amazon CodeWhisperer"],
+        "our_positioning": "Enterprise-focused with on-prem deployment option",
+        "stage": "Growth stage, post-PMF"
+      },
+      "expected_behaviors": [
+        "Identifies at least 4 competitors with detailed profiles",
+        "Creates feature-by-feature differentiation matrix",
+        "Includes pricing model comparison",
+        "Analyzes recent competitive moves (funding, launches, pivots)",
+        "Provides strategic implications specific to our positioning",
+        "Recommends concrete responses ranked by urgency",
+        "Assesses moat durability for each competitive advantage",
+        "Applies context adaptation for growth stage and B2B signals",
+        "References relevant frameworks (Value Proposition Canvas for differentiation)"
+      ],
+      "quality_gates": [
+        "Competitors >= 3 with positioning, strengths (>=2), weaknesses (>=2)",
+        "Differentiation matrix is a complete table, not a list",
+        "Pricing models documented for each competitor",
+        "Strategic implications >= 3 with specific roadmap actions",
+        "Moat assessment distinguishes durable vs temporary advantages",
+        "Recent moves section covers last 12 months",
+        "Recommended responses are prioritized, not just listed"
+      ]
+    },
+    {
+      "id": "prioritization-matrix-rice",
+      "query": "Create a RICE prioritization matrix for our Q2 roadmap candidates: SSO integration, mobile app redesign, API v2, in-app analytics dashboard, workflow automation builder, and CSV bulk import improvements",
+      "context": {
+        "product": "B2B SaaS project management tool",
+        "users": "5,000 active workspaces, mix of SMB and mid-market",
+        "stage": "Growth stage",
+        "data_available": {
+          "feature_requests": "SSO: 45 requests, Mobile: 120, API v2: 30, Analytics: 85, Automation: 60, CSV: 25",
+          "churn_mentions": "SSO: 12 churned accounts cited it, Mobile: 5, Analytics: 8",
+          "revenue_impact": "SSO blocks $800K pipeline, API v2 blocks $200K partner deals"
+        }
+      },
+      "expected_behaviors": [
+        "Applies RICE framework correctly with all four dimensions",
+        "Scores each item with explicit justification per dimension",
+        "Uses the provided data to inform reach and impact scores",
+        "Identifies a clear cut line with reasoning",
+        "Documents assumptions that could change the ranking",
+        "Performs sensitivity analysis on top-ranked items",
+        "Flags items where confidence is low and recommends data gathering",
+        "Detects heuristic patterns (e.g., SSO as enterprise signal, mobile requests without retention data)",
+        "Checks for anti-patterns (feature parity, HiPPO influence)"
+      ],
+      "quality_gates": [
+        "All 6 items scored across Reach, Impact, Confidence, Effort",
+        "Each score has a justification (not just a number)",
+        "Final ranking is internally consistent with the scores",
+        "Cut line is explicit with reasoning for the boundary",
+        "Assumptions section lists >= 3 key assumptions",
+        "Sensitivity analysis identifies items that would change rank with 20% score shifts",
+        "At least one item flagged for low confidence with recommendation to gather more data",
+        "Evidence from context (feature requests, churn, revenue) is referenced in scoring"
+      ]
+    },
+    {
+      "id": "launch-readiness-checklist",
+      "query": "Create a launch readiness checklist for our new team permissions system that adds role-based access control (RBAC) to the platform",
+      "context": {
+        "product": "B2B SaaS collaboration platform",
+        "feature": "RBAC with custom roles, permission inheritance, and audit logging",
+        "launch_date": "2026-04-15",
+        "users_affected": "All 5,000 active workspaces will be migrated",
+        "risks": [
+          "Existing permissions may change for some users during migration",
+          "Custom integrations via API may break if permission checks change",
+          "Support team has never handled RBAC-related tickets"
+        ]
+      },
+      "expected_behaviors": [
+        "Covers all required gate domains: product quality, engineering stability, support readiness, marketing, legal/compliance, analytics",
+        "Each gate has status, owner, evidence, and blockers",
+        "Addresses migration-specific risks (data migration, backward compatibility)",
+        "Includes rollback criteria and plan",
+        "Defines post-launch monitoring schedule",
+        "Includes communication plan for affected users",
+        "Addresses API backward compatibility for integrations",
+        "Applies context adaptation for enterprise and B2B signals",
+        "References cross-agent handoffs (engineering for stability, support for readiness, marketing for comms)"
+      ],
+      "quality_gates": [
+        "All 6 gate domains present with at least 2 items each",
+        "Every gate item has status (green/yellow/red), owner, and evidence",
+        "Go/no-go recommendation present with risk summary",
+        "Rollback criteria are specific and measurable (not 'if things go wrong')",
+        "Post-launch plan includes first review date and success criteria",
+        "Migration plan addresses existing user permissions",
+        "API backward compatibility addressed explicitly",
+        "Support readiness includes FAQ, escalation paths, and team briefing status",
+        "Analytics gate confirms tracking is implemented and dashboards are live"
       ]
     }
   ],
@@ -78,17 +190,29 @@
       "Vague success metrics without numbers",
       "No technical requirements section",
       "User stories missing 'so that' benefit",
-      "No validation before completing"
+      "No validation before completing",
+      "Solution-first problem statements",
+      "No consideration of product stage or context",
+      "No reference to prior learnings or decisions",
+      "Competitive analysis is a feature list without strategic implications",
+      "Prioritization is gut-feel without a framework",
+      "Launch checklist misses support readiness and analytics"
     ],
-    "pass_rate": "40%"
+    "pass_rate": "30%"
   },
   "target_with_skill": {
     "expected_pass_rate": "95%",
     "key_improvements": [
-      "Structured output following template",
+      "Structured output following template for all artifact types",
       "Validation gate enforcement",
-      "Measurable metrics with baselines",
-      "Complete acceptance criteria coverage"
+      "Measurable metrics with baselines and health-check pairs",
+      "Complete acceptance criteria coverage",
+      "Product thinking checklist applied consistently",
+      "Context adaptation protocol adjusts artifact depth and focus",
+      "Flywheel learnings checked before drafting and submitted after",
+      "Cross-agent handoff contracts complete",
+      "Frameworks applied appropriately, not just referenced",
+      "Anti-patterns detected and flagged"
     ]
   }
 }

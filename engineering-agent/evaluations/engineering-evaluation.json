@@ -1,7 +1,7 @@
 {
   "evaluation_id": "engineering-agent-001",
   "skill": "orgx-engineering-agent",
-  "description": "Evaluate RFC, code review, and technical documentation quality",
+  "description": "Evaluate RFC, code review, technical documentation, tech debt inventory, and migration playbook quality",
   "scenarios": [
     {
       "id": "rfc-database-migration",
@@ -18,7 +18,9 @@
         "Documents at least 2 alternatives (Aurora Global, Spanner, etc.)",
         "Has rollback plan for each phase",
         "Identifies data consistency risks",
-        "Includes latency benchmarks in success metrics"
+        "Includes latency benchmarks in success metrics",
+        "Applies CAP theorem analysis to the tradeoff",
+        "References DORA impact of the migration process"
       ],
       "quality_gates": [
         "validate_engineering.py returns exit code 0",
@@ -26,7 +28,9 @@
         "Alternatives >= 2 with pros/cons/why_not",
         "Migration plan has rollback for each phase",
         "Risks >= 2 with mitigations",
-        "Success metrics include latency targets"
+        "Success metrics include latency targets",
+        "Security considerations reference STRIDE categories",
+        "RFC Thinking Checklist items addressed"
       ]
     },
     {
@@ -44,14 +48,16 @@
         "Reviews rate limiting on auth endpoints",
         "Checks for proper error handling (no info leakage)",
         "Validates test coverage for auth flows",
-        "Provides specific line comments"
+        "Provides specific line comments",
+        "Maps security findings to STRIDE categories"
       ],
       "quality_gates": [
         "Security review section present",
         "OWASP considerations documented",
         "Test coverage assessment included",
         "Comments reference specific files/lines",
-        "Verdict is justified"
+        "Verdict is justified",
+        "Reading order provided for 450-line PR"
       ]
     },
     {
@@ -69,14 +75,16 @@
         "Quantifies customer impact",
         "Proposes action items with owners",
         "Includes lessons learned",
-        "No blame, focuses on systems"
+        "No blame, focuses on systems",
+        "Notes DORA metrics impact (MTTR, change failure rate)"
       ],
       "quality_gates": [
         "Timeline has >= 5 events with timestamps",
         "Root cause >= 100 chars",
         "Impact is quantified",
         "Action items >= 3 with owners",
-        "Lessons learned >= 2"
+        "Lessons learned >= 2",
+        "DORA impact section present"
       ]
     },
     {
@@ -100,6 +108,81 @@
         "Decision >= 50 chars",
         "Consequences >= 2"
       ]
+    },
+    {
+      "id": "tech-debt-inventory-payment-service",
+      "query": "Create a tech debt inventory for our payment processing service. It's a 3-year-old Node.js service with Express, Knex ORM, and Stripe integration. The test suite takes 25 minutes, there are 6 known flaky tests, the Stripe SDK is 2 major versions behind, error handling is inconsistent (mix of try/catch and .catch() with some unhandled promise rejections), and there's a hand-rolled retry mechanism that doesn't implement exponential backoff. The service handles $2M/month in transactions.",
+      "context": {
+        "service": "payment-service",
+        "language": "Node.js 16 (EOL)",
+        "framework": "Express 4.x",
+        "database": "PostgreSQL via Knex",
+        "monthly_volume": "$2M in transactions",
+        "team_size": 3,
+        "incident_history": "2 P2 incidents in past quarter related to retry storms",
+        "test_suite_duration": "25 minutes",
+        "flaky_tests": 6,
+        "stripe_sdk_version": "2 major versions behind"
+      },
+      "expected_behaviors": [
+        "Identifies Node.js 16 EOL as a critical severity item",
+        "Flags outdated Stripe SDK with CVE risk assessment",
+        "Quantifies test suite slowness impact on developer feedback loop",
+        "Identifies hand-rolled retry as architecture debt with incident correlation",
+        "Assigns interest rates reflecting compounding risk for financial service",
+        "Produces prioritized top-5 backlog ranked by impact/effort",
+        "Calculates total remediation cost in person-weeks",
+        "Recommends sprint capacity allocation for debt reduction",
+        "Links each item to concrete evidence (incidents, metrics, code)"
+      ],
+      "quality_gates": [
+        "validate_engineering.py returns exit code 0 for tech-debt type",
+        "All items have severity, effort_estimate, blast_radius, and interest_rate",
+        "prioritized_backlog has exactly 5 items with rationale",
+        "total_estimated_cost is present and expressed in person-weeks",
+        "recommended_budget percentage is between 15-25%",
+        "Critical items include Node.js EOL and retry mechanism",
+        "Evidence field links to specific incidents or metrics for each item",
+        "Categories span at least 3 of the 6 allowed categories"
+      ]
+    },
+    {
+      "id": "migration-playbook-monolith-extraction",
+      "query": "Create a migration playbook for extracting the notification subsystem from our Rails monolith into a standalone service. The monolith handles 500 requests/second, the notification subsystem sends 50,000 emails and 20,000 push notifications daily, and it currently shares the monolith's PostgreSQL database with direct table access to users, preferences, and notification_logs tables. We have 4 engineers and a 3-month timeline. The team has never done a service extraction before.",
+      "context": {
+        "source": "Rails monolith, 200K lines of code, 8 years old",
+        "target": "Standalone notification service (language TBD)",
+        "notification_volume": "50,000 emails + 20,000 push notifications daily",
+        "shared_tables": ["users", "preferences", "notification_logs"],
+        "monolith_traffic": "500 rps",
+        "team_size": 4,
+        "timeline": "3 months",
+        "team_experience": "No prior service extractions",
+        "current_issues": "Notification queue blocking web requests, email delivery latency spikes during peak traffic"
+      },
+      "expected_behaviors": [
+        "Recommends strangler fig pattern over big-bang given team inexperience",
+        "Identifies shared database as the primary coupling risk",
+        "Proposes API contract between monolith and new service for user/preference data",
+        "Phases the migration with independent rollback per phase",
+        "Includes a data migration plan for notification_logs table",
+        "Defines feature flags to control traffic routing during migration",
+        "Addresses the team's inexperience with service extractions explicitly",
+        "Includes communication plan for stakeholders dependent on notifications",
+        "Evaluates at least 2 technology options for the new service",
+        "Defines verification criteria proving the extraction is complete and correct"
+      ],
+      "quality_gates": [
+        "validate_engineering.py returns exit code 0 for migration type",
+        "Strategy is 'strangler-fig' (justified given context)",
+        "At least 3 phases with rollback_trigger and rollback_procedure per phase",
+        "data_migration_plan includes strategy, volume, duration, and consistency verification",
+        "feature_flags are defined for controlling migration phases",
+        "risk_matrix has at least 4 risks with probability, impact, and mitigation",
+        "verification_criteria include both functional and performance validation",
+        "communication_plan addresses downstream stakeholders",
+        "Conway's Law considered: does the team structure support owning a separate service?"
+      ]
     }
   ],
   "baseline_without_skill": {
@@ -109,7 +192,10 @@
       "Migration plans without rollback strategies",
       "Code reviews missing security analysis",
       "Post-mortems without quantified impact",
-      "No validation before completing"
+      "No validation before completing",
+      "Tech debt inventories that are just lists without prioritization",
+      "Migration playbooks without data migration plans",
+      "No framework-based analysis (STRIDE, DORA, CAP)"
     ],
     "pass_rate": "30%"
   },
@@ -118,9 +204,14 @@
     "key_improvements": [
       "Data-driven problem statements",
       "Comprehensive alternative analysis",
-      "Security-first code reviews",
-      "Blameless post-mortems with action items",
-      "Validation gate enforcement"
+      "Security-first code reviews with STRIDE mapping",
+      "Blameless post-mortems with action items and DORA correlation",
+      "Validation gate enforcement",
+      "Framework-informed analysis (DORA, STRIDE, CAP, Conway's Law)",
+      "Prioritized tech debt with compounding risk assessment",
+      "Phased migration playbooks with independent rollback per phase",
+      "Cross-agent handoff quality gates satisfied",
+      "Flywheel learning integration (retrieve before, submit after)"
     ]
   }
 }

@@ -1,7 +1,7 @@
 {
   "evaluation_id": "marketing-agent-001",
   "skill": "orgx-marketing-agent",
-  "description": "Evaluate campaign brief and content generation quality",
+  "description": "Evaluate campaign brief, content generation, positioning, and launch planning quality",
   "scenarios": [
     {
       "id": "campaign-product-launch",
@@ -20,7 +20,9 @@
         "Specifies channels appropriate for enterprise (LinkedIn, email, webinar)",
         "Includes measurable success metrics with baselines",
         "Defines testable hypotheses",
-        "Runs validation script before completing"
+        "Runs validation script before completing",
+        "Cites at least one framework from Domain Expertise Canon",
+        "Runs context adaptation protocol and identifies Enterprise GTM signals"
       ],
       "quality_gates": [
         "validate_marketing.py returns exit code 0",
@@ -28,7 +30,8 @@
         "Target audience has company size and pain points",
         "Messaging pillars >= 3 with proof points",
         "Success metrics >= 3 with numeric targets",
-        "Timeline has >= 4 milestones"
+        "Timeline has >= 4 milestones",
+        "Marketing thinking checklist is referenced or completed"
       ]
     },
     {
@@ -44,7 +47,9 @@
         "Twitter content is thread format (numbered)",
         "Email has compelling subject line and clear CTA",
         "All content aligned to startup CTO pain points",
-        "Each piece has distinct CTA appropriate to channel"
+        "Each piece has distinct CTA appropriate to channel",
+        "Context adaptation identifies Growth stage / Developer audience signals",
+        "Applies PAS or AIDA framework to structure copy"
       ],
       "quality_gates": [
         "Content items >= 3 for specified channels",
@@ -68,7 +73,9 @@
         "Progression from education to urgency over sequence",
         "Includes personalization variables ({{first_name}}, {{project_name}})",
         "Each email has single, clear CTA",
-        "Final emails include urgency (trial ending)"
+        "Final emails include urgency (trial ending)",
+        "Maps sequence to Hook Model stages (trigger, action, reward, investment)",
+        "References AARRR framework to identify activation as the bottleneck"
       ],
       "quality_gates": [
         "Emails >= 5",
@@ -96,13 +103,108 @@
         "Objection handlers for common Salesforce advantages",
         "Specific landmine questions to set",
         "Proof points with customer examples",
-        "Win strategies tailored to mid-market"
+        "Win strategies tailored to mid-market",
+        "Acknowledges at least one genuine Salesforce strength",
+        "Includes trap questions that expose Salesforce weakness in mid-market context"
       ],
       "quality_gates": [
         "Differentiation points >= 3",
         "Objection handlers >= 4",
         "Landmine questions >= 3",
-        "Includes win/loss insights"
+        "Includes win/loss insights",
+        "Acknowledges at least one competitor strength (no one-sided narratives)"
+      ]
+    },
+    {
+      "id": "positioning-document",
+      "query": "Create a positioning document for an AI-powered code review tool targeting engineering leaders at mid-stage startups",
+      "context": {
+        "product": "AI code review assistant that learns team patterns",
+        "target_market": "Engineering leaders at Series B-D startups (50-500 engineers)",
+        "competitive_alternatives": ["GitHub Copilot", "Manual code review", "Linters and static analysis"],
+        "unique_capabilities": [
+          "Learns team-specific coding patterns and conventions",
+          "Identifies architectural drift across PRs",
+          "Reduces review cycle time from days to hours"
+        ],
+        "proof_points": [
+          "3 design partners reduced review time by 60%",
+          "One customer caught 12 architectural violations in first week",
+          "NPS of 72 among beta users"
+        ],
+        "company_stage": "Series A, 18 months post-founding"
+      },
+      "expected_behaviors": [
+        "Applies April Dunford positioning framework (competitive alternatives, unique attributes, value, best-fit customers, market category)",
+        "Defines competitive alternatives from the customer's perspective, not the company's",
+        "Maps unique attributes to customer outcomes, not features",
+        "Specifies best-fit customers with triggering events and current workarounds",
+        "Chooses market category type (existing, adjacent, or new) with rationale",
+        "Includes proof points with type classification (customer, data, analyst, award)",
+        "Defines 3-5 messaging pillars each backed by specific proof",
+        "Runs context adaptation protocol and identifies Pre-PMF to Growth stage transition",
+        "Queries org memory for prior positioning and competitive intelligence",
+        "Passes the 'so what?' test -- every attribute connects to a customer outcome"
+      ],
+      "quality_gates": [
+        "competitive_alternatives has >= 3 entries",
+        "unique_attributes has >= 3 entries",
+        "value_proposition is outcome-focused, not feature-focused",
+        "best_fit_customers includes triggering_event and current_workaround",
+        "market_category includes category_type with rationale",
+        "proof_points has >= 3 entries with type classification",
+        "messaging_pillars has 3-5 entries each with headline, supporting_copy, and proof",
+        "No unsubstantiated superlatives (industry-leading, best-in-class without data)",
+        "April Dunford framework is explicitly cited as the structural foundation"
+      ]
+    },
+    {
+      "id": "launch-plan-tier-1",
+      "query": "Create a Tier 1 launch plan for our platform rebrand and new enterprise product line",
+      "context": {
+        "product": "Developer productivity platform rebranding from DevBoost to Velocity",
+        "launch_type": "Rebrand + new enterprise tier",
+        "target_audiences": [
+          "Existing customers (migration)",
+          "Enterprise prospects (new acquisition)",
+          "Developer community (brand awareness)"
+        ],
+        "budget": "$200,000",
+        "timeline": "12 weeks total (4 week tease, launch day, 8 week activation)",
+        "constraints": [
+          "Must not disrupt existing customer workflows",
+          "Enterprise tier requires analyst validation",
+          "Developer community is skeptical of enterprise pivots"
+        ]
+      },
+      "expected_behaviors": [
+        "Classifies as Tier 1 launch (rebrand + new product line)",
+        "Includes all four phases: tease, announce, activate, sustain",
+        "Specifies >= 5 channels with distinct roles, timing, owners, and budgets",
+        "Includes enablement materials (internal FAQ, customer FAQ, demo script, objection handlers)",
+        "Defines success metrics by phase (tease, announce, activate, sustain)",
+        "Includes contingency plan for each phase",
+        "Includes rollback criteria",
+        "Addresses the three distinct audiences with tailored messaging per audience",
+        "Applies Category Design framework for the rebrand narrative",
+        "Applies StoryBrand framework for the brand narrative arc",
+        "Identifies analyst brief as a prerequisite and hands off to analyst-brief artifact",
+        "Addresses the developer community skepticism constraint explicitly",
+        "Runs context adaptation protocol and identifies Enterprise GTM + Developer audience signals",
+        "Queries org memory for prior brand assets and customer communication templates"
+      ],
+      "quality_gates": [
+        "launch_tier is 1-Major",
+        "timeline includes tease, announce, activate, and sustain phases",
+        "channels >= 5 with name, content_description, timing, owner, and budget",
+        "enablement_materials includes internal_faq, customer_facing_faq, demo_script, and objection_handlers",
+        "success_metrics defined for each phase",
+        "contingency_plan is present and actionable",
+        "rollback_criteria is defined with specific thresholds",
+        "Budget breakdown sums to <= $200,000",
+        "At least two frameworks from Domain Expertise Canon are cited",
+        "Cross-agent handoffs identified (design-agent for visual rebrand, sales-agent for enablement, analyst-brief for analyst relations)",
+        "30/60/90-day sustain plan is present (no Launch and Abandon anti-pattern)"
       ]
     }
   ],
@@ -113,7 +215,11 @@
       "Missing messaging pillars or proof points",
       "Same content copy-pasted across channels",
       "No CTAs or weak CTAs",
-      "No validation before completing"
+      "No validation before completing",
+      "Positioning based on features rather than customer outcomes",
+      "Launch plans missing sustain phase",
+      "No framework application -- pure intuition",
+      "No competitive context or one-sided narratives"
     ],
     "pass_rate": "35%"
   },
@@ -124,7 +230,12 @@
       "Detailed ICP with pain points and triggers",
       "Channel-appropriate content formatting",
       "Validation gate enforcement",
-      "Measurable hypotheses included"
+      "Measurable hypotheses included",
+      "Framework-backed strategic reasoning",
+      "Context-adapted artifact generation",
+      "Cross-agent handoff awareness",
+      "Flywheel learning integration",
+      "Honest competitive analysis"
     ]
   }
 }
