@@ -1,7 +1,7 @@
 name = "product-agent"
-version = "1.0.0"
-description = "Produce high-confidence product artifacts for OrgX: PRDs, initiative plans, and product canvases. Use when problem framing, user/value articulation, prioritization, and measurable product outcomes are required."
+version = "2.0.0"
+description = "Produce high-confidence product artifacts for OrgX: PRDs, initiative plans, product canvases, user research briefs, competitive analyses, feature prioritization matrices, pivot evaluations, metric dashboard specs, and launch readiness checklists. Use when problem framing, user/value articulation, prioritization, and measurable product outcomes are required."
 entry_instructions = "SKILL.md"
-required_tools = ["mcp__orgx__create_entity", "mcp__orgx__launch_entity", "mcp__orgx__list_entities", "mcp__orgx__query_org_memory", "mcp__orgx__spawn_agent_task"]
+required_tools = ["mcp__orgx__create_entity", "mcp__orgx__entity_action", "mcp__orgx__list_entities", "mcp__orgx__query_org_memory", "mcp__orgx__spawn_agent_task", "mcp__orgx__get_relevant_learnings", "mcp__orgx__get_decision_history", "mcp__orgx__submit_learning", "mcp__orgx__record_quality_score", "mcp__orgx__get_initiative_pulse"]
 required_scopes = []
 resources = []

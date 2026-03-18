@@ -1,0 +1,292 @@
+{
+  "name": "orchestrator-agent-evaluation",
+  "version": "1.0.0",
+  "description": "Evaluation scenarios for the OrgX Orchestrator Agent. Tests initiative planning, delegation quality, cross-domain synthesis, and retrospective generation.",
+  "scenarios": [
+    {
+      "id": "initiative-product-launch",
+      "name": "Cross-Domain Product Launch Initiative",
+      "description": "Plan a product launch initiative that requires coordination across product, engineering, design, marketing, and sales agents. Tests the orchestrator's ability to decompose work, map dependencies, identify critical path, and produce a valid initiative plan.",
+      "trigger": "Plan an initiative to launch the new 'Workspace Analytics Dashboard' feature. The feature lets workspace owners see agent activity, decision history, and outcome metrics in a single view. Target launch: 6 weeks from today. Success metrics: 50% of active workspaces adopt within 30 days, NPS score of 40+ from dashboard users, <2s page load time at p95. Participating agents: product-agent (PRD and user research), engineering-agent (implementation), design-agent (UI/UX), marketing-agent (launch comms and positioning), sales-agent (enablement for enterprise demos).",
+      "expected_artifact_type": "initiative",
+      "evaluation_criteria": [
+        {
+          "criterion": "workstream_count",
+          "description": "Initiative has 3-5 workstreams covering all participating domains",
+          "check": "workstreams array has 3-5 entries with valid agent assignments",
+          "weight": 1.0
+        },
+        {
+          "criterion": "dependency_graph_valid",
+          "description": "Dependencies are explicit, directional, and acyclic",
+          "check": "dependency_graph exists, no circular dependencies detected by cycle check",
+          "weight": 1.0
+        },
+        {
+          "criterion": "critical_path_identified",
+          "description": "The critical path is explicitly identified with total duration",
+          "check": "critical_path field exists with path array and total_duration",
+          "weight": 1.0
+        },
+        {
+          "criterion": "success_metrics_measurable",
+          "description": "All success metrics have numeric targets and measurement methods",
+          "check": "success_metrics array has >=2 entries, each with target and measurement_method",
+          "weight": 1.0
+        },
+        {
+          "criterion": "risks_with_mitigation",
+          "description": "At least 2 risks identified with probability, impact, and mitigation",
+          "check": "risks array has >=2 entries, each with probability, impact, and mitigation fields",
+          "weight": 1.0
+        },
+        {
+          "criterion": "raci_defined",
+          "description": "RACI matrix assigns Accountable for every workstream",
+          "check": "raci field exists with at least one Accountable per workstream",
+          "weight": 0.8
+        },
+        {
+          "criterion": "milestones_have_dates",
+          "description": "Every milestone has a due_date and deliverables list",
+          "check": "all milestones in all workstreams have due_date and non-empty deliverables",
+          "weight": 1.0
+        },
+        {
+          "criterion": "timeline_feasibility",
+          "description": "Timeline fits within 6-week constraint given dependencies",
+          "check": "target_date is within 6 weeks, critical path total_duration does not exceed 6 weeks",
+          "weight": 0.8
+        },
+        {
+          "criterion": "cross_domain_coordination",
+          "description": "Initiative addresses handoff points between agents",
+          "check": "dependency_graph includes cross-domain edges (e.g., design depends on product PRD, engineering depends on design specs)",
+          "weight": 0.8
+        },
+        {
+          "criterion": "validator_passes",
+          "description": "Artifact passes validate_orchestration.py with zero errors",
+          "check": "run validate_orchestration.py --type initiative, exit code 0",
+          "weight": 1.0
+        }
+      ],
+      "minimum_passing_score": 0.8
+    },
+    {
+      "id": "delegation-engineering-workstream",
+      "name": "Engineering Workstream Delegation",
+      "description": "Delegate an engineering workstream to the engineering-agent with full context, acceptance criteria, dependencies, and escalation path. Tests the orchestrator's ability to produce a high-quality delegation that meets the 7-element Delegation Quality Standard.",
+      "trigger": "Delegate the 'Backend API and Data Pipeline' workstream to the engineering-agent for the Workspace Analytics Dashboard initiative. The workstream needs to: build REST API endpoints for agent activity, decision history, and outcome metrics; create a data aggregation pipeline that processes raw events into dashboard-ready views; achieve <200ms p95 API response time. The design-agent will deliver component specs by end of week 2. Marketing-agent needs API documentation by end of week 4 for developer-facing launch content. Deadline: 5 weeks from today with a week 3 checkpoint.",
+      "expected_artifact_type": "delegation",
+      "evaluation_criteria": [
+        {
+          "criterion": "context_complete",
+          "description": "Background explains why the work matters and links to initiative",
+          "check": "context.background is >=50 chars and references the initiative, context.initiative_id is present",
+          "weight": 1.0
+        },
+        {
+          "criterion": "objective_measurable",
+          "description": "Objective states what done looks like in measurable terms",
+          "check": "task.objective includes specific deliverables and measurable criteria (e.g., response time target)",
+          "weight": 1.0
+        },
+        {
+          "criterion": "scope_explicit",
+          "description": "In-scope and out-of-scope are explicitly defined",
+          "check": "task.scope has both in_scope and out_of_scope arrays, out_of_scope items are genuinely tempting scope",
+          "weight": 1.0
+        },
+        {
+          "criterion": "acceptance_criteria_testable",
+          "description": "Acceptance criteria are specific and testable by a machine or process",
+          "check": "quality.acceptance_criteria has >=2 entries, each is a testable condition",
+          "weight": 1.0
+        },
+        {
+          "criterion": "deadline_with_rationale",
+          "description": "Deadline is a specific date with rationale for why that date",
+          "check": "timeline.deadline is a date with accompanying rationale text",
+          "weight": 1.0
+        },
+        {
+          "criterion": "checkpoints_defined",
+          "description": "At least one intermediate checkpoint is defined",
+          "check": "timeline.checkpoints has >=1 entry with date and expected_deliverable",
+          "weight": 1.0
+        },
+        {
+          "criterion": "dependencies_bidirectional",
+          "description": "Both incoming and outgoing dependencies are specified",
+          "check": "dependencies.needs_from_others and dependencies.others_need are both present and non-empty",
+          "weight": 1.0
+        },
+        {
+          "criterion": "escalation_path_clear",
+          "description": "Escalation path specifies who to contact and expected response time",
+          "check": "escalation.path is present with contact, information_to_include, and response_time",
+          "weight": 0.8
+        },
+        {
+          "criterion": "output_format_specified",
+          "description": "Expected output format is clearly defined",
+          "check": "handoff.output_format is present and specific (not just 'document' but 'RFC with implementation plan')",
+          "weight": 0.8
+        },
+        {
+          "criterion": "validator_passes",
+          "description": "Artifact passes validate_orchestration.py with zero errors",
+          "check": "run validate_orchestration.py --type delegation, exit code 0",
+          "weight": 1.0
+        }
+      ],
+      "minimum_passing_score": 0.8
+    },
+    {
+      "id": "synthesis-cross-domain",
+      "name": "Cross-Domain Synthesis Report",
+      "description": "Synthesize outputs from 4 domain agents (product, engineering, design, marketing) into a coherent initiative status with conflict resolution. Tests the orchestrator's ability to identify conflicts, align assumptions, and produce actionable recommendations.",
+      "trigger": "Synthesize the following agent outputs for the Workspace Analytics Dashboard initiative (initiative ID: init-analytics-dash-001):\n\n1. Product Agent delivered a PRD specifying 12 dashboard widgets with real-time updates and a 'custom widget builder' for power users.\n2. Engineering Agent delivered an RFC estimating 8 weeks for the full widget set, noting that real-time updates require WebSocket infrastructure that does not exist yet (adds 2 weeks). They recommend server-sent events as a faster alternative.\n3. Design Agent delivered component specs assuming real-time data updates every 5 seconds, with animations on data change. They note that the custom widget builder needs 3 additional weeks of design work.\n4. Marketing Agent delivered a launch plan targeting the original 6-week date with press coverage already scheduled.\n\nConflicts to resolve: timeline (8+2 weeks engineering vs 6 weeks marketing), scope (custom widget builder adds 3 weeks design + unknown engineering effort), technical approach (WebSocket vs SSE for real-time).",
+      "expected_artifact_type": "synthesis",
+      "evaluation_criteria": [
+        {
+          "criterion": "all_inputs_represented",
+          "description": "All 4 agent inputs are included with summaries",
+          "check": "inputs array has >=4 entries, each with agent, summary, and artifact_ref",
+          "weight": 1.0
+        },
+        {
+          "criterion": "conflicts_identified",
+          "description": "All 3 conflicts are identified and described",
+          "check": "conflicts array has >=3 entries covering timeline, scope, and technical approach",
+          "weight": 1.0
+        },
+        {
+          "criterion": "conflicts_resolved_with_rationale",
+          "description": "Each conflict has a resolution with explicit rationale",
+          "check": "every conflict entry has resolution and rationale fields, rationale references success metrics or constraints",
+          "weight": 1.0
+        },
+        {
+          "criterion": "assumption_alignment",
+          "description": "Assumption discrepancies across agents are identified",
+          "check": "assumption_alignment field lists discrepancies (e.g., product assumed real-time, engineering costed polling)",
+          "weight": 1.0
+        },
+        {
+          "criterion": "synthesis_integrated",
+          "description": "Synthesis is an integrated view, not concatenation of inputs",
+          "check": "synthesis field is >=200 chars and presents a coherent narrative connecting all agent inputs",
+          "weight": 1.0
+        },
+        {
+          "criterion": "recommendations_actionable",
+          "description": "Recommendations have owners and priorities",
+          "check": "recommendations array has >=3 entries, each with owner and priority",
+          "weight": 1.0
+        },
+        {
+          "criterion": "next_steps_assigned",
+          "description": "Next steps specify agent, action, and deadline",
+          "check": "next_steps array has >=2 entries, each with agent, action, and deadline",
+          "weight": 1.0
+        },
+        {
+          "criterion": "quality_assessment_per_input",
+          "description": "Each agent input is assessed against delegation acceptance criteria",
+          "check": "quality_assessment array has entries for each input agent with acceptance criteria evaluation",
+          "weight": 0.8
+        },
+        {
+          "criterion": "tradeoff_explicit",
+          "description": "The synthesis makes tradeoff decisions visible (scope vs timeline vs quality)",
+          "check": "at least one conflict resolution explicitly names what is sacrificed (e.g., custom widget builder deferred to v2)",
+          "weight": 0.8
+        },
+        {
+          "criterion": "validator_passes",
+          "description": "Artifact passes validate_orchestration.py with zero errors",
+          "check": "run validate_orchestration.py --type synthesis, exit code 0",
+          "weight": 1.0
+        }
+      ],
+      "minimum_passing_score": 0.8
+    },
+    {
+      "id": "retrospective-q1-initiative",
+      "name": "Q1 Initiative Retrospective",
+      "description": "Produce a retrospective for a completed Q1 initiative that ran over timeline and under on one success metric. Tests the orchestrator's ability to honestly assess what happened, identify root causes, evaluate agent performance, and generate actionable improvements.",
+      "trigger": "Produce a retrospective for the 'Customer Onboarding Redesign' initiative (initiative ID: init-onboarding-v2-001). Period: January 6 - March 14, 2026 (planned end: February 28).\n\nResults:\n- Success Metric 1 - Onboarding completion rate: Target 80%, Actual 82% (exceeded)\n- Success Metric 2 - Time to first value: Target <5 minutes, Actual 8.2 minutes (missed)\n- Success Metric 3 - Support tickets from new users: Target 30% reduction, Actual 45% reduction (exceeded)\n\nKey events:\n- Product agent delivered PRD on time with strong user evidence.\n- Engineering agent underestimated migration effort by 2x (estimated 2 weeks, took 4).\n- Design agent delivered specs on time but had to revise twice after usability testing revealed issues.\n- Marketing agent launch plan was ready on time but had to be delayed due to engineering delay.\n- The database migration dependency between engineering and operations was discovered late (week 3) and was not in the original plan.\n- Operations agent had to create an emergency runbook for the migration.\n\n5 agents participated: product-agent, engineering-agent, design-agent, marketing-agent, operations-agent.",
+      "expected_artifact_type": "retro",
+      "evaluation_criteria": [
+        {
+          "criterion": "what_went_well_evidenced",
+          "description": "What went well items have evidence backing them",
+          "check": "what_went_well array has >=2 entries, each with observation and evidence",
+          "weight": 1.0
+        },
+        {
+          "criterion": "what_didnt_root_caused",
+          "description": "What didn't go well items have root causes identified",
+          "check": "what_didnt array has >=2 entries, each with observation, root_cause, and contributing_factors",
+          "weight": 1.0
+        },
+        {
+          "criterion": "surprises_captured",
+          "description": "At least one surprise is documented (the hidden database migration dependency)",
+          "check": "surprises array has >=1 entry describing an unpredicted event",
+          "weight": 1.0
+        },
+        {
+          "criterion": "metrics_review_complete",
+          "description": "All 3 success metrics are reviewed with planned vs actual and variance explanation",
+          "check": "metrics_review has 3 entries with metric, target, actual, and variance_explanation",
+          "weight": 1.0
+        },
+        {
+          "criterion": "agent_performance_assessed",
+          "description": "All 5 agents have performance assessments with quality, speed, and collaboration scores",
+          "check": "agent_performance has 5 entries, each with quality_score, speed_score, collaboration_score (1-5), and notes",
+          "weight": 1.0
+        },
+        {
+          "criterion": "action_items_actionable",
+          "description": "Action items have owners, deadlines, and success criteria",
+          "check": "action_items array has >=3 entries, each with action, owner, deadline, and success_criteria",
+          "weight": 1.0
+        },
+        {
+          "criterion": "process_improvements_specific",
+          "description": "Process improvements are specific to orchestration, not generic platitudes",
+          "check": "process_improvements array has >=2 entries with area, current_state, proposed_change, and expected_impact",
+          "weight": 1.0
+        },
+        {
+          "criterion": "coordination_lessons_present",
+          "description": "Coordination-specific lessons are documented",
+          "check": "coordination_lessons array has >=2 entries with specific orchestration patterns to reuse or avoid",
+          "weight": 0.8
+        },
+        {
+          "criterion": "honest_assessment",
+          "description": "The retrospective does not sugarcoat failures or inflate successes",
+          "check": "engineering underestimate is named with 2x factor, hidden dependency is identified as orchestrator failure, missed time-to-value metric is analyzed",
+          "weight": 0.8
+        },
+        {
+          "criterion": "learning_submitted",
+          "description": "The retrospective is paired with flywheel learning submission",
+          "check": "artifact includes reference to submit_learning call or next step to submit coordination learnings",
+          "weight": 0.8
+        }
+      ],
+      "minimum_passing_score": 0.8
+    }
+  ],
+  "scoring": {
+    "method": "weighted_average",
+    "passing_threshold": 0.8,
+    "description": "Each criterion is scored 0 (fail) or 1 (pass), multiplied by its weight, then averaged. A scenario passes if the weighted average meets the minimum_passing_score."
+  }
+}

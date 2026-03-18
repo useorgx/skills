@@ -1,0 +1,205 @@
+{
+  "evaluation_id": "sales-agent-001",
+  "skill": "orgx-sales-agent",
+  "description": "Evaluate sales artifact quality across battlecards, MEDDIC scorecards, territory plans, and win/loss analyses",
+  "scenarios": [
+    {
+      "id": "battlecard-competitor-entry",
+      "query": "Create a competitive battlecard against LinearB for engineering teams evaluating developer productivity platforms. We are positioned in mid-market B2B SaaS companies with 50-500 engineers.",
+      "context": {
+        "competitor": "LinearB",
+        "segment": "mid-market",
+        "our_product": "AI-powered engineering intelligence platform",
+        "our_strengths": [
+          "Deeper AI-driven insights beyond DORA metrics",
+          "Initiative-level orchestration across teams",
+          "Autonomous agent execution, not just dashboards"
+        ],
+        "competitor_strengths": [
+          "Established market presence in developer productivity",
+          "Strong DORA metrics tracking",
+          "Git-based workflow analytics"
+        ],
+        "recent_losses": "Lost 2 deals in Q4 where LinearB was incumbent. Buyers cited 'simpler setup' and 'team already knows the tool.'"
+      },
+      "expected_behaviors": [
+        "Differentiates on business outcomes, not just feature comparison",
+        "Addresses 'simpler setup' objection with specific counter (time-to-value data)",
+        "Includes landmine questions that expose LinearB limitations",
+        "Provides a 60-second talk track a rep can use immediately",
+        "Incorporates recent loss learnings into win strategies",
+        "Separates enterprise vs. mid-market positioning advice",
+        "Competitive pricing context is realistic, not dismissive"
+      ],
+      "quality_gates": [
+        "validate_sales.py returns exit code 0",
+        "quick_summary >= 100 characters",
+        "differentiation >= 3 with proof for each",
+        "objection_handlers >= 4 with specific responses",
+        "landmines >= 3 framed as questions to ask the prospect",
+        "win_strategies >= 2 tied to specific buyer personas",
+        "talk_track is present and under 200 words",
+        "No generic claims without evidence or confidence level"
+      ]
+    },
+    {
+      "id": "meddic-enterprise-deal",
+      "query": "Score this enterprise deal using MEDDIC and identify the three biggest gaps threatening close. Deal: Acme Corp, $480K ACV, currently in Technical Evaluation stage, expected close in 6 weeks. Our champion is the VP of Engineering. Economic buyer is the CTO but we have not met them. They are also evaluating one competitor. Security review has not started.",
+      "context": {
+        "deal_name": "Acme Corp Platform Consolidation",
+        "deal_value": 480000,
+        "stage": "Technical Evaluation",
+        "segment": "enterprise",
+        "close_date": "2026-04-30",
+        "champion": "VP of Engineering, Sarah Chen",
+        "economic_buyer": "CTO, unknown name, not yet engaged",
+        "competitor": "Competitor X, unknown details",
+        "pain": "Engineering team velocity has dropped 30% due to tool sprawl",
+        "decision_criteria": "Unknown formal criteria",
+        "security_review": "Not started",
+        "team_size": "200 engineers across 4 offices"
+      },
+      "expected_behaviors": [
+        "Scores each MEDDIC element 1-5 with evidence for each score",
+        "Flags economic buyer gap as critical (score 1-2)",
+        "Flags decision process gap due to missing security review timeline",
+        "Questions whether VP of Engineering is a true champion or just a contact",
+        "Identifies that 6-week close target is unrealistic given security review not started",
+        "Provides specific coaching questions for the manager to ask the rep",
+        "Recommends multi-threading beyond the VP of Engineering",
+        "Each next step has an owner and due date"
+      ],
+      "quality_gates": [
+        "validate_sales.py returns exit code 0",
+        "All 6 MEDDIC elements scored 1-5 with evidence",
+        "At least 2 elements have non-empty gaps",
+        "next_steps >= 2 with owner and due_date",
+        "risk_level is 'high' given the gaps described",
+        "coaching_notes present and specific to this deal",
+        "deal_velocity assessment is present",
+        "Close date realism is addressed"
+      ]
+    },
+    {
+      "id": "territory-plan-q2",
+      "query": "Build a Q2 territory plan for the West Coast mid-market segment. Quota is $1.2M. Current pipeline is $800K. We have 2 reps and 1 SDR. Average deal size is $60K. Win rate is 25%. Average cycle is 75 days.",
+      "context": {
+        "territory": "West Coast US",
+        "segment": "mid-market",
+        "quota": 1200000,
+        "current_pipeline": 800000,
+        "team": {
+          "account_executives": 2,
+          "sdrs": 1
+        },
+        "metrics": {
+          "avg_deal_size": 60000,
+          "win_rate": 0.25,
+          "avg_cycle_days": 75,
+          "meetings_to_opportunity_rate": 0.30
+        },
+        "verticals": ["SaaS", "Fintech", "Healthcare Tech"],
+        "q1_results": {
+          "closed_won": 280000,
+          "pipeline_generated": 950000,
+          "meetings_booked": 45
+        }
+      },
+      "expected_behaviors": [
+        "Calculates required pipeline from quota, win rate, and cycle length",
+        "Identifies pipeline gap ($1.2M / 25% = $4.8M needed, have $800K = $4M gap)",
+        "Tiers accounts into T1/T2/T3 with specific criteria",
+        "Allocates SDR and AE time across tiers realistically",
+        "Defines specific plays per tier with expected pipeline contribution",
+        "Sets quarterly targets that math checks against the inputs",
+        "Flags if the plan is achievable with current resources (it likely isn't)",
+        "Recommends actions to close the gap (increase win rate, increase deal size, more pipeline)",
+        "Includes tracking cadence and review rhythm"
+      ],
+      "quality_gates": [
+        "validate_sales.py returns exit code 0",
+        "territory_definition is specific to West Coast mid-market",
+        "market_sizing includes TAM, SAM, and target_accounts",
+        "account_tiers has 3 tiers with criteria and counts",
+        "plays >= 2 with activities, timeline, and expected_pipeline",
+        "quarterly_targets include pipeline_generation and closed_won",
+        "Math is internally consistent (pipeline needed vs. generated)",
+        "resource_allocation is realistic for 2 AEs + 1 SDR",
+        "Plan acknowledges gap or risk if numbers don't add up"
+      ]
+    },
+    {
+      "id": "win-loss-lost-deal",
+      "query": "Conduct a win/loss analysis for the TechNova deal we lost. $180K ACV, 90-day cycle, lost to Competitor Z. Our champion left the company mid-deal. The new stakeholder had a prior relationship with Competitor Z's team. We had strong technical evaluation scores but lost on 'strategic partnership' narrative.",
+      "context": {
+        "deal_name": "TechNova Digital Transformation",
+        "outcome": "lost",
+        "deal_value": 180000,
+        "segment": "mid-market",
+        "cycle_length_days": 90,
+        "competitor": "Competitor Z",
+        "timeline": [
+          { "date": "2025-12-01", "event": "Initial discovery call with VP Eng (champion)" },
+          { "date": "2025-12-15", "event": "Technical demo, strong positive feedback" },
+          { "date": "2026-01-10", "event": "POC started, 3 engineers assigned" },
+          { "date": "2026-01-20", "event": "VP Eng (champion) leaves company" },
+          { "date": "2026-01-25", "event": "New VP Eng introduced, has relationship with Competitor Z" },
+          { "date": "2026-02-01", "event": "Competitor Z brought in for evaluation" },
+          { "date": "2026-02-15", "event": "Business review meeting, 'strategic partnership' language from new VP" },
+          { "date": "2026-02-28", "event": "Lost - chose Competitor Z" }
+        ],
+        "what_we_heard": "Your product scored highest in technical evaluation but we decided to go with a strategic partner who can grow with us."
+      },
+      "expected_behaviors": [
+        "Identifies single-threading as the root cause vulnerability",
+        "Analyzes the champion departure as the deal-breaking event",
+        "Recognizes 'strategic partnership' as relationship-based decision, not technical",
+        "Recommends multi-threading strategy for future deals",
+        "Recommends executive-level engagement earlier in cycle",
+        "Provides specific competitive insights about Competitor Z's relationship selling",
+        "Extracts actionable recommendations, not just observations",
+        "Acknowledges what worked (technical evaluation) for future leverage",
+        "Product feedback section captures the positive technical eval"
+      ],
+      "quality_gates": [
+        "validate_sales.py returns exit code 0",
+        "outcome is 'lost' with primary_reason >= 100 characters",
+        "buying_process_timeline has key events with dates",
+        "what_worked >= 2 specific items",
+        "what_didnt >= 2 specific items",
+        "stakeholder_analysis identifies champion departure impact",
+        "competitive_insights captures relationship-based selling",
+        "recommendations >= 3, each actionable and specific",
+        "No blame language; focuses on systemic improvements"
+      ]
+    }
+  ],
+  "baseline_without_skill": {
+    "common_failures": [
+      "Battlecards list features instead of differentiating on outcomes",
+      "MEDDIC scores assigned without evidence or gap analysis",
+      "Territory plans without math (pipeline needed vs. generated)",
+      "Win/loss analyses describe what happened without extracting lessons",
+      "No objection handlers, just generic 'we're better' claims",
+      "Missing competitive context and pricing positioning",
+      "Proposals without ROI models or business case math",
+      "No stakeholder analysis in deal reviews",
+      "No validation before completing artifact"
+    ],
+    "pass_rate": "25%"
+  },
+  "target_with_skill": {
+    "expected_pass_rate": "90%",
+    "key_improvements": [
+      "Evidence-backed differentiation with proof points",
+      "MEDDIC scoring with gap analysis and coaching notes",
+      "Territory plans with internally consistent math",
+      "Win/loss analyses with systemic recommendations",
+      "Objection handlers with specific talk tracks",
+      "ROI models with explicit assumptions",
+      "Stakeholder mapping in every deal artifact",
+      "Validation gate enforcement before delivery",
+      "Flywheel learning integration for continuous improvement"
+    ]
+  }
+}
