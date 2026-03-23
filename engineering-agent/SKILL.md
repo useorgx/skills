@@ -13,7 +13,7 @@ description: |
 
 1. Confirm the artifact or decision type and the target audience.
 2. Pull OrgX context with `mcp__orgx__list_entities` and `mcp__orgx__query_org_memory`.
-3. Retrieve relevant learnings with `mcp__orgx__get_relevant_learnings` and decision history with `mcp__orgx__get_decision_history`.
+3. Retrieve relevant learnings with `mcp__orgx__get_relevant_learnings` and prior decisions with `mcp__orgx__query_org_memory` scoped to decisions.
 4. Assess the org context (stage, team topology, reliability maturity) and adapt formality accordingly.
 5. Produce the artifact using the contract below and return:
    - A concise summary (3-6 bullets)
@@ -175,7 +175,7 @@ Declare assumptions explicitly if data is missing. Never fabricate metrics or in
 2. Assess org context using the Context Adaptation Protocol.
 3. Retrieve learnings and precedent:
    - `mcp__orgx__get_relevant_learnings` for engineering domain insights
-   - `mcp__orgx__get_decision_history` for related architecture decisions
+   - `mcp__orgx__query_org_memory` with `scope: "decisions"` for related architecture decisions
    - `mcp__orgx__query_org_memory` for organizational precedent
 4. Gather evidence:
    - `mcp__github__*` for code, PR, and repository evidence
@@ -429,7 +429,7 @@ If any of these five elements is missing from an incoming handoff, request clari
 ### Before Drafting
 
 1. Call `mcp__orgx__get_relevant_learnings` scoped to the engineering domain and the specific artifact type. Look for patterns like "previous RFCs for this service underestimated migration effort by 2x" or "this team prefers ADRs over RFCs for decisions under 1 week of work."
-2. Call `mcp__orgx__get_decision_history` filtered to related architecture areas. Check for superseded ADRs, rejected RFC alternatives that are relevant again, and postmortem action items that should constrain new designs.
+2. Call `mcp__orgx__query_org_memory` with `scope: "decisions"` and a query covering the related architecture area. Check for superseded ADRs, rejected RFC alternatives that are relevant again, and postmortem action items that should constrain new designs.
 3. Apply learnings as explicit constraints or confidence adjustments. If a learning says "database migrations for this service historically take 3x the estimate," note that in the risk section and adjust effort estimates accordingly.
 
 ### After Completion
@@ -469,7 +469,7 @@ Primary:
 - `mcp__orgx__list_entities` — related work items and initiatives
 - `mcp__orgx__create_entity` — publish completed artifacts
 - `mcp__orgx__get_relevant_learnings` — domain-specific insights from previous work
-- `mcp__orgx__get_decision_history` — prior architecture decisions
+- `mcp__orgx__query_org_memory` — prior architecture decisions and organizational precedent
 - `mcp__orgx__submit_learning` — contribute learnings back to the flywheel
 - `mcp__orgx__record_quality_score` — score artifact quality for continuous improvement
 

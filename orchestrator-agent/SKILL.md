@@ -12,7 +12,7 @@ description: |
 
 1. Confirm the artifact or decision type and the target audience.
 2. Pull OrgX context with `mcp__orgx__list_entities` and `mcp__orgx__query_org_memory`.
-3. Retrieve relevant learnings with `mcp__orgx__get_relevant_learnings` and decision history with `mcp__orgx__get_decision_history`.
+3. Retrieve relevant learnings with `mcp__orgx__get_relevant_learnings` and prior coordination decisions with `mcp__orgx__query_org_memory` scoped to decisions.
 4. Assess the coordination context (number of agents, dependency complexity, time horizon) and adapt formality accordingly.
 5. Produce the artifact using the contract below and return:
    - A concise summary (3-6 bullets)
@@ -164,7 +164,7 @@ If unknown, state assumptions explicitly and request missing owners or dates. Ne
 2. Assess coordination context using the Context Adaptation Protocol.
 3. Retrieve learnings and precedent:
    - `mcp__orgx__get_relevant_learnings` — past coordination patterns for similar initiatives
-   - `mcp__orgx__get_decision_history` — what worked and failed in prior cross-domain work
+   - `mcp__orgx__query_org_memory` with `scope: "decisions"` — what worked and failed in prior cross-domain work
    - `mcp__orgx__query_org_memory` — organizational precedent and norms
 4. Gather baseline context:
    - `mcp__orgx__list_entities` — discover existing initiatives, workstreams, tasks, agents
@@ -441,7 +441,7 @@ The orchestrator's effectiveness compounds over time through systematic learning
 ### Before Orchestrating
 
 1. Call `mcp__orgx__get_relevant_learnings` scoped to the coordination domain and the specific artifact type. Look for patterns like "last quarter's product launch initiative underestimated marketing lead time by 3 weeks" or "engineering-agent estimates for migration work are consistently 1.5x optimistic."
-2. Call `mcp__orgx__get_decision_history` filtered to related initiative types. Check for past coordination decisions that worked or failed.
+2. Call `mcp__orgx__query_org_memory` with `scope: "decisions"` and a query covering related initiative types. Check for past coordination decisions that worked or failed.
 3. Apply calibration factors to all estimates. If historical data shows an agent consistently under-estimates or over-estimates, adjust the plan accordingly. Document the calibration factor so it is transparent.
 
 ### During Execution
@@ -493,7 +493,7 @@ Run the validator script and confirm zero errors. Verify that all spawned tasks 
 - `mcp__orgx__orgx_apply_changeset` — batch state updates (idempotent, transactional)
 - `mcp__orgx__get_initiative_pulse` — understand initiative momentum and blockers
 - `mcp__orgx__get_relevant_learnings` — retrieve past coordination patterns
-- `mcp__orgx__get_decision_history` — retrieve prior coordination decisions
+- `mcp__orgx__query_org_memory` — retrieve prior coordination decisions
 - `mcp__orgx__submit_learning` — contribute coordination insights to the flywheel
 - `mcp__orgx__record_quality_score` — score artifact and agent contribution quality
 - `mcp__orgx__record_outcome` — record milestone outcomes for calibration
@@ -503,7 +503,7 @@ Run the validator script and confirm zero errors. Verify that all spawned tasks 
 - `mcp__linear__list_issues`, `mcp__linear__get_project` — external project management context
 - `mcp__orgx__get_org_snapshot` — high-level organizational health
 - `mcp__orgx__get_scoring_signals` — prioritization signals for next-up queue
-- `mcp__orgx__score_next_up_queue` — update prioritization based on coordination signals
+- `mcp__orgx__recommend_next_action` — update prioritization based on coordination signals
 
 ## Failure Handling
 

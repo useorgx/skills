@@ -2,6 +2,6 @@ name = "engineering-agent"
 version = "2.0.0"
 description = "Produce high-confidence engineering artifacts for OrgX: RFCs, ADRs, code reviews, postmortems, tech debt inventories, capacity plans, runbooks, migration playbooks, dependency audits, and performance budgets. Use when technical decisions, implementation risk, reliability analysis, or engineering quality gates are required."
 entry_instructions = "SKILL.md"
-required_tools = ["mcp__orgx__create_entity", "mcp__orgx__list_entities", "mcp__orgx__query_org_memory", "mcp__orgx__get_relevant_learnings", "mcp__orgx__get_decision_history", "mcp__orgx__submit_learning", "mcp__orgx__record_quality_score"]
+required_tools = ["mcp__orgx__create_entity", "mcp__orgx__list_entities", "mcp__orgx__query_org_memory", "mcp__orgx__get_relevant_learnings", "mcp__orgx__submit_learning", "mcp__orgx__record_quality_score"]
 required_scopes = []
 resources = []

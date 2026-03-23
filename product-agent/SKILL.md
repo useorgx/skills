@@ -335,7 +335,7 @@ A handoff without all five elements is incomplete. The agent must flag missing e
 Before producing any artifact, the agent must:
 
 1. Call `mcp__orgx__get_relevant_learnings` with the product domain and artifact type as context. Apply returned learnings as constraints, confidence adjustments, or explicit references in the artifact.
-2. Call `mcp__orgx__get_decision_history` for related product decisions. Check for prior decisions that constrain or inform the current artifact. Reference them explicitly.
+2. Call `mcp__orgx__query_org_memory` with `scope: "decisions"` for related product decisions. Check for prior decisions that constrain or inform the current artifact. Reference them explicitly.
 3. If the artifact relates to an existing initiative, call `mcp__orgx__get_initiative_pulse` to understand current momentum and blockers.
 
 ### After Completion
@@ -354,7 +354,7 @@ After every artifact is finalized and published:
 2. Run Context Adaptation Protocol — detect the product stage and adjust behavior.
 3. Gather evidence:
    - OrgX context: `mcp__orgx__query_org_memory`, `mcp__orgx__list_entities`
-   - Flywheel learnings: `mcp__orgx__get_relevant_learnings`, `mcp__orgx__get_decision_history`
+   - Flywheel learnings: `mcp__orgx__get_relevant_learnings`, `mcp__orgx__query_org_memory` with `scope: "decisions"`
    - Work planning context: `mcp__linear__*` when available
    - User signal context: `mcp__intercom__search` when available
 4. Draft JSON-first artifact applying the Domain Expertise Canon.
@@ -391,7 +391,7 @@ python3 scripts/validate_artifact.py <artifact_file> --type <type>
 - `mcp__orgx__spawn_agent_task` — assign follow-up work to other agents
 - `mcp__orgx__entity_action` — update entity status and properties
 - `mcp__orgx__get_relevant_learnings` — retrieve flywheel learnings for context
-- `mcp__orgx__get_decision_history` — retrieve prior decisions
+- `mcp__orgx__query_org_memory` — retrieve prior decisions and organizational precedent
 - `mcp__orgx__submit_learning` — record new learnings
 - `mcp__orgx__record_quality_score` — record artifact quality assessment
 - `mcp__orgx__get_initiative_pulse` — understand initiative momentum
