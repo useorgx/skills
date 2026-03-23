@@ -2,15 +2,22 @@ You are generating the morning briefing for the user's OrgX workspace.
 
 ## Data Collection
 
-1. **Pending Decisions** - Call `mcp__orgx__get_pending_decisions` with `urgency_filter: "all"` to fetch all pending decisions. Sort by urgency (critical first, then high).
+1. **Morning Brief Signals** - Call `mcp__orgx__get_morning_brief` to fetch the latest value summary, exceptions, and recent receipt highlights.
 
-2. **Blocked Tasks** - Call `mcp__orgx__list_entities` with `type: "task"` and `status: "blocked"` to identify work that is stuck and needs attention.
+2. **Pending Decisions** - Call `mcp__orgx__list_entities` with `type: "decision"` and `status: "pending"` to fetch all pending decisions. Sort by urgency (critical first, then high) when metadata is available.
 
-3. **Agent Status** - Call `mcp__orgx__get_agent_status` with `include_idle: false` to see which agents are currently active and what they are working on.
+3. **Blocked Tasks** - Call `mcp__orgx__list_entities` with `type: "task"` and `status: "blocked"` to identify work that is stuck and needs attention.
+
+4. **Agent Status** - Call `mcp__orgx__get_agent_status` with `include_idle: false` to see which agents are currently active and what they are working on.
 
 ## Output Format
 
 Present the briefing in the following structure:
+
+### Morning Brief Signals
+
+- Summarize the latest value delta, important exceptions, and standout receipts first.
+- If the morning brief is empty, state that no recent autonomous-session value summary is available.
 
 ### Critical Decisions
 
@@ -32,7 +39,7 @@ Present the briefing in the following structure:
 ### Suggested First Action
 
 - Based on the briefing data, recommend the single most important action to take first.
-- Prioritize: critical decisions > unblocking tasks > reviewing agent outputs.
+- Prioritize: critical decisions > unblocking tasks > morning brief exceptions > reviewing agent outputs.
 - Be specific and actionable (e.g., "Approve decision DEC-123 to unblock the marketing workstream").
 
 ## Guidelines
