@@ -9,14 +9,17 @@ description: |
 
 ## Quick Start
 
-1. Confirm the artifact or decision type and the target audience.
-2. Pull OrgX context with `mcp__orgx__list_entities` and `mcp__orgx__query_org_memory`.
-3. Identify the operational maturity stage (see Context Adaptation Protocol) and calibrate depth.
-4. Produce the artifact using the contract below and return:
+1. Run `mcp__orgx__orgx_bootstrap`, then resolve workspace scope with `mcp__orgx__workspace`.
+2. Confirm the artifact or decision type and the target audience. If the request is task-bound, hydrate it with `mcp__orgx__get_task_with_context`; otherwise map related work with `mcp__orgx__list_entities`.
+3. Pull precedent with `mcp__orgx__query_org_memory` and `mcp__orgx__get_relevant_learnings`.
+4. For playbooks, migrations, or SLO programs, use the planning loop: `mcp__orgx__start_plan_session`, `mcp__orgx__improve_plan`, `mcp__orgx__record_plan_edit`, then `mcp__orgx__complete_plan`.
+5. Identify the operational maturity stage (see Context Adaptation Protocol) and calibrate depth.
+6. Produce the artifact using the contract below and return:
    - A concise summary (3-6 bullets)
    - The artifact body (JSON or structured Markdown)
    - 3 actionable next steps
-5. Run the Precision Loop before publishing.
+7. Run the Precision Loop before publishing.
+8. Attach the result back to the active task or initiative with `mcp__orgx__entity_action` (`action=attach`) or `mcp__orgx__comment_on_entity`, then record quality with `mcp__orgx__record_quality_score`.
 
 Deliver operational artifacts that reduce incident risk, improve response quality, and drive systematic reliability improvement.
 
@@ -173,23 +176,36 @@ When producing any artifact, identify the applicable signals first and adjust ar
 
 ## Operating Workflow
 
-1. Pick `artifact_type` and define success condition.
-2. Identify organizational maturity signals from Context Adaptation Protocol.
-3. Gather evidence:
+1. Run `mcp__orgx__orgx_bootstrap` and resolve workspace with `mcp__orgx__workspace`.
+2. Pick `artifact_type` and define success condition.
+3. Hydrate the active task or parent entity:
+   - `mcp__orgx__get_task_with_context` for task-bound work
+   - `mcp__orgx__list_entities` for surrounding initiatives, milestones, and prior incidents or playbooks
+4. Identify organizational maturity signals from Context Adaptation Protocol.
+5. Gather evidence:
    - OrgX context: `mcp__orgx__query_org_memory`, `mcp__orgx__list_entities`
+   - Prior learnings: `mcp__orgx__get_relevant_learnings`
    - Incident context: PagerDuty/observability tools when available
    - Cost data: cloud provider billing, FinOps tooling
    - Capacity data: APM, load balancer metrics, database metrics
-4. Apply relevant frameworks from Domain Expertise Canon.
-5. Draft JSON-first artifact following the contract for the selected type.
-6. Run the Precision Loop (all 4 passes).
-7. Validate:
+6. For programmatic operational plans, open a plan session with `mcp__orgx__start_plan_session`, refine with `mcp__orgx__improve_plan`, and record major revisions with `mcp__orgx__record_plan_edit`.
+7. Apply relevant frameworks from Domain Expertise Canon.
+8. Draft JSON-first artifact following the contract for the selected type.
+9. Run the Precision Loop (all 4 passes).
+10. Validate:
 
 ```bash
 python3 scripts/validate_ops.py <artifact_file> --type <artifact_type>
 ```
 
-8. Resolve all failed gates, then publish via `mcp__orgx__create_entity`.
+11. Resolve all failed gates, then publish via `mcp__orgx__create_entity`.
+12. Attach proof or conclusions back to the active work:
+    - `mcp__orgx__complete_plan` with `attach_to` for plan sessions
+    - `mcp__orgx__entity_action` with `action=attach` for incidents, SLOs, budgets, and playbooks
+    - `mcp__orgx__comment_on_entity` for reviews or escalation notes
+13. Submit learnings via `mcp__orgx__submit_learning`.
+14. Record measurable outcomes with `mcp__orgx__record_outcome` when the artifact closes a reliability or cost event.
+15. Record artifact quality with `mcp__orgx__record_quality_score`.
 
 ---
 
@@ -533,12 +549,22 @@ Incorporate relevant prior learnings into the artifact. Reference them explicitl
 
 ### Primary
 
+- `mcp__orgx__orgx_bootstrap` — initialize OrgX session scope and recommended workflow
+- `mcp__orgx__workspace` — resolve workspace scope before reading or writing
+- `mcp__orgx__get_task_with_context` — hydrate task-bound context, attachments, and prior plan sessions
 - `mcp__orgx__query_org_memory` — Retrieve organizational context and prior decisions
 - `mcp__orgx__list_entities` — List initiatives, workstreams, tasks, milestones
+- `mcp__orgx__start_plan_session` — open tracked planning sessions for playbooks, migrations, and SLO programs
+- `mcp__orgx__improve_plan` — refine operational plans with historical patterns
+- `mcp__orgx__record_plan_edit` — capture major planning revisions
+- `mcp__orgx__complete_plan` — persist and attach finalized operational plans
 - `mcp__orgx__create_entity` — Publish artifacts and create operational tasks
+- `mcp__orgx__entity_action` — attach evidence and update operational state
+- `mcp__orgx__comment_on_entity` — add operational notes and review feedback to active work
 - `mcp__orgx__update_entity` — Update existing operational entities
 - `mcp__orgx__submit_learning` — Feed findings into the learning loop
 - `mcp__orgx__record_outcome` — Record measurable operational outcomes
+- `mcp__orgx__record_quality_score` — score artifact quality for calibration
 - `mcp__orgx__get_relevant_learnings` — Check for prior learnings before drafting
 
 ### Optional (if configured)

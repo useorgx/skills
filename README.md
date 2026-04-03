@@ -50,6 +50,16 @@ These skills require the [OrgX MCP server](https://mcp.useorgx.com) to be config
 }
 ```
 
+## Verification
+
+Run the repo-level drift check before opening a PR or shipping skill changes:
+
+```bash
+python3 scripts/check_skill_tool_drift.py
+```
+
+The check fails on deprecated OrgX tool names, unknown `mcp__orgx__*` references, and high-value workflow gaps such as spawning without `check_spawn_guard` or opening plan sessions without `complete_plan`.
+
 ## Skill Format
 
 Each skill follows [Anthropic's skill format](https://github.com/anthropics/skills):

@@ -2,39 +2,45 @@
 name: milestone-protocol
 description: |
   Milestone tracking and checkpoint management for OrgX initiatives.
-  Handles milestone creation, progress tracking, risk flagging, and completion.
-  Use when working with initiative milestones and delivery checkpoints.
+  Handles milestone creation, launch, risk flagging, evidence attachment,
+  and completion. Use when working with initiative milestones and delivery
+  checkpoints.
 ---
 
 # Milestone Protocol
 
+Milestones are checkpoints with explicit deliverables. Treat them as proof gates, not status labels.
+
+## Core Loop
+
+1. Bootstrap and confirm workspace with `mcp__orgx__orgx_bootstrap` and `mcp__orgx__workspace`.
+2. Load the parent initiative or workstream with `mcp__orgx__list_entities`.
+3. Create or update the milestone.
+4. Attach evidence as deliverables land.
+5. Verify readiness before completing.
+
 ## Creating Milestones
 
-- Create: `mcp__orgx__create_entity type=milestone`
-- Link to initiative and workstream
-- Define deliverables and due_date
+- Prefer `mcp__orgx__create_milestone` when creating a single checkpoint.
+- Use `mcp__orgx__batch_create_entities` when creating multiple milestones with shared refs.
+- Always link the milestone to its initiative, and workstream when applicable.
+- Include deliverables and `due_date`.
 
 ## Tracking Progress
 
-- Start: `mcp__orgx__launch_entity type=milestone`
-- Check status via `mcp__orgx__list_entities type=milestone`
-- Review linked tasks for completion percentage
+- Start with `mcp__orgx__entity_action type=milestone action=launch`.
+- Inspect status with `mcp__orgx__list_entities type=milestone` or the parent initiative pulse.
+- Use `mcp__orgx__comment_on_entity` for checkpoint notes that should remain visible to operators.
 
 ## Flagging Risk
 
-- If at risk: `mcp__orgx__pause_entity type=milestone`
-- Include reason and mitigation plan
-- Escalate to orchestrator if cross-domain impact
+- Pause with `mcp__orgx__entity_action type=milestone action=pause note="..."`.
+- Include the blocker, mitigation path, and owner.
+- Escalate cross-domain risks through the parent initiative or orchestrator comments, not only in chat.
 
 ## Completing
 
-- Verify all deliverables are met
-- Verify readiness: `mcp__orgx__verify_entity_completion type=milestone`
-- Complete: `mcp__orgx__complete_entity type=milestone`
-- Document what was delivered
-
-## Best Practices
-
-- Milestones are checkpoints, not tasks - they mark meaningful progress
-- Each milestone should have clear, verifiable deliverables
-- Flag risk early rather than missing silently
+1. Verify all milestone deliverables are attached or linked.
+2. Run `mcp__orgx__verify_entity_completion type=milestone`.
+3. Attach proof with `mcp__orgx__entity_action action=attach`.
+4. Complete with `mcp__orgx__entity_action type=milestone action=complete`.

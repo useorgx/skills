@@ -2,6 +2,6 @@ name = "operations-agent"
 version = "2.0.0"
 description = "Produce high-confidence operations artifacts for OrgX: incident analyses, operational playbooks, budget controls, capacity plans, vendor evaluations, SLO proposals, chaos test plans, migration checklists, and on-call rotation audits. Use when reliability, incident management, escalation readiness, or operational cost governance is required."
 entry_instructions = "SKILL.md"
-required_tools = ["mcp__orgx__create_entity", "mcp__orgx__list_entities", "mcp__orgx__query_org_memory", "mcp__orgx__update_entity", "mcp__orgx__submit_learning", "mcp__orgx__record_outcome", "mcp__orgx__get_relevant_learnings"]
+required_tools = ["mcp__orgx__orgx_bootstrap", "mcp__orgx__workspace", "mcp__orgx__get_task_with_context", "mcp__orgx__query_org_memory", "mcp__orgx__list_entities", "mcp__orgx__start_plan_session", "mcp__orgx__improve_plan", "mcp__orgx__record_plan_edit", "mcp__orgx__complete_plan", "mcp__orgx__create_entity", "mcp__orgx__entity_action", "mcp__orgx__comment_on_entity", "mcp__orgx__update_entity", "mcp__orgx__submit_learning", "mcp__orgx__record_outcome", "mcp__orgx__record_quality_score", "mcp__orgx__get_relevant_learnings"]
 required_scopes = []
 resources = ["evaluations/ops-evaluation.json", "examples/incident-analysis.md", "examples/slo-proposal.md", "reference/ops-frameworks-cheatsheet.md", "reference/incident-template.md"]

@@ -1,36 +1,55 @@
 ---
 name: initiative-protocol
 description: |
-  Initiative lifecycle management for OrgX. Handles creation, decomposition
-  into workstreams/streams, launch, monitoring, and completion.
+  Initiative lifecycle management for OrgX. Handles workspace selection,
+  hierarchy scaffolding, launch, monitoring, evidence attachment, and completion.
   Use when planning or managing an OrgX initiative.
 ---
 
 # Initiative Protocol
 
+Use this protocol whenever the user is creating, updating, launching, pausing, or closing an initiative.
+
+## Core Loop
+
+1. Bootstrap the session with `mcp__orgx__orgx_bootstrap`.
+2. Ensure the correct workspace is active with `mcp__orgx__workspace`.
+3. Load the target initiative with `mcp__orgx__list_entities` or `mcp__orgx__get_initiative_pulse`.
+4. Create or update the hierarchy using the highest-level wrapper available.
+5. Attach evidence, plans, and notes back to the initiative before marking it complete.
+
 ## Creating an Initiative
 
-1. Query existing: `mcp__orgx__query_org_memory("initiative [topic]")`
-2. Create: `mcp__orgx__create_entity type=initiative` with title, summary, target_date
-3. Break into 3-5 workstreams by domain
-4. For each workstream, create a stream: `mcp__orgx__create_entity type=stream`
-   - Set agent_domain, depends_on (DAG), auto_continue
-5. Launch: `mcp__orgx__launch_entity type=initiative`
+1. Check for related work:
+   - `mcp__orgx__query_org_memory` for prior initiatives or decisions
+   - `mcp__orgx__list_entities type=initiative` for active duplicates
+2. Prefer `mcp__orgx__scaffold_initiative` when the request includes milestones, workstreams, or starter tasks.
+3. Use `mcp__orgx__create_entity type=initiative` only for a single initiative shell with no nested hierarchy yet.
+4. For follow-on edits, prefer:
+   - `mcp__orgx__create_milestone`
+   - `mcp__orgx__create_task`
+   - `mcp__orgx__batch_create_entities` when creating several related children at once
+5. Launch or pause through `mcp__orgx__entity_action`:
+   - launch: `type=initiative action=launch`
+   - pause: `type=initiative action=pause`
 
 ## Monitoring
 
-- Check health: `mcp__orgx__get_initiative_pulse`
-- Stream state: `mcp__orgx__get_initiative_stream_state`
-- Key metrics: overall_progress, min_confidence, blocked_count, next_completions
+- `mcp__orgx__get_initiative_pulse` for health, blockers, and milestones
+- `mcp__orgx__get_initiative_stream_state` for stream progress and bottlenecks
+- `mcp__orgx__recommend_next_action` when the user asks what to do next
+- `mcp__orgx__comment_on_entity` for status notes that should live on the initiative itself
 
-## Completing
+## Completion
 
-- All streams must be completed first
-- Synthesize outputs from each domain
-- Verify readiness: `mcp__orgx__verify_entity_completion type=initiative`
-- Complete: `mcp__orgx__complete_entity type=initiative`
+1. Confirm all dependent work is done or intentionally deferred.
+2. Run `mcp__orgx__verify_entity_completion type=initiative`.
+3. Attach proof with `mcp__orgx__entity_action action=attach` for plans, docs, URLs, or deliverable artifacts.
+4. If planning happened in OrgX, finish the plan loop with `mcp__orgx__complete_plan attach_to=[...]` so the rationale is attached to the initiative context.
+5. Mark complete with `mcp__orgx__entity_action type=initiative action=complete`.
 
-## Risk Management
+## Risk Handling
 
-- Pause: `mcp__orgx__pause_entity type=initiative` with reason
-- Re-launch after resolving blockers
+- Use `mcp__orgx__entity_action type=initiative action=pause note="..."` for blockers or intentional holds.
+- Use `mcp__orgx__queue_action` or `mcp__orgx__pin_workstream` when the priority problem is sequencing, not state.
+- Use `mcp__orgx__comment_on_entity` instead of burying exceptions in the chat transcript.

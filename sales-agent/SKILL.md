@@ -9,14 +9,17 @@ description: |
 
 ## Quick Start
 
-1. Confirm the artifact or decision type and the target audience.
-2. Pull OrgX context with `mcp__orgx__list_entities` and `mcp__orgx__query_org_memory`.
-3. Adapt behavior to deal segment and motion using the Context Adaptation Protocol below.
-4. Produce the artifact using the contract below and return:
+1. Run `mcp__orgx__orgx_bootstrap`, then resolve workspace scope with `mcp__orgx__workspace`.
+2. Confirm the artifact or decision type and the target audience. If the request is task-bound, hydrate it with `mcp__orgx__get_task_with_context`; otherwise map related deal work with `mcp__orgx__list_entities`.
+3. Pull precedent with `mcp__orgx__query_org_memory` and `mcp__orgx__get_relevant_learnings`.
+4. For deal plans, QBRs, or territory programs, use the planning loop: `mcp__orgx__start_plan_session`, `mcp__orgx__improve_plan`, `mcp__orgx__record_plan_edit`, then `mcp__orgx__complete_plan`.
+5. Adapt behavior to deal segment and motion using the Context Adaptation Protocol below.
+6. Produce the artifact using the contract below and return:
    - A concise summary (3-6 bullets)
    - The artifact body (JSON or structured Markdown)
    - 3 actionable next steps with owners and dates
-5. Run the Precision Loop before finalizing.
+7. Run the Precision Loop before finalizing.
+8. Attach the result back to the active work with `mcp__orgx__entity_action` (`action=attach`) or `mcp__orgx__comment_on_entity`, then record quality with `mcp__orgx__record_quality_score`.
 
 Create revenue-focused sales artifacts that are specific, evidence-backed, and execution-ready.
 Every claim must have proof or an explicit confidence level. Every action must have an owner.
@@ -418,23 +421,34 @@ Before producing any artifact, query learnings via `mcp__orgx__get_relevant_lear
 
 ## Operating Workflow
 
-1. Select `artifact_type`.
-2. Run Context Adaptation Protocol to determine segment, motion, and complexity level.
-3. Gather evidence:
+1. Run `mcp__orgx__orgx_bootstrap` and resolve workspace with `mcp__orgx__workspace`.
+2. Select `artifact_type`.
+3. Hydrate the active task or deal context:
+   - `mcp__orgx__get_task_with_context` for task-bound sales work
+   - `mcp__orgx__list_entities` for related initiatives, prior proposals, and deal artifacts
+4. Run Context Adaptation Protocol to determine segment, motion, and complexity level.
+5. Gather evidence:
    - OrgX historical context via `mcp__orgx__query_org_memory`
    - Recent learnings via `mcp__orgx__get_relevant_learnings`
    - CRM/call context via `mcp__salesforce__*` and `mcp__gong__*` when available
-4. Apply relevant frameworks from the Domain Expertise Canon.
-5. Draft JSON-first artifact per the contract above.
-6. Run Precision Loop (below).
-7. Validate:
+6. For sequences, account plans, or QBRs, open a plan session with `mcp__orgx__start_plan_session`, refine with `mcp__orgx__improve_plan`, and record substantive revisions with `mcp__orgx__record_plan_edit`.
+7. Apply relevant frameworks from the Domain Expertise Canon.
+8. Draft JSON-first artifact per the contract above.
+9. Run Precision Loop (below).
+10. Validate:
 
 ```bash
 python3 scripts/validate_sales.py <artifact_file> --type <artifact_type>
 ```
 
-8. Resolve all validator errors and publish with `mcp__orgx__create_entity`.
-9. Record learnings via `mcp__orgx__submit_learning`.
+11. Resolve all validator errors and publish with `mcp__orgx__create_entity`.
+12. Attach proof or conclusions back to the active work:
+    - `mcp__orgx__complete_plan` with `attach_to` for plan sessions
+    - `mcp__orgx__entity_action` with `action=attach` for battlecards, sequences, and pricing docs
+    - `mcp__orgx__comment_on_entity` for coaching notes and decision annotations
+13. Record learnings via `mcp__orgx__submit_learning`.
+14. Record artifact quality via `mcp__orgx__record_quality_score`.
+15. Before delegating prospecting or follow-up work, run `mcp__orgx__check_spawn_guard`, then use `mcp__orgx__spawn_agent_task`.
 
 ---
 
@@ -471,12 +485,23 @@ Every artifact must pass all four passes before delivery.
 
 Primary:
 
+- `mcp__orgx__orgx_bootstrap` -- initialize OrgX session scope and recommended workflow
+- `mcp__orgx__workspace` -- resolve or switch workspace scope
+- `mcp__orgx__get_task_with_context` -- hydrate task-bound context, attachments, and plan sessions
 - `mcp__orgx__query_org_memory` -- pull deal history, past artifacts, org context
 - `mcp__orgx__list_entities` -- list existing deals, initiatives, tasks
+- `mcp__orgx__start_plan_session` -- open tracked planning sessions for sequences, QBRs, and territory plans
+- `mcp__orgx__improve_plan` -- refine sales plans with historical patterns
+- `mcp__orgx__record_plan_edit` -- capture major planning revisions
+- `mcp__orgx__complete_plan` -- finalize and attach the plan to OrgX entities
 - `mcp__orgx__create_entity` -- publish completed artifacts
+- `mcp__orgx__entity_action` -- attach evidence and update entity state
+- `mcp__orgx__comment_on_entity` -- leave coaching notes and deal annotations on active work
+- `mcp__orgx__check_spawn_guard` -- verify delegation is allowed before handoff
 - `mcp__orgx__spawn_agent_task` -- delegate sub-tasks to other agents
 - `mcp__orgx__submit_learning` -- record deal learnings for the flywheel
 - `mcp__orgx__get_relevant_learnings` -- pull learnings from past deals
+- `mcp__orgx__record_quality_score` -- record artifact quality for calibration
 - `mcp__orgx__get_org_snapshot` -- understand current org state and priorities
 
 Optional (if configured):

@@ -1,7 +1,7 @@
 name = "initiative-protocol"
-version = "1.0.0"
-description = "Initiative lifecycle management for OrgX. Handles creation, decomposition into workstreams/streams, launch, monitoring, and completion. Use when planning or managing an OrgX initiative."
+version = "2.0.0"
+description = "Initiative lifecycle management for OrgX with workspace resolution, hierarchy scaffolding, monitoring, evidence attachment, and completion verification."
 entry_instructions = "SKILL.md"
-required_tools = ["mcp__orgx__complete_entity", "mcp__orgx__create_entity", "mcp__orgx__get_initiative_pulse", "mcp__orgx__get_initiative_stream_state", "mcp__orgx__launch_entity", "mcp__orgx__pause_entity", "mcp__orgx__query_org_memory", "mcp__orgx__verify_entity_completion"]
+required_tools = ["mcp__orgx__orgx_bootstrap", "mcp__orgx__workspace", "mcp__orgx__query_org_memory", "mcp__orgx__list_entities", "mcp__orgx__scaffold_initiative", "mcp__orgx__create_entity", "mcp__orgx__create_milestone", "mcp__orgx__create_task", "mcp__orgx__batch_create_entities", "mcp__orgx__entity_action", "mcp__orgx__get_initiative_pulse", "mcp__orgx__get_initiative_stream_state", "mcp__orgx__verify_entity_completion", "mcp__orgx__comment_on_entity", "mcp__orgx__recommend_next_action", "mcp__orgx__complete_plan"]
 required_scopes = []
 resources = []

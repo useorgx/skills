@@ -1,96 +1,56 @@
 ---
 name: Morning Briefing
 description: |
-  Generate a daily OrgX briefing with morning brief value signals, pending decisions, blocked tasks, agent status, and initiative health.
-  Use when the user asks for: a daily briefing, morning update, status overview, what needs attention today,
-  pending decisions summary, blocked work report, or any variation of "what should I work on first?"
-  Triggers on: "morning briefing", "daily status", "what's pending", "show me blockers", "agent activity".
+  Generate a daily OrgX briefing with morning-brief value signals, pending
+  decisions, blocked tasks, agent activity, initiative health, and the single
+  best next action for the active workspace.
 ---
 
 # Morning Briefing
 
-Generate a concise daily status report for OrgX users.
+Generate a concise daily status report for the active OrgX workspace.
 
 ## Workflow
 
-1. **Fetch morning brief value signals** using `mcp__orgx__get_morning_brief`
-
-   - Use the most recent session by default
-   - Surface exceptions, ROI delta, and value signals first
-
-2. **Fetch pending decisions** using `mcp__orgx__list_entities`
-
-   - Type: `decision`, status: `pending`
-   - Filter by urgency: critical and high first when available in metadata
-   - Sort by age (oldest first)
-
-3. **Fetch blocked tasks** using `mcp__orgx__list_entities`
-
-   - Type: `task`, status: `blocked`
-   - Group by initiative
-
-4. **Fetch agent status** using `mcp__orgx__get_agent_status`
-
-   - Include active agents only by default
-   - Show current task for each
-
-5. **Fetch initiative health** using `mcp__orgx__get_initiative_pulse`
-
-   - For active initiatives
-   - Include blockers and upcoming milestones
-
-6. **Synthesize and prioritize** the suggested first action:
-   - Critical decision > Blocked high-priority task > Morning brief exception > Agent needing input
+1. Bootstrap with `mcp__orgx__orgx_bootstrap`.
+2. Resolve the workspace with `mcp__orgx__workspace`.
+3. Fetch:
+   - `mcp__orgx__get_morning_brief`
+   - `mcp__orgx__list_entities type=decision status=pending`
+   - `mcp__orgx__list_entities type=task status=blocked`
+   - `mcp__orgx__get_agent_status include_idle=false`
+   - `mcp__orgx__get_org_snapshot`
+   - `mcp__orgx__recommend_next_action entity_type=workspace`
+4. Prioritize the briefing:
+   - critical decisions
+   - blocked work the user can unblock
+   - value exceptions or risk signals
+   - agents waiting on input
 
 ## Output Format
 
 ```markdown
-## 🌅 Morning Brief Signals
+## Morning Brief Signals
 
-- [Value delta, exceptions, and notable receipts]
+- [value delta, exceptions, notable receipts]
 
-## 🔴 Critical Decisions (X need attention)
+## Critical Decisions
 
-| ID  | Title | Urgency | Age |
-| --- | ----- | ------- | --- |
+- [decision summary]
 
-## 🟡 Blocked Tasks (X blocked)
+## Blocked Tasks
 
-| ID  | Title | Blocker | Unblock Owner |
-| --- | ----- | ------- | ------------- |
+- [task summary]
 
-## 🤖 Active Agents (X running)
+## Active Agents
 
-| Agent | Domain | Current Task |
-| ----- | ------ | ------------ |
+- [agent + current work]
 
-## 📊 Initiative Health
+## Initiative Health
 
-| Name | Status | Health | Next Milestone |
-| ---- | ------ | ------ | -------------- |
+- [highest-risk initiatives]
 
-## ✅ Suggested First Action
+## Suggested First Action
 
-> [Specific, actionable recommendation with entity ID]
+> [single actionable recommendation]
 ```
-
-## Priority Logic
-
-Recommend first action based on:
-
-1. Critical decision pending > 24 hours
-2. High-priority task blocked by something user can resolve
-3. Decision aging toward SLA breach
-4. Agent waiting for input
-5. Initiative at risk (health < 50%)
-6. Stale task needing attention
-7. Low-priority cleanup items
-8. Proactive review if nothing urgent
-
-## Error Handling
-
-If any API call fails:
-
-- Continue with available data
-- Note missing sections
-- Never block on partial failures

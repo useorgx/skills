@@ -1,66 +1,50 @@
 ---
 name: nightly-recap
 description: |
-  Draft nightly recaps summarizing OrgX activity including completed tasks, decisions made, and agent work.
-  Use when: user asks for a daily summary, end-of-day recap, activity report, or wants to see what happened today.
-  Triggers on: "nightly recap", "daily summary", "what happened today", "end of day report", "activity summary".
+  Draft nightly recaps summarizing OrgX workspace activity including completed
+  work, pending decisions, active agents, and notable risks still open at the
+  end of the day.
 ---
 
 # Nightly Recap
 
-Generate a summary of the day's OrgX activity.
+Generate an end-of-day OrgX summary for the active workspace.
 
-## Required Tools
+## Required Sequence
 
-- `context.run_summary` - Get run activity
-- `telemetry.errors.list` - Check for errors
+1. Call `mcp__orgx__orgx_bootstrap`.
+2. Resolve the workspace with `mcp__orgx__workspace`.
+3. Gather:
+   - `mcp__orgx__get_org_snapshot`
+   - `mcp__orgx__list_entities type=task status=done`
+   - `mcp__orgx__list_entities type=decision status=pending`
+   - `mcp__orgx__get_agent_status include_idle=true`
+   - `mcp__orgx__recommend_next_action entity_type=workspace`
 
-## Workflow
-
-1. **Fetch today's activity** using run summary tools
-2. **Aggregate by category**:
-
-   - Tasks completed
-   - Decisions made
-   - Artifacts created
-   - Agent activity
-   - Errors/issues encountered
-
-3. **Generate recap** in this format:
+## Output
 
 ```markdown
 # Nightly Recap - [Date]
 
-## 📊 Summary
+## Summary
 
-- Tasks completed: X
-- Decisions made: Y
-- Artifacts created: Z
+- Work completed: [highlights]
+- Decisions still pending: [count]
+- Risks still open: [count or none]
 
-## ✅ Completed Tasks
+## Completed Work
 
-| Task | Initiative | Completed By |
-| ---- | ---------- | ------------ |
+- [task or milestone]
 
-## 🎯 Decisions Made
+## Pending Decisions
 
-| Decision | Outcome | Initiative |
-| -------- | ------- | ---------- |
+- [decision]
 
-## 🤖 Agent Activity
+## Agent Activity
 
-| Agent | Tasks Completed | Time Active |
-| ----- | --------------- | ----------- |
+- [agent summary]
 
-## ⚠️ Issues (if any)
+## Tomorrow's First Move
 
-- [List any errors or blocked items]
-
-## 📝 Notes
-
-[Any notable patterns or recommendations]
+> [single next action]
 ```
-
-## Checklist
-
-See [checklist.md](checklist.md) for validation items.

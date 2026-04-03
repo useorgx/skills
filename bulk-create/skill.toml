@@ -1,7 +1,7 @@
 name = "bulk-create"
-version = "1.0.0"
-description = "Create multiple tasks or milestones from a markdown checklist or bullet list"
+version = "2.0.0"
+description = "Create multiple tasks or milestones from a markdown checklist or bullet list using batch creation and ref-based dependency wiring"
 entry_instructions = "instructions.md"
-required_tools = ["mcp__orgx__create_entity", "mcp__orgx__list_entities", "mcp__orgx__update_entity"]
+required_tools = ["mcp__orgx__orgx_bootstrap", "mcp__orgx__workspace", "mcp__orgx__list_entities", "mcp__orgx__batch_create_entities", "mcp__orgx__create_task", "mcp__orgx__create_milestone"]
 required_scopes = []
 resources = []
