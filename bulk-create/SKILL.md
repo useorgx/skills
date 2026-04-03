@@ -1,126 +1,63 @@
 ---
 name: Bulk Create
 description: |
-  Create multiple OrgX tasks or milestones from a markdown checklist or bullet list.
-  Automatically detects priorities from keywords and sets up dependencies for nested items.
-  Use when: importing a task list, creating multiple items at once, converting notes to tasks,
-  or batch-creating entities from any list format.
-  Triggers on: "bulk create", "create tasks from list", "import checklist", "batch create".
-  Supports: checkbox lists (- [ ]), bullet lists (- or *), numbered lists (1.).
+  Create multiple OrgX tasks or milestones from a markdown checklist or bullet
+  list. Uses batch creation, ref-based dependency wiring, and current workspace
+  context instead of one-off entity creation loops.
 ---
 
 # Bulk Create
 
-Parse markdown lists and create multiple OrgX entities in batch.
+Parse markdown lists and create multiple OrgX entities in one pass.
 
 ## Supported Formats
 
-```markdown
-# Checkbox lists
+- checkbox lists: `- [ ] item`
+- bullet lists: `- item` or `* item`
+- numbered lists: `1. item`
 
-- [ ] Task one
-- [ ] Task two (urgent)
-- [x] Already done (skipped)
-
-# Bullet lists
-
-- Task one
-- Task two
-  - Subtask (creates dependency)
-
-# Numbered lists
-
-1. First task
-2. Second task (high priority)
-
-# Mixed priorities
-
-- [CRITICAL] Fix security issue
-- [P0] Launch blocker
-- Task with (urgent) keyword
-- (low priority) Nice to have
-```
+Completed checkbox items are skipped by default.
 
 ## Workflow
 
-1. **Parse input** to extract items:
-
-   - Title: main text content
-   - Priority: detected from keywords
-   - Parent: if nested under another item
-   - Checked: skip if already checked [x]
-
-2. **Confirm scope** with user:
-
-   - Entity type: task (default) or milestone
-   - Parent initiative/workstream/milestone
-   - Default priority if not detected
-
-3. **Check context** using `mcp__orgx__list_entities`
-
-   - Verify parent entities exist
-   - Avoid duplicates
-
-4. **Create entities** using `mcp__orgx__create_entity`
-
-   - Process in order (parents before children)
-   - Capture IDs for dependency setup
-
-5. **Set dependencies** using `mcp__orgx__update_entity`
-   - Nested items blocked by their parent
-   - Sequential items can be linked if requested
+1. Bootstrap with `mcp__orgx__orgx_bootstrap`.
+2. Confirm or set workspace via `mcp__orgx__workspace`.
+3. Parse the list into ordered items with priority, nesting, and completion state.
+4. Check the parent initiative, milestone, or workstream with `mcp__orgx__list_entities`.
+5. Build a single `mcp__orgx__batch_create_entities` payload:
+   - use `ref` keys for each created item
+   - use `depends_on` for nested or sequential dependencies
+   - prefer `type=task` unless the user explicitly wants milestones
+6. If a few standalone items are being added to an existing hierarchy, `mcp__orgx__create_task` or `mcp__orgx__create_milestone` is acceptable, but batch create is preferred.
 
 ## Priority Detection
 
-| Keywords                                            | Priority |
-| --------------------------------------------------- | -------- |
-| urgent, critical, ASAP, P0, blocker, [CRITICAL]     | high     |
-| important, P1, high priority                        | high     |
-| normal, P2, medium priority                         | medium   |
-| low priority, P3, nice to have, backlog, eventually | low      |
+| Keywords | Priority |
+| --- | --- |
+| urgent, critical, ASAP, P0, blocker | high |
+| important, P1, high priority | high |
+| normal, P2, medium priority | medium |
+| low priority, P3, backlog, nice to have | low |
 
-Default: medium (if no keywords detected)
+Default priority is `medium`.
+
+## Dependency Logic
+
+- Nested items depend on their nearest parent item.
+- Sequential mode is optional; only apply it when the user asks for ordered execution.
+- Prefer `depends_on` in the batch payload over patching dependencies after creation.
 
 ## Output Format
 
 ```
-✅ Bulk Create Complete
+Bulk create complete
 
-| # | Title | Priority | ID | Blocked By |
-|---|-------|----------|----|-----------|
-| 1 | Task one | high | task_xxx | - |
-| 2 | Task two | medium | task_yyy | - |
-| 3 | Subtask | medium | task_zzz | task_yyy |
+Created:
+- [id] [title] ([priority])
 
-📊 Summary:
-  - Created: X entities
-  - Dependencies: Y set
-  - Skipped: Z (already checked or errors)
+Skipped:
+- [title] — already complete
 
-❌ Errors (if any):
-  - "Item text": [error message]
+Errors:
+- [title] — [reason]
 ```
-
-## Dependency Logic
-
-```
-- Parent task
-  - Child task 1    → blockedBy: [parent]
-  - Child task 2    → blockedBy: [parent]
-    - Grandchild    → blockedBy: [child 2]
-```
-
-For sequential mode (optional):
-
-```
-1. First   → blockedBy: []
-2. Second  → blockedBy: [first]
-3. Third   → blockedBy: [second]
-```
-
-## Error Handling
-
-- Continue on individual failures
-- Report all errors at end
-- Never fail entire batch for one item
-- Rollback not supported (items remain if created)

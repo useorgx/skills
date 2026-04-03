@@ -2,8 +2,9 @@
 name: workstream-protocol
 description: |
   Stream execution lifecycle for OrgX workstreams. Handles initialization,
-  progress reporting, blocker management, and completion with DAG resolution.
-  Use when executing work within an OrgX initiative stream.
+  progress reporting, blocker management, evidence attachment, and completion
+  with DAG-aware sequencing. Use when executing work within an OrgX initiative
+  stream.
 ---
 
 # Workstream Execution Protocol
@@ -12,35 +13,37 @@ description: |
 
 ### 1. Initialize
 
-- Read stream: `mcp__orgx__list_entities type=stream`
-- Check deps: `mcp__orgx__get_initiative_stream_state`
-- Verify status is 'ready' or 'active' before proceeding
-- Report 0% progress: `mcp__orgx__update_stream_progress`
+- Bootstrap with `mcp__orgx__orgx_bootstrap`.
+- Confirm or set workspace through `mcp__orgx__workspace`.
+- Read the stream with `mcp__orgx__list_entities type=stream`.
+- Check upstream and downstream pressure with `mcp__orgx__get_initiative_stream_state`.
+- If the stream is ready to start, use `mcp__orgx__entity_action type=stream action=launch`.
+- Report 0% progress via `mcp__orgx__update_stream_progress`.
 
 ### 2. Execute
 
-- Follow your domain skill workflows
-- Report progress at meaningful milestones (25%, 50%, 75%)
-- Progress and confidence are SEPARATE:
-  - `progress_pct` (0-100): How much work is done
-  - `confidence` (0-1): How confident you are in the output quality
-- Include `status_note` for human visibility
-- Use `expected_version` for optimistic locking
+- Follow the relevant domain skill workflow.
+- Report progress at meaningful milestones.
+- Progress and confidence are separate:
+  - `progress_pct`: how much work is done
+  - `confidence`: how confident you are in the current output
+- Attach important outputs to the stream or its tasks with `mcp__orgx__entity_action action=attach`.
 
 ### 3. Handle Blockers
 
-- If blocked: `mcp__orgx__entity_action type=stream action=block`
-- Always include `blocked_reason`
-- Spawn tasks for unresolved deps: `mcp__orgx__spawn_agent_task`
+- Pause or block with `mcp__orgx__entity_action type=stream action=pause note="..."`.
+- Use `mcp__orgx__comment_on_entity` for detailed blocker context.
+- Before delegating new work, call `mcp__orgx__check_spawn_guard`.
+- Use `mcp__orgx__spawn_agent_task` or `mcp__orgx__handoff_task` only after the guard passes.
 
 ### 4. Complete
 
-- Run domain-specific validation (quality gates)
-- Verify readiness: `mcp__orgx__verify_entity_completion type=workstream`
-- Complete: `mcp__orgx__complete_entity type=stream`
-- This triggers DAG resolution: downstream streams become 'ready'
+- Run domain-specific validation.
+- Verify readiness with `mcp__orgx__verify_entity_completion type=workstream`.
+- Complete with `mcp__orgx__entity_action type=stream action=complete`.
+- Downstream streams should move because the DAG is now unblocked; verify with `mcp__orgx__get_initiative_stream_state`.
 
 ### 5. Error Handling
 
-- Recoverable: set confidence to 0.5, add status_note, continue
-- Unrecoverable: block stream with reason, never silently fail
+- Recoverable issue: lower confidence, document status, continue.
+- Unrecoverable issue: pause the stream and make the blocker explicit on the entity.

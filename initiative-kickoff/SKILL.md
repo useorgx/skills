@@ -1,127 +1,74 @@
 ---
 name: Initiative Kickoff
 description: |
-  Create a complete OrgX initiative from a one-line goal, with milestones, workstreams, tasks, and agent assignments.
-  Use when the user wants to: start a new project, create an initiative, kick off work on a goal,
-  set up a project structure, or bootstrap a new effort.
-  Triggers on: "kickoff", "new initiative", "start project", "create initiative for", "set up [goal]".
-  NOT for: updating existing initiatives, simple task creation, or research questions.
+  Create a complete OrgX initiative from a one-line goal, using the current
+  workspace, hierarchy scaffolding tools, and guarded agent delegation.
+  Use when the user wants to start a new project, create an initiative, kick
+  off work on a goal, set up a project structure, or bootstrap a new effort.
 ---
 
 # Initiative Kickoff
 
-Transform a goal into a structured OrgX initiative with milestones, workstreams, and initial tasks.
+Transform a goal into a structured OrgX initiative with milestones, workstreams, starter tasks, and optional agent delegation.
 
 ## Quick Start
 
-1. Confirm the goal, scope, and any timeline hints.
-2. Check for existing initiatives to avoid duplicates.
-3. Create the initiative, milestones, workstreams, and starter tasks.
-4. Launch the initiative if the user asks to start execution immediately.
+1. Bootstrap the session with `mcp__orgx__orgx_bootstrap`.
+2. Confirm or set the target workspace with `mcp__orgx__workspace`.
+3. Check for duplicate or overlapping initiatives.
+4. Prefer `mcp__orgx__scaffold_initiative` for the full hierarchy.
+5. Launch only if the user wants execution to start now.
 
 ## Workflow
 
-1. **Parse the goal** to extract:
+1. Parse the goal:
+   - target outcome
+   - likely domains
+   - timeline hints
+   - success indicators
+2. Check context:
+   - `mcp__orgx__list_entities type=initiative`
+   - `mcp__orgx__query_org_memory` for similar efforts or prior decisions
+3. Create the full hierarchy with `mcp__orgx__scaffold_initiative`.
+4. If the user requests specific agent delegation:
+   - call `mcp__orgx__check_spawn_guard`
+   - then `mcp__orgx__spawn_agent_task`
+5. Launch with `mcp__orgx__entity_action type=initiative action=launch` when the initiative should go live immediately.
+6. Finish with `mcp__orgx__recommend_next_action` so the user knows the first move after kickoff.
 
-   - Core objective (what success looks like)
-   - Domain signals (engineering, product, marketing, etc.)
-   - Timeline hints (if mentioned)
-   - Success indicators
+## Default Structure
 
-2. **Check context** using `mcp__orgx__list_entities`
+- 3-5 milestones
+- 2-6 workstreams depending on domain spread
+- 2-4 starter tasks per workstream
+- an orchestrator-owned coordination path when more than two domains are involved
 
-   - Verify no duplicate initiative exists
-   - Check for related initiatives to link
+## Timeline Inference
 
-3. **Create initiative** using `mcp__orgx__create_entity`
-
-   ```json
-   {
-     "type": "initiative",
-     "title": "[Derived from goal]",
-     "description": "[Expanded goal with context]",
-     "priority": "high"
-   }
-   ```
-
-4. **Create 3-5 milestones** following this pattern:
-
-   - M1: Discovery/Planning (10-15% of timeline)
-   - M2: Foundation/Setup (15-20%)
-   - M3: Core Development (40-50%)
-   - M4: Integration/Testing (15-20%)
-   - M5: Launch/Delivery (10-15%)
-
-5. **Create workstreams** by detected domains:
-
-   - Engineering: technical implementation
-   - Product: requirements, specs, prioritization
-   - Marketing: positioning, launch prep
-   - Sales: enablement, outreach prep
-   - Operations: processes, tooling
-   - Design: UX/UI, visual assets
-
-6. **Create 2-4 initial tasks per workstream**:
-
-   | Domain      | Starter Tasks                                 |
-   | ----------- | --------------------------------------------- |
-   | Engineering | Tech spike, architecture doc, dev environment |
-   | Product     | PRD draft, user stories, acceptance criteria  |
-   | Marketing   | Messaging brief, positioning doc              |
-   | Sales       | ICP definition, battlecard draft              |
-   | Operations  | Process mapping, tool evaluation              |
-   | Design      | Design brief, wireframes, style exploration   |
-
-7. **Assign agents** (if requested) using `mcp__orgx__spawn_agent_task`
-
-8. **Launch initiative** (if requested) using `mcp__orgx__launch_entity`
+- 1 domain: 2 weeks
+- 2-3 domains: 4-6 weeks
+- 4+ domains: 8-12 weeks
 
 ## Output Format
 
 ```
-✅ Initiative Created: [title] (ID: init_xxx)
+Initiative created: [title] ([id])
 
-📍 Milestones (X created):
-  M1: [title] - Due: [date] (ID: ms_xxx)
-  M2: [title] - Due: [date] (ID: ms_xxx)
-  ...
+Milestones:
+- [milestone title] — [due date]
 
-🔀 Workstreams (X created):
-  - [domain]: [X tasks] (ID: ws_xxx)
-  ...
+Workstreams:
+- [domain] — [task count] starter tasks
 
-📋 Tasks Created: X total
+Delegation:
+- [agent assignment summary or "none"]
 
-🤖 Agents Assigned: [list or "none - use /delegate to assign"]
-
-🔗 Next Steps:
-  1. Review milestones and adjust dates
-  2. Add specific tasks to workstreams
-  3. Assign agents with: delegate-task [task_id] to [agent]
+Next action:
+- [single highest-leverage next step]
 ```
-
-## Timeline Inference
-
-If no timeline specified:
-
-- Small initiative (1 domain): 2 weeks
-- Medium initiative (2-3 domains): 4-6 weeks
-- Large initiative (4+ domains): 8-12 weeks
-
-Set milestone due dates proportionally.
-
-## Domain Detection
-
-Detect domains from goal keywords:
-
-- "build", "implement", "code", "API" → engineering
-- "launch", "campaign", "content" → marketing
-- "sell", "pipeline", "deal" → sales
-- "design", "UI", "UX" → design
-- "process", "workflow", "automate" → operations
-- "spec", "requirements", "feature" → product
 
 ## Failure Handling
 
-- If a similar initiative exists, pause and ask whether to update or create a new one.
-- If required OrgX tools are unavailable, explain what is missing and stop rather than guessing.
+- If a similar initiative exists, stop and ask whether to extend it or create a new one.
+- If the workspace is unset, resolve it before scaffolding anything.
+- If spawn guard blocks delegation, create the initiative anyway and report the block explicitly.

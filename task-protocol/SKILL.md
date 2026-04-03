@@ -2,7 +2,8 @@
 name: task-protocol
 description: |
   Individual task execution protocol for OrgX. Handles task lifecycle from
-  start through completion with consistent status reporting.
+  hydration through completion with consistent reporting, evidence attachment,
+  and spawn-guarded delegation.
   Use when executing individual tasks within a workstream.
 ---
 
@@ -10,38 +11,45 @@ description: |
 
 ## Starting a Task
 
-- Read task details: `mcp__orgx__list_entities type=task`
-- Start: `mcp__orgx__launch_entity type=task`
-- Emit kickoff telemetry: `mcp__orgx__orgx_emit_activity` (`phase=intent`)
-- Verify prerequisites are met
+- Bootstrap with `mcp__orgx__orgx_bootstrap`.
+- Confirm or set workspace through `mcp__orgx__workspace`.
+- Read the task with `mcp__orgx__get_task_with_context`.
+- If you only have an entity ID, use `mcp__orgx__list_entities` with `id` and `hydrate_context=true`.
+- Start with `mcp__orgx__entity_action type=task action=launch`.
+- Emit kickoff telemetry with `mcp__orgx__orgx_emit_activity phase=intent`.
+- Verify prerequisites, context attachments, and acceptance criteria before doing work.
 
 ## Executing
 
-- Follow domain-specific workflows from your skill
-- For each meaningful step, emit telemetry: `mcp__orgx__orgx_emit_activity` (`phase=execution`)
-- Create artifacts as needed: `mcp__orgx__create_entity type=artifact`
-- Batch state mutations through `mcp__orgx__orgx_apply_changeset` (do not do per-entity reporting writes)
+- Follow the domain-specific workflow from the active skill.
+- Emit progress with `mcp__orgx__orgx_emit_activity` at meaningful milestones.
+- Use `mcp__orgx__entity_action action=attach` to link docs, URLs, plans, PRs, screenshots, or other proof back to the task.
+- If the work starts as planning, run:
+  - `mcp__orgx__start_plan_session`
+  - `mcp__orgx__improve_plan`
+  - `mcp__orgx__record_plan_edit` for major revisions
+  - `mcp__orgx__complete_plan attach_to=[{ entity_type: "task", entity_id: ... }]`
 
 ## Handling Blockers
 
-- Block: `mcp__orgx__pause_entity type=task`
-- Document the blocker clearly
-- Emit blocker telemetry: `mcp__orgx__orgx_emit_activity` (`phase=blocked`)
-- Escalate if cross-domain: `mcp__orgx__spawn_agent_task` to relevant agent
+- Pause with `mcp__orgx__entity_action type=task action=pause note="..."`.
+- Document the blocker clearly with `mcp__orgx__comment_on_entity`.
+- Emit blocker telemetry with `mcp__orgx__orgx_emit_activity phase=blocked`.
+- Before cross-domain delegation, call `mcp__orgx__check_spawn_guard`.
+- Use `mcp__orgx__spawn_agent_task` or `mcp__orgx__handoff_task` only after the guard passes.
 
 ## Completing
 
-- Validate output against acceptance criteria
-- Run domain-specific quality gates
-- Verify readiness: `mcp__orgx__verify_entity_completion type=task`
-- Complete via changeset when possible: `mcp__orgx__orgx_apply_changeset` (`task.update`, `milestone.update`, `decision.create` as needed)
-- Emit final telemetry: `mcp__orgx__orgx_emit_activity` (`phase=completed`, `progress_pct=100`)
-- Complete: `mcp__orgx__complete_entity type=task`
-- Link artifacts to task for traceability
+- Validate output against acceptance criteria.
+- Run domain-specific quality gates.
+- Verify readiness with `mcp__orgx__verify_entity_completion type=task`.
+- Attach final proof if anything is still only in the transcript.
+- Emit final telemetry with `mcp__orgx__orgx_emit_activity phase=completed progress_pct=100`.
+- Complete with `mcp__orgx__entity_action type=task action=complete`.
 
 ## Task Types
 
-- `research`: Gather information, analyze options
-- `create`: Produce new artifact (RFC, PRD, campaign, etc.)
-- `review`: Evaluate existing work, provide feedback
-- `implement`: Execute technical changes
+- `research`: gather information, analyze options
+- `create`: produce a new artifact
+- `review`: evaluate existing work and comment on it
+- `implement`: execute technical or operational changes

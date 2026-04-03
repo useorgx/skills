@@ -9,14 +9,17 @@ description: |
 
 ## 1. Quick Start
 
-1. Confirm the artifact or decision type and the target audience.
-2. Pull OrgX context with `mcp__orgx__list_entities` and `mcp__orgx__query_org_memory`.
-3. Identify the **context signal** (see Context Adaptation Protocol) and adjust depth accordingly.
-4. Produce the artifact using the contract below and return:
+1. Run `mcp__orgx__orgx_bootstrap`, then resolve workspace scope with `mcp__orgx__workspace`.
+2. Confirm the artifact or decision type and the target audience. If the request is task-bound, hydrate it with `mcp__orgx__get_task_with_context`; otherwise map neighboring work with `mcp__orgx__list_entities`.
+3. Pull prior design precedent with `mcp__orgx__query_org_memory` and `mcp__orgx__get_relevant_learnings`.
+4. For interaction specs, breakpoint plans, or design-system migrations, use the planning loop: `mcp__orgx__start_plan_session`, `mcp__orgx__improve_plan`, `mcp__orgx__record_plan_edit`, then `mcp__orgx__complete_plan`.
+5. Identify the **context signal** (see Context Adaptation Protocol) and adjust depth accordingly.
+6. Produce the artifact using the contract below and return:
    - A concise summary (3-6 bullets)
    - The artifact body (JSON or structured Markdown)
    - 3 actionable next steps with owners and effort estimates
-5. Run the precision loop before delivery. Every artifact ships validator-clean.
+7. Run the precision loop before delivery. Every artifact ships validator-clean.
+8. Attach the result back to the active entity with `mcp__orgx__entity_action` (`action=attach`) or `mcp__orgx__comment_on_entity`, then record quality with `mcp__orgx__record_quality_score`.
 
 Deliver design artifacts that are implementation-ready, accessibility-compliant, and validator-clean.
 
@@ -115,23 +118,31 @@ If inputs are incomplete, declare assumptions explicitly at the top of the artif
 
 ## 6. Operating Workflow
 
-1. **Scope**: Confirm the artifact type and audience. Identify the context signal from the table above.
-2. **Gather evidence**:
+1. **Bootstrap**: Run `mcp__orgx__orgx_bootstrap` and resolve workspace with `mcp__orgx__workspace`.
+2. **Scope**: Confirm the artifact type and audience. If task-bound, load `mcp__orgx__get_task_with_context`. Identify the context signal from the table above.
+3. **Gather evidence**:
    - Query existing OrgX artifacts with `mcp__orgx__list_entities`
    - Pull prior standards and decisions with `mcp__orgx__query_org_memory`
+   - Pull prior learnings with `mcp__orgx__get_relevant_learnings`
    - Pull Figma context with `mcp__figma__*` when available
    - Review related artifacts from Engineering and Product agents for constraints
-3. **Draft**: Produce the artifact directly in JSON (preferred) or Markdown with a fenced JSON block.
-4. **Self-review**: Run the Precision Loop (Section 12) against the draft.
-5. **Validate**:
+4. **Plan when needed**: For interaction flows, token migrations, or breakpoint programs, open a plan session with `mcp__orgx__start_plan_session`, refine with `mcp__orgx__improve_plan`, and record major revisions with `mcp__orgx__record_plan_edit`.
+5. **Draft**: Produce the artifact directly in JSON (preferred) or Markdown with a fenced JSON block.
+6. **Self-review**: Run the Precision Loop (Section 12) against the draft.
+7. **Validate**:
 
 ```bash
 python3 scripts/validate_design.py <artifact_file> --type <artifact_type>
 ```
 
-6. **Fix and re-validate**: Resolve every failed gate. Re-run validator until all gates pass.
-7. **Publish**: Save with `mcp__orgx__create_entity` and link related entities.
-8. **Handoff**: Notify downstream agents per the Cross-Agent Handoff Contracts.
+8. **Fix and re-validate**: Resolve every failed gate. Re-run validator until all gates pass.
+9. **Publish**: Save with `mcp__orgx__create_entity` and link related entities.
+10. **Attach proof**:
+    - `mcp__orgx__complete_plan` with `attach_to` for planning sessions
+    - `mcp__orgx__entity_action` with `action=attach` for audits, token packages, and component docs
+    - `mcp__orgx__comment_on_entity` for design review feedback
+11. **Record learnings and quality**: Submit learnings with `mcp__orgx__submit_learning` and record quality with `mcp__orgx__record_quality_score`.
+12. **Handoff**: Before delegating downstream work, run `mcp__orgx__check_spawn_guard`, then notify or spawn downstream agents per the Cross-Agent Handoff Contracts.
 
 ## 7. Artifact Contracts
 
@@ -771,11 +782,22 @@ Apply relevant prior learnings. Reference them explicitly (e.g., "Per learning L
 
 ### Primary:
 
+- `mcp__orgx__orgx_bootstrap` — initialize OrgX session scope and recommended workflow
+- `mcp__orgx__workspace` — resolve workspace scope before review or publication
+- `mcp__orgx__get_task_with_context` — hydrate task-bound context, attachments, and plan sessions
 - `mcp__orgx__list_entities` — Query existing design artifacts and related work
 - `mcp__orgx__query_org_memory` — Pull prior design decisions and learnings
+- `mcp__orgx__get_relevant_learnings` — retrieve design-specific learnings before drafting
+- `mcp__orgx__start_plan_session` — open tracked design planning sessions
+- `mcp__orgx__improve_plan` — refine interaction or system plans
+- `mcp__orgx__record_plan_edit` — capture major planning revisions
+- `mcp__orgx__complete_plan` — persist and attach finalized design plans
 - `mcp__orgx__create_entity` — Publish completed artifacts
+- `mcp__orgx__entity_action` — attach evidence and update entity state
 - `mcp__orgx__submit_learning` — Record design learnings for the flywheel
 - `mcp__orgx__comment_on_entity` — Add design review comments to engineering work
+- `mcp__orgx__record_quality_score` — score artifact quality for calibration
+- `mcp__orgx__check_spawn_guard` — verify delegation is allowed before spawning follow-on work
 
 ### Optional (when configured):
 

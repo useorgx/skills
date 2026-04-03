@@ -10,15 +10,18 @@ description: |
 
 ## Quick Start
 
-1. Confirm the artifact or decision type and the target audience.
-2. Pull OrgX context with `mcp__orgx__list_entities` and `mcp__orgx__query_org_memory`.
+1. Run `mcp__orgx__orgx_bootstrap`, then resolve workspace scope with `mcp__orgx__workspace`.
+2. Confirm the artifact or decision type and the target audience. If the work is task-bound, hydrate it with `mcp__orgx__get_task_with_context`; otherwise map the surrounding initiative with `mcp__orgx__list_entities` and `mcp__orgx__get_initiative_pulse`.
 3. Retrieve relevant learnings with `mcp__orgx__get_relevant_learnings` and prior coordination decisions with `mcp__orgx__query_org_memory` scoped to decisions.
-4. Assess the coordination context (number of agents, dependency complexity, time horizon) and adapt formality accordingly.
-5. Produce the artifact using the contract below and return:
+4. For new initiative formation, prefer `mcp__orgx__scaffold_initiative`. For strategy-heavy coordination work, run a planning loop with `mcp__orgx__start_plan_session`, `mcp__orgx__improve_plan`, `mcp__orgx__record_plan_edit`, and `mcp__orgx__complete_plan`.
+5. Assess the coordination context (number of agents, dependency complexity, time horizon) and adapt formality accordingly.
+6. Produce the artifact using the contract below and return:
    - A concise summary (3-6 bullets)
    - The artifact body (JSON or structured Markdown)
    - 3 actionable next steps with owners and deadlines
-6. Submit learnings with `mcp__orgx__submit_learning` and score the artifact with `mcp__orgx__record_quality_score`.
+7. Attach proof back to the initiative, task, or decision with `mcp__orgx__entity_action` (`action=attach`) or `mcp__orgx__comment_on_entity`.
+8. Before every delegation, run `mcp__orgx__check_spawn_guard`, then use `mcp__orgx__spawn_agent_task`.
+9. Submit learnings with `mcp__orgx__submit_learning` and score the artifact with `mcp__orgx__record_quality_score`.
 
 Drive multi-agent execution with clear dependencies, quality gates, and accountable handoffs. The orchestrator never does the domain work itself — it coordinates, sequences, unblocks, and synthesizes.
 
@@ -160,34 +163,44 @@ If unknown, state assumptions explicitly and request missing owners or dates. Ne
 
 ## Operating Workflow
 
-1. Choose `artifact_type` based on the coordination need.
-2. Assess coordination context using the Context Adaptation Protocol.
-3. Retrieve learnings and precedent:
+1. Run `mcp__orgx__orgx_bootstrap` and resolve workspace with `mcp__orgx__workspace`.
+2. Choose `artifact_type` based on the coordination need.
+3. Hydrate the active task or initiative:
+   - `mcp__orgx__get_task_with_context` for task-bound orchestration work
+   - `mcp__orgx__list_entities` and `mcp__orgx__get_initiative_pulse` for parent initiative state and neighboring work
+4. Assess coordination context using the Context Adaptation Protocol.
+5. Retrieve learnings and precedent:
    - `mcp__orgx__get_relevant_learnings` — past coordination patterns for similar initiatives
    - `mcp__orgx__query_org_memory` with `scope: "decisions"` — what worked and failed in prior cross-domain work
    - `mcp__orgx__query_org_memory` — organizational precedent and norms
-4. Gather baseline context:
+6. Gather baseline context:
    - `mcp__orgx__list_entities` — discover existing initiatives, workstreams, tasks, agents
    - `mcp__orgx__get_initiative_pulse` — understand momentum and blockers for in-flight work
-5. Apply learnings as constraints or calibration adjustments. If a learning says "engineering-agent estimates are consistently 1.5x optimistic," apply that correction factor.
-6. Draft JSON-first artifact following the artifact contract.
-7. Run the Precision Loop (all 5 passes).
-8. Validate:
+   - `mcp__orgx__recommend_next_action` — understand current queue pressure before adding new work
+7. For new initiative setup, prefer `mcp__orgx__scaffold_initiative` to manual hierarchy assembly. For coordination plans and retrospectives, run a plan session with `mcp__orgx__start_plan_session`, `mcp__orgx__improve_plan`, and `mcp__orgx__record_plan_edit`.
+8. Apply learnings as constraints or calibration adjustments. If a learning says "engineering-agent estimates are consistently 1.5x optimistic," apply that correction factor.
+9. Draft JSON-first artifact following the artifact contract.
+10. Run the Precision Loop (all 5 passes).
+11. Validate:
 
 ```bash
 python3 scripts/validate_orchestration.py <artifact_file> --type <artifact_type>
 ```
 
-9. Resolve all failed gates.
-10. Execute orchestration:
-    - Create/launch initiative with `mcp__orgx__create_entity` and `mcp__orgx__entity_action`
-    - Delegate with `mcp__orgx__spawn_agent_task`
+12. Resolve all failed gates.
+13. Execute orchestration:
+    - Create new initiative hierarchies with `mcp__orgx__scaffold_initiative`, or publish supporting artifacts with `mcp__orgx__create_entity`
+    - Launch, block, resume, complete, attach evidence, or update state with `mcp__orgx__entity_action`
+    - Before each delegation, run `mcp__orgx__check_spawn_guard`, then delegate with `mcp__orgx__spawn_agent_task`
     - Emit progress checkpoints with `mcp__orgx__orgx_emit_activity`
     - Batch state updates with `mcp__orgx__orgx_apply_changeset` (idempotent, transactional)
     - Record outcomes with `mcp__orgx__record_outcome` at each milestone
-    - Close loop with `mcp__orgx__entity_action`
-11. Submit learnings: `mcp__orgx__submit_learning` with coordination-specific insight.
-12. Score the artifact: `mcp__orgx__record_quality_score`.
+14. Attach coordination proof back to OrgX:
+    - `mcp__orgx__complete_plan` with `attach_to` for planning sessions
+    - `mcp__orgx__entity_action` with `action=attach` for initiative plans, synthesis, and risk registers
+    - `mcp__orgx__comment_on_entity` for unblock requests, reviews, and decision notes
+15. Submit learnings: `mcp__orgx__submit_learning` with coordination-specific insight.
+16. Score the artifact: `mcp__orgx__record_quality_score`.
 
 ## Artifact Contracts
 
@@ -484,10 +497,20 @@ Run the validator script and confirm zero errors. Verify that all spawned tasks 
 
 ### Primary
 
+- `mcp__orgx__orgx_bootstrap` — initialize OrgX session scope and recommended workflow
+- `mcp__orgx__workspace` — resolve workspace scope before orchestration changes
+- `mcp__orgx__get_task_with_context` — hydrate task-bound orchestration work with attachments and plan sessions
 - `mcp__orgx__query_org_memory` — organizational precedent and context
 - `mcp__orgx__list_entities` — discover existing initiatives, workstreams, tasks, agents
+- `mcp__orgx__start_plan_session` — open tracked plan sessions for initiative design and retrospectives
+- `mcp__orgx__improve_plan` — refine coordination plans using prior patterns
+- `mcp__orgx__record_plan_edit` — capture major plan revisions
+- `mcp__orgx__complete_plan` — persist and attach the final plan to OrgX entities
+- `mcp__orgx__scaffold_initiative` — create initiative hierarchies in one step
 - `mcp__orgx__create_entity` — create initiatives, workstreams, milestones, tasks
 - `mcp__orgx__entity_action` — launch, complete, or update entity status
+- `mcp__orgx__comment_on_entity` — write unblock requests, reviews, and coordination notes
+- `mcp__orgx__check_spawn_guard` — verify delegation is allowed before agent spawn
 - `mcp__orgx__spawn_agent_task` — delegate work to domain agents
 - `mcp__orgx__orgx_emit_activity` — emit progress checkpoints and status updates
 - `mcp__orgx__orgx_apply_changeset` — batch state updates (idempotent, transactional)

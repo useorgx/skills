@@ -1,7 +1,7 @@
 name = "morning-briefing"
-version = "1.0.0"
-description = "Get your daily OrgX briefing - morning brief value signals, pending decisions, blocked work, and agent status"
+version = "2.0.0"
+description = "Get your daily OrgX briefing with workspace-aware value signals, pending decisions, blocked work, agent status, initiative health, and the single best next action"
 entry_instructions = "instructions.md"
-required_tools = ["mcp__orgx__get_morning_brief", "mcp__orgx__get_agent_status", "mcp__orgx__list_entities", "mcp__orgx__get_initiative_pulse"]
+required_tools = ["mcp__orgx__orgx_bootstrap", "mcp__orgx__workspace", "mcp__orgx__get_morning_brief", "mcp__orgx__get_agent_status", "mcp__orgx__list_entities", "mcp__orgx__get_org_snapshot", "mcp__orgx__recommend_next_action"]
 required_scopes = []
 resources = []
