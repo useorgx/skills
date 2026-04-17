@@ -1,5 +1,6 @@
 ---
 name: Morning Briefing
+version: "2.0.0"
 description: |
   Generate a daily OrgX briefing with morning-brief value signals, pending
   decisions, blocked tasks, agent activity, initiative health, and the single

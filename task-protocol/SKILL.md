@@ -1,5 +1,6 @@
 ---
 name: task-protocol
+version: "2.0.0"
 description: |
   Individual task execution protocol for OrgX. Handles task lifecycle from
   hydration through completion with consistent reporting, evidence attachment,

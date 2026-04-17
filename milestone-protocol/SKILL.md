@@ -1,5 +1,6 @@
 ---
 name: milestone-protocol
+version: "2.0.0"
 description: |
   Milestone tracking and checkpoint management for OrgX initiatives.
   Handles milestone creation, launch, risk flagging, evidence attachment,

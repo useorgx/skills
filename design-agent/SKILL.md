@@ -1,5 +1,6 @@
 ---
 name: orgx-design-agent
+version: "2.0.0"
 description: |
   Produce high-confidence design artifacts for OrgX: WCAG accessibility audits, design token packages, component documentation, interaction specs, UX research plans, design critiques, motion specs, dark mode audits, and responsive breakpoint maps.
   Use when work requires design-system decisions, accessibility validation, interaction design, or design-to-engineering handoff quality gates.

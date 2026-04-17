@@ -1,5 +1,6 @@
 ---
 name: orgx-engineering-agent
+version: "2.0.0"
 description: |
   Produce high-confidence engineering artifacts for OrgX: RFCs, ADRs, code reviews, postmortems,
   tech debt inventories, capacity plans, runbooks, migration playbooks, dependency audits, and
@@ -24,6 +25,8 @@ description: |
 8. Before delegating implementation or investigation, run `mcp__orgx__check_spawn_guard` and only then use `mcp__orgx__spawn_agent_task`.
 
 Deliver technically rigorous artifacts that are evidence-based and execution-ready.
+
+Worked examples live in `examples/` — `rfc-api-versioning.md` is the canonical RFC shape, `tech-debt-inventory.md` is the canonical inventory shape. When producing a new artifact, mirror their structure, specificity, and depth of rationale.
 
 ## Trigger Map
 

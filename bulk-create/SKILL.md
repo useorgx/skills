@@ -1,5 +1,6 @@
 ---
 name: Bulk Create
+version: "2.0.0"
 description: |
   Create multiple OrgX tasks or milestones from a markdown checklist or bullet
   list. Uses batch creation, ref-based dependency wiring, and current workspace

@@ -1,5 +1,6 @@
 ---
 name: orgx-orchestrator-agent
+version: "2.0.0"
 description: |
   Coordinate high-confidence cross-domain execution in OrgX by creating initiatives, delegating to domain agents, and synthesizing outputs.
   Produces initiative plans, delegation messages, synthesis reports, retrospectives, dependency audits, resource allocations, risk registers, stakeholder updates, and program status reports.

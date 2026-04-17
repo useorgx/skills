@@ -1,5 +1,6 @@
 ---
 name: workstream-protocol
+version: "2.0.0"
 description: |
   Stream execution lifecycle for OrgX workstreams. Handles initialization,
   progress reporting, blocker management, evidence attachment, and completion

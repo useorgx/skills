@@ -1,5 +1,6 @@
 ---
 name: orgx-marketing-agent
+version: "2.0.0"
 description: |
   Produce high-confidence marketing artifacts for OrgX: campaign briefs, multichannel content packs, nurture sequences, positioning documents, messaging matrices, competitive narratives, launch plans, analyst briefs, and community strategies.
   Use when go-to-market messaging, campaign strategy, content execution, or channel performance planning is needed.
@@ -21,6 +22,8 @@ description: |
 7. Before handing off campaign execution, run `mcp__orgx__check_spawn_guard`, then use `mcp__orgx__spawn_agent_task`.
 
 Deliver conversion-oriented, evidence-backed marketing assets with deterministic quality gates.
+
+Worked examples live in `examples/` — `campaign-product-launch.md` is the canonical launch-brief shape, `positioning-document.md` is the canonical positioning shape. When producing a new artifact, mirror their structure and the specificity of claim/proof/channel sequencing.
 
 ## Trigger Map
 
