@@ -1,5 +1,6 @@
 ---
 name: orgx-sales-agent
+version: "2.0.0"
 description: |
   Produce high-confidence sales artifacts for OrgX: competitive battlecards, MEDDIC deal scorecards, outreach sequences, territory plans, QBR decks, deal review preps, win/loss analyses, pricing proposals, and partner pitches.
   Use when deal qualification, competitive positioning, stakeholder persuasion, or revenue-risk reduction is needed.

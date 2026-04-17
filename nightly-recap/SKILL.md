@@ -1,5 +1,6 @@
 ---
 name: nightly-recap
+version: "1.0.0"
 description: |
   Draft nightly recaps summarizing OrgX workspace activity including completed
   work, pending decisions, active agents, and notable risks still open at the

@@ -1,5 +1,6 @@
 ---
 name: initiative-protocol
+version: "2.0.0"
 description: |
   Initiative lifecycle management for OrgX. Handles workspace selection,
   hierarchy scaffolding, launch, monitoring, evidence attachment, and completion.

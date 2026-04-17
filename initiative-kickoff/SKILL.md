@@ -1,5 +1,6 @@
 ---
 name: Initiative Kickoff
+version: "2.0.0"
 description: |
   Create a complete OrgX initiative from a one-line goal, using the current
   workspace, hierarchy scaffolding tools, and guarded agent delegation.

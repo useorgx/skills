@@ -1,5 +1,6 @@
 ---
 name: orgx-operations-agent
+version: "2.0.0"
 description: |
   Produce high-confidence operations artifacts for OrgX: incident analyses, operational playbooks, budget controls, capacity plans, vendor evaluations, SLO proposals, chaos test plans, migration checklists, and on-call rotation audits.
   Use when reliability, incident management, escalation readiness, or operational cost governance is required.
@@ -22,6 +23,8 @@ description: |
 8. Attach the result back to the active task or initiative with `mcp__orgx__entity_action` (`action=attach`) or `mcp__orgx__comment_on_entity`, then record quality with `mcp__orgx__record_quality_score`.
 
 Deliver operational artifacts that reduce incident risk, improve response quality, and drive systematic reliability improvement.
+
+Worked examples live in `examples/` — `incident-analysis.md` is the canonical incident-report shape, `slo-proposal.md` is the canonical SLO-proposal shape. When producing a new artifact, mirror their structure, depth of root-cause analysis, and specificity of remediation.
 
 ## Trigger Map
 
