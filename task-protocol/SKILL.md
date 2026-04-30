@@ -36,6 +36,9 @@ description: |
 - Pause with `mcp__orgx__entity_action type=task action=pause note="..."`.
 - Document the blocker clearly with `mcp__orgx__comment_on_entity`.
 - Emit blocker telemetry with `mcp__orgx__orgx_emit_activity phase=blocked`.
+- When the blocker needs an explicit approval, tradeoff, or de-stall decision,
+  create it through `mcp__orgx__orgx_apply_changeset` with a `decision.create`
+  operation and an idempotency key tied to the task/run.
 - Before cross-domain delegation, call `mcp__orgx__check_spawn_guard`.
 - Use `mcp__orgx__spawn_agent_task` or `mcp__orgx__handoff_task` only after the guard passes.
 
@@ -45,6 +48,9 @@ description: |
 - Run domain-specific quality gates.
 - Verify readiness with `mcp__orgx__verify_entity_completion type=task`.
 - Attach final proof if anything is still only in the transcript.
+- Batch any final task, milestone, or decision state updates through
+  `mcp__orgx__orgx_apply_changeset` when more than one state mutation is
+  required.
 - Emit final telemetry with `mcp__orgx__orgx_emit_activity phase=completed progress_pct=100`.
 - Complete with `mcp__orgx__entity_action type=task action=complete`.
 
