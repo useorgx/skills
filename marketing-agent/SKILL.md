@@ -10,16 +10,16 @@ description: |
 
 ## Quick Start
 
-1. Run `mcp__orgx__orgx_bootstrap`, then resolve workspace scope with `mcp__orgx__workspace`.
-2. Confirm the artifact or decision type and the target audience. If the request is task-bound, hydrate it with `mcp__orgx__get_task_with_context`; otherwise map relevant initiatives and prior artifacts with `mcp__orgx__list_entities`.
-3. Pull precedent with `mcp__orgx__query_org_memory` and `mcp__orgx__get_relevant_learnings`.
-4. For launch plans or initiative decomposition, use the planning loop: `mcp__orgx__start_plan_session`, `mcp__orgx__improve_plan`, `mcp__orgx__record_plan_edit`, then `mcp__orgx__complete_plan`.
+1. Run `mcp__orgx__orgx_bootstrap`, then resolve workspace scope with `mcp__orgx__orgx_bootstrap`.
+2. Confirm the artifact or decision type and the target audience. If the request is task-bound, hydrate it with `mcp__orgx__orgx_inspect`; otherwise map relevant initiatives and prior artifacts with `mcp__orgx__orgx_search`.
+3. Pull precedent with `mcp__orgx__orgx_search` and `mcp__orgx__orgx_search`.
+4. For launch plans or initiative decomposition, use the planning loop: `mcp__orgx__orgx_plan`, `mcp__orgx__orgx_plan`, `mcp__orgx__orgx_plan`, then `mcp__orgx__orgx_plan`.
 5. Produce the artifact using the contract below and return:
    - A concise summary (3-6 bullets)
    - The artifact body (JSON or structured Markdown)
    - 3 actionable next steps
-6. Attach the result back to the active task or initiative with `mcp__orgx__entity_action` (`action=attach`) or `mcp__orgx__comment_on_entity`.
-7. Before handing off campaign execution, run `mcp__orgx__check_spawn_guard`, then use `mcp__orgx__spawn_agent_task`.
+6. Attach the result back to the active task or initiative with `mcp__orgx__orgx_act` (`action=attach`) or `mcp__orgx__orgx_act`.
+7. Before handing off campaign execution, run `mcp__orgx__orgx_spawn`, then use `mcp__orgx__orgx_spawn`.
 
 Deliver conversion-oriented, evidence-backed marketing assets with deterministic quality gates.
 
@@ -391,7 +391,7 @@ When receiving context from another agent:
 When handing off to another agent:
 1. Provide the artifact in the format specified by the target agent's contract.
 2. Include a brief (3-5 sentence) context summary explaining the strategic intent.
-3. Tag handoff in OrgX with `mcp__orgx__spawn_agent_task` and link to source artifact.
+3. Tag handoff in OrgX with `mcp__orgx__orgx_spawn` and link to source artifact.
 
 ---
 
@@ -401,18 +401,18 @@ This agent gets better over time by feeding learnings back into OrgX's memory sy
 
 ### After every artifact:
 
-1. **Record what worked**: If the artifact is based on a previous campaign or positioning that performed well, cite the source and what made it effective via `mcp__orgx__submit_learning`.
+1. **Record what worked**: If the artifact is based on a previous campaign or positioning that performed well, cite the source and what made it effective via `mcp__orgx__orgx_submit_receipt`.
 2. **Record what failed**: If the artifact replaces or improves on a previous version, document what was wrong with the previous version and why.
-3. **Update org memory**: Store the artifact's strategic assumptions (ICP, positioning angle, competitive frame) so future agents can reference them via `mcp__orgx__query_org_memory`.
+3. **Update org memory**: Store the artifact's strategic assumptions (ICP, positioning angle, competitive frame) so future agents can reference them via `mcp__orgx__orgx_search`.
 4. **Tag for measurement**: Every artifact must include at least one measurable hypothesis. When results come in (from sales-agent, from analytics, from user feedback), the learning should be recorded.
 
 ### Learning queries to run before drafting:
 
 ```
-mcp__orgx__query_org_memory({ query: "previous campaigns for [ICP/segment]" })
-mcp__orgx__query_org_memory({ query: "competitive positioning against [competitor]" })
-mcp__orgx__query_org_memory({ query: "messaging that performed well for [audience]" })
-mcp__orgx__query_org_memory({ query: "content performance data for [channel]" })
+mcp__orgx__orgx_search({ query: "previous campaigns for [ICP/segment]" })
+mcp__orgx__orgx_search({ query: "competitive positioning against [competitor]" })
+mcp__orgx__orgx_search({ query: "messaging that performed well for [audience]" })
+mcp__orgx__orgx_search({ query: "content performance data for [channel]" })
 ```
 
 Use findings to inform the new artifact. Cite previous learnings explicitly: "Based on Q4 campaign results showing 3.2x higher CTR with outcome-led messaging (ref: campaign-2024-q4-analytics-launch), this brief leads with customer outcomes rather than feature descriptions."
@@ -421,21 +421,21 @@ Use findings to inform the new artifact. Cite previous learnings explicitly: "Ba
 
 ## Operating Workflow
 
-1. Run `mcp__orgx__orgx_bootstrap` and resolve workspace with `mcp__orgx__workspace`.
+1. Run `mcp__orgx__orgx_bootstrap` and resolve workspace with `mcp__orgx__orgx_bootstrap`.
 2. Choose `artifact_type` and define one primary goal metric.
 3. Hydrate context:
-   - `mcp__orgx__get_task_with_context` for active task work
-   - `mcp__orgx__list_entities` for related initiatives, prior briefs, and existing content
+   - `mcp__orgx__orgx_inspect` for active task work
+   - `mcp__orgx__orgx_search` for related initiatives, prior briefs, and existing content
 4. Run context adaptation protocol -- classify company stage, audience type, and GTM motion.
 5. Gather evidence:
 
-- Prior campaign context from `mcp__orgx__query_org_memory`
-- Prior learnings from `mcp__orgx__get_relevant_learnings`
-- Existing artifacts from `mcp__orgx__list_entities`
+- Prior campaign context from `mcp__orgx__orgx_search`
+- Prior learnings from `mcp__orgx__orgx_search`
+- Existing artifacts from `mcp__orgx__orgx_search`
 - Channel constraints from CMS or content platform when available
 - Competitive context from org memory or provided intel
 
-6. For launch plans, messaging frameworks, or initiative decomposition, open a plan session with `mcp__orgx__start_plan_session`, refine with `mcp__orgx__improve_plan`, and log major revisions with `mcp__orgx__record_plan_edit`.
+6. For launch plans, messaging frameworks, or initiative decomposition, open a plan session with `mcp__orgx__orgx_plan`, refine with `mcp__orgx__orgx_plan`, and log major revisions with `mcp__orgx__orgx_plan`.
 7. Select frameworks -- choose 1-3 frameworks from the Domain Expertise Canon that are most relevant to this artifact type and context.
 8. Draft JSON-first artifact following the contract for the chosen type.
 9. Run the Precision Loop (see below).
@@ -445,14 +445,14 @@ Use findings to inform the new artifact. Cite previous learnings explicitly: "Ba
 python3 scripts/validate_marketing.py <artifact_file> --type <artifact_type>
 ```
 
-11. Fix all failed gates, then publish with `mcp__orgx__create_entity`.
+11. Fix all failed gates, then publish with `mcp__orgx__orgx_write`.
 12. Attach proof or conclusions back to the active work:
-    - `mcp__orgx__complete_plan` with `attach_to` for completed plan sessions
-    - `mcp__orgx__entity_action` with `action=attach` for campaign briefs, launch plans, and messaging docs
-    - `mcp__orgx__comment_on_entity` for feedback or decision notes
-13. Record learnings via `mcp__orgx__submit_learning`.
-14. Record artifact quality via `mcp__orgx__record_quality_score`.
-15. Before handing off execution, run `mcp__orgx__check_spawn_guard`, then use `mcp__orgx__spawn_agent_task`.
+    - `mcp__orgx__orgx_plan` with `attach_to` for completed plan sessions
+    - `mcp__orgx__orgx_act` with `action=attach` for campaign briefs, launch plans, and messaging docs
+    - `mcp__orgx__orgx_act` for feedback or decision notes
+13. Record learnings via `mcp__orgx__orgx_submit_receipt`.
+14. Record artifact quality via `mcp__orgx__orgx_submit_receipt`.
+15. Before handing off execution, run `mcp__orgx__orgx_spawn`, then use `mcp__orgx__orgx_spawn`.
 
 ---
 
@@ -487,24 +487,24 @@ Before marking any artifact as complete, verify these strategic questions are an
 Primary:
 
 - `mcp__orgx__orgx_bootstrap` -- initialize OrgX session scope and recommended workflow
-- `mcp__orgx__workspace` -- resolve or switch workspace scope
-- `mcp__orgx__get_task_with_context` -- hydrate task-bound context, attachments, and plan sessions
-- `mcp__orgx__query_org_memory` -- retrieve prior campaigns, learnings, competitive intel
-- `mcp__orgx__get_relevant_learnings` -- pull prior GTM learnings before drafting
-- `mcp__orgx__list_entities` -- find existing artifacts, initiatives, and context
-- `mcp__orgx__start_plan_session` -- open tracked planning sessions for launch and messaging work
-- `mcp__orgx__improve_plan` -- refine campaign or launch plans
-- `mcp__orgx__record_plan_edit` -- capture material revisions to the plan
-- `mcp__orgx__complete_plan` -- finalize and attach the plan to OrgX entities
-- `mcp__orgx__create_entity` -- publish completed artifacts
-- `mcp__orgx__entity_action` -- attach evidence and update entity state
-- `mcp__orgx__comment_on_entity` -- leave review notes on active initiatives or tasks
-- `mcp__orgx__check_spawn_guard` -- verify delegation is allowed before handoff
-- `mcp__orgx__spawn_agent_task` -- hand off to other agents
-- `mcp__orgx__submit_learning` -- record learnings for the flywheel
-- `mcp__orgx__record_quality_score` -- record artifact quality for calibration
-- `mcp__orgx__get_org_snapshot` -- understand current org state and priorities
-- `mcp__orgx__recommend_next_action` -- identify highest-leverage marketing action
+- `mcp__orgx__orgx_bootstrap` -- resolve or switch workspace scope
+- `mcp__orgx__orgx_inspect` -- hydrate task-bound context, attachments, and plan sessions
+- `mcp__orgx__orgx_search` -- retrieve prior campaigns, learnings, competitive intel
+- `mcp__orgx__orgx_search` -- pull prior GTM learnings before drafting
+- `mcp__orgx__orgx_search` -- find existing artifacts, initiatives, and context
+- `mcp__orgx__orgx_plan` -- open tracked planning sessions for launch and messaging work
+- `mcp__orgx__orgx_plan` -- refine campaign or launch plans
+- `mcp__orgx__orgx_plan` -- capture material revisions to the plan
+- `mcp__orgx__orgx_plan` -- finalize and attach the plan to OrgX entities
+- `mcp__orgx__orgx_write` -- publish completed artifacts
+- `mcp__orgx__orgx_act` -- attach evidence and update entity state
+- `mcp__orgx__orgx_act` -- leave review notes on active initiatives or tasks
+- `mcp__orgx__orgx_spawn` -- verify delegation is allowed before handoff
+- `mcp__orgx__orgx_spawn` -- hand off to other agents
+- `mcp__orgx__orgx_submit_receipt` -- record learnings for the flywheel
+- `mcp__orgx__orgx_submit_receipt` -- record artifact quality for calibration
+- `mcp__orgx__orgx_recommend` -- understand current org state and priorities
+- `mcp__orgx__orgx_recommend` -- identify highest-leverage marketing action
 
 Optional (if configured):
 
@@ -517,8 +517,8 @@ Optional (if configured):
 ## Failure Handling
 
 - **Missing ICP precision**: Provide two candidate ICPs with reasoning for each. Mark the primary as an assumption. Do not proceed with generic targeting.
-- **Missing brand rules**: Default to existing OrgX tone from org memory and tag all creative direction as provisional. Query: `mcp__orgx__query_org_memory({ query: "brand voice guidelines" })`.
-- **Missing competitive intel**: State what is known, flag gaps explicitly, and recommend competitive research as a prerequisite task via `mcp__orgx__spawn_agent_task`.
+- **Missing brand rules**: Default to existing OrgX tone from org memory and tag all creative direction as provisional. Query: `mcp__orgx__orgx_search({ query: "brand voice guidelines" })`.
+- **Missing competitive intel**: State what is known, flag gaps explicitly, and recommend competitive research as a prerequisite task via `mcp__orgx__orgx_spawn`.
 - **Missing performance data**: Use industry benchmarks as starting baselines, cite the source, and flag that baselines should be updated with actual data within 30 days.
 - **Validator errors**: Do not publish until fixed. Never override validation gates.
 - **Conflicting inputs**: When product-agent and sales-agent provide conflicting positioning, flag the conflict explicitly, present both framings, and recommend a positioning alignment session.

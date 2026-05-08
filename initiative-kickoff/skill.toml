@@ -2,6 +2,6 @@ name = "initiative-kickoff"
 version = "2.0.0"
 description = "From a one-line goal, creates a complete initiative with scaffolded hierarchy, current workspace context, and optional guarded agent assignments"
 entry_instructions = "instructions.md"
-required_tools = ["mcp__orgx__orgx_bootstrap", "mcp__orgx__workspace", "mcp__orgx__list_entities", "mcp__orgx__query_org_memory", "mcp__orgx__scaffold_initiative", "mcp__orgx__entity_action", "mcp__orgx__check_spawn_guard", "mcp__orgx__spawn_agent_task", "mcp__orgx__recommend_next_action"]
+required_tools = ["mcp__orgx__orgx_bootstrap", "mcp__orgx__orgx_bootstrap", "mcp__orgx__orgx_search", "mcp__orgx__orgx_search", "mcp__orgx__orgx_write", "mcp__orgx__orgx_act", "mcp__orgx__orgx_spawn", "mcp__orgx__orgx_spawn", "mcp__orgx__orgx_recommend"]
 required_scopes = []
 resources = ["checklist.md"]

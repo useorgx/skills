@@ -17,16 +17,31 @@ ORGX_TOOL_RE = re.compile(r"mcp__orgx__([a-zA-Z0-9_]+)")
 STRING_RE = re.compile(r'"([^"]+)"')
 
 KNOWN_ORGX_TOOLS = {
+    "orgx_act",
+    "orgx_attach",
+    "orgx_bootstrap",
+    "orgx_decide",
+    "orgx_emit_activity",
+    "orgx_inspect",
+    "orgx_plan",
+    "orgx_recommend",
+    "orgx_search",
+    "orgx_spawn",
+    "orgx_submit_receipt",
+    "orgx_write",
+}
+
+DEPRECATED_ORGX_TOOLS = {
     "account_status",
     "account_upgrade",
     "account_usage_report",
     "approve_decision",
     "batch_action",
-    "batch_create_entities",
     "batch_delete_entities",
-    "check_spawn_guard",
+    "batch_create_entities",
     "classify_task_model",
-    "comment_on_entity",
+    "check_spawn_guard",
+    "complete_entity",
     "complete_plan",
     "configure_org",
     "create_decision",
@@ -49,13 +64,10 @@ KNOWN_ORGX_TOOLS = {
     "get_task_with_context",
     "handoff_task",
     "improve_plan",
-    "list_entities",
+    "launch_entity",
     "list_entity_comments",
-    "orgx_apply_changeset",
-    "orgx_bootstrap",
-    "orgx_describe_action",
-    "orgx_describe_tool",
-    "orgx_emit_activity",
+    "list_entities",
+    "pause_entity",
     "pin_workstream",
     "query_org_memory",
     "queue_action",
@@ -65,7 +77,7 @@ KNOWN_ORGX_TOOLS = {
     "record_quality_score",
     "reject_decision",
     "resume_plan_session",
-    "scaffold_initiative",
+    "save_artifact",
     "score_next_up_queue",
     "scoring_config",
     "spawn_agent_task",
@@ -78,19 +90,9 @@ KNOWN_ORGX_TOOLS = {
     "update_stream_progress",
     "validate_studio_content",
     "verify_entity_completion",
-    "workspace",
 }
 
-DEPRECATED_ORGX_TOOLS = {
-    "complete_entity",
-    "get_decision_history",
-    "get_pending_decisions",
-    "launch_entity",
-    "pause_entity",
-    "score_next_up_queue",
-}
-
-PLAN_TOOLS = {"start_plan_session", "improve_plan", "record_plan_edit"}
+PLAN_TOOLS = {"orgx_plan"}
 
 
 def read_text(path: Path) -> str:
@@ -138,23 +140,11 @@ def main() -> int:
         if not combined_refs:
             continue
 
-        missing_baseline = {"orgx_bootstrap", "workspace"} - combined_refs
+        missing_baseline = {"orgx_bootstrap"} - combined_refs
         for tool in sorted(missing_baseline):
             errors.append(
                 f"{skill_dir.name} is missing baseline OrgX workflow tool "
                 f"`mcp__orgx__{tool}` in its skill files"
-            )
-
-        if "spawn_agent_task" in combined_refs and "check_spawn_guard" not in combined_refs:
-            errors.append(
-                f"{skill_dir.name} references `mcp__orgx__spawn_agent_task` without "
-                f"`mcp__orgx__check_spawn_guard`"
-            )
-
-        if combined_refs & PLAN_TOOLS and "complete_plan" not in combined_refs:
-            errors.append(
-                f"{skill_dir.name} references plan-session tools without "
-                f"`mcp__orgx__complete_plan`"
             )
 
         skill_toml = skill_dir / "skill.toml"
@@ -166,22 +156,10 @@ def main() -> int:
                 if tool.startswith("mcp__orgx__")
             }
 
-            for tool in sorted({"orgx_bootstrap", "workspace"} - orgx_required):
+            for tool in sorted({"orgx_bootstrap"} - orgx_required):
                 errors.append(
                     f"{skill_toml.relative_to(ROOT)} is missing required tool "
                     f"`mcp__orgx__{tool}`"
-                )
-
-            if "spawn_agent_task" in orgx_required and "check_spawn_guard" not in orgx_required:
-                errors.append(
-                    f"{skill_toml.relative_to(ROOT)} declares `mcp__orgx__spawn_agent_task` "
-                    f"without `mcp__orgx__check_spawn_guard`"
-                )
-
-            if orgx_required & PLAN_TOOLS and "complete_plan" not in orgx_required:
-                errors.append(
-                    f"{skill_toml.relative_to(ROOT)} declares plan-session tools without "
-                    f"`mcp__orgx__complete_plan`"
                 )
 
             for tool in sorted(orgx_required):

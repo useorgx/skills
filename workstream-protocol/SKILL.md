@@ -15,11 +15,11 @@ description: |
 ### 1. Initialize
 
 - Bootstrap with `mcp__orgx__orgx_bootstrap`.
-- Confirm or set workspace through `mcp__orgx__workspace`.
-- Read the stream with `mcp__orgx__list_entities type=stream`.
-- Check upstream and downstream pressure with `mcp__orgx__get_initiative_stream_state`.
-- If the stream is ready to start, use `mcp__orgx__entity_action type=stream action=launch`.
-- Report 0% progress via `mcp__orgx__update_stream_progress`.
+- Confirm or set workspace through `mcp__orgx__orgx_bootstrap`.
+- Read the stream with `mcp__orgx__orgx_search type=stream`.
+- Check upstream and downstream pressure with `mcp__orgx__orgx_inspect`.
+- If the stream is ready to start, use `mcp__orgx__orgx_act type=stream action=launch`.
+- Report 0% progress via `mcp__orgx__orgx_emit_activity`.
 
 ### 2. Execute
 
@@ -28,21 +28,21 @@ description: |
 - Progress and confidence are separate:
   - `progress_pct`: how much work is done
   - `confidence`: how confident you are in the current output
-- Attach important outputs to the stream or its tasks with `mcp__orgx__entity_action action=attach`.
+- Attach important outputs to the stream or its tasks with `mcp__orgx__orgx_act action=attach`.
 
 ### 3. Handle Blockers
 
-- Pause or block with `mcp__orgx__entity_action type=stream action=pause note="..."`.
-- Use `mcp__orgx__comment_on_entity` for detailed blocker context.
-- Before delegating new work, call `mcp__orgx__check_spawn_guard`.
-- Use `mcp__orgx__spawn_agent_task` or `mcp__orgx__handoff_task` only after the guard passes.
+- Pause or block with `mcp__orgx__orgx_act type=stream action=pause note="..."`.
+- Use `mcp__orgx__orgx_act` for detailed blocker context.
+- Before delegating new work, call `mcp__orgx__orgx_spawn`.
+- Use `mcp__orgx__orgx_spawn` or `mcp__orgx__orgx_spawn` only after the guard passes.
 
 ### 4. Complete
 
 - Run domain-specific validation.
-- Verify readiness with `mcp__orgx__verify_entity_completion type=workstream`.
-- Complete with `mcp__orgx__entity_action type=stream action=complete`.
-- Downstream streams should move because the DAG is now unblocked; verify with `mcp__orgx__get_initiative_stream_state`.
+- Verify readiness with `mcp__orgx__orgx_act type=workstream`.
+- Complete with `mcp__orgx__orgx_act type=stream action=complete`.
+- Downstream streams should move because the DAG is now unblocked; verify with `mcp__orgx__orgx_inspect`.
 
 ### 5. Error Handling
 

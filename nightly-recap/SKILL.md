@@ -14,13 +14,13 @@ Generate an end-of-day OrgX summary for the active workspace.
 ## Required Sequence
 
 1. Call `mcp__orgx__orgx_bootstrap`.
-2. Resolve the workspace with `mcp__orgx__workspace`.
+2. Resolve the workspace with `mcp__orgx__orgx_bootstrap`.
 3. Gather:
-   - `mcp__orgx__get_org_snapshot`
-   - `mcp__orgx__list_entities type=task status=done`
-   - `mcp__orgx__list_entities type=decision status=pending`
-   - `mcp__orgx__get_agent_status include_idle=true`
-   - `mcp__orgx__recommend_next_action entity_type=workspace`
+   - `mcp__orgx__orgx_recommend`
+   - `mcp__orgx__orgx_search type=task status=done`
+   - `mcp__orgx__orgx_search type=decision status=pending`
+   - `mcp__orgx__orgx_recommend include_idle=true`
+   - `mcp__orgx__orgx_recommend entity_type=workspace`
 
 ## Output
 

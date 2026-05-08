@@ -277,7 +277,7 @@
         {
           "criterion": "learning_submitted",
           "description": "The retrospective is paired with flywheel learning submission",
-          "check": "artifact includes reference to submit_learning call or next step to submit coordination learnings",
+          "check": "artifact includes reference to orgx_submit_receipt call or next step to submit coordination learnings",
           "weight": 0.8
         }
       ],
