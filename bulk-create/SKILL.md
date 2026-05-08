@@ -22,14 +22,14 @@ Completed checkbox items are skipped by default.
 ## Workflow
 
 1. Bootstrap with `mcp__orgx__orgx_bootstrap`.
-2. Confirm or set workspace via `mcp__orgx__workspace`.
+2. Confirm or set workspace via `mcp__orgx__orgx_bootstrap`.
 3. Parse the list into ordered items with priority, nesting, and completion state.
-4. Check the parent initiative, milestone, or workstream with `mcp__orgx__list_entities`.
-5. Build a single `mcp__orgx__batch_create_entities` payload:
+4. Check the parent initiative, milestone, or workstream with `mcp__orgx__orgx_search`.
+5. Build a single `mcp__orgx__orgx_write` payload:
    - use `ref` keys for each created item
    - use `depends_on` for nested or sequential dependencies
    - prefer `type=task` unless the user explicitly wants milestones
-6. If a few standalone items are being added to an existing hierarchy, `mcp__orgx__create_task` or `mcp__orgx__create_milestone` is acceptable, but batch create is preferred.
+6. If a few standalone items are being added to an existing hierarchy, `mcp__orgx__orgx_write` or `mcp__orgx__orgx_write` is acceptable, but batch create is preferred.
 
 ## Priority Detection
 

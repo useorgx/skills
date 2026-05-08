@@ -380,7 +380,7 @@
     },
     {
       "check": "learning_recorded",
-      "description": "At least one learning submitted via mcp__orgx__submit_learning per artifact",
+      "description": "At least one learning submitted via mcp__orgx__orgx_submit_receipt per artifact",
       "applies_to": "all"
     },
     {

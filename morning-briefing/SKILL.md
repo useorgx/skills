@@ -14,14 +14,14 @@ Generate a concise daily status report for the active OrgX workspace.
 ## Workflow
 
 1. Bootstrap with `mcp__orgx__orgx_bootstrap`.
-2. Resolve the workspace with `mcp__orgx__workspace`.
+2. Resolve the workspace with `mcp__orgx__orgx_bootstrap`.
 3. Fetch:
-   - `mcp__orgx__get_morning_brief`
-   - `mcp__orgx__list_entities type=decision status=pending`
-   - `mcp__orgx__list_entities type=task status=blocked`
-   - `mcp__orgx__get_agent_status include_idle=false`
-   - `mcp__orgx__get_org_snapshot`
-   - `mcp__orgx__recommend_next_action entity_type=workspace`
+   - `mcp__orgx__orgx_recommend`
+   - `mcp__orgx__orgx_search type=decision status=pending`
+   - `mcp__orgx__orgx_search type=task status=blocked`
+   - `mcp__orgx__orgx_recommend include_idle=false`
+   - `mcp__orgx__orgx_recommend`
+   - `mcp__orgx__orgx_recommend entity_type=workspace`
 4. Prioritize the briefing:
    - critical decisions
    - blocked work the user can unblock

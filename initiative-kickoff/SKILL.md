@@ -15,9 +15,9 @@ Transform a goal into a structured OrgX initiative with milestones, workstreams,
 ## Quick Start
 
 1. Bootstrap the session with `mcp__orgx__orgx_bootstrap`.
-2. Confirm or set the target workspace with `mcp__orgx__workspace`.
+2. Confirm or set the target workspace with `mcp__orgx__orgx_bootstrap`.
 3. Check for duplicate or overlapping initiatives.
-4. Prefer `mcp__orgx__scaffold_initiative` for the full hierarchy.
+4. Prefer `mcp__orgx__orgx_write` for the full hierarchy.
 5. Launch only if the user wants execution to start now.
 
 ## Workflow
@@ -28,14 +28,14 @@ Transform a goal into a structured OrgX initiative with milestones, workstreams,
    - timeline hints
    - success indicators
 2. Check context:
-   - `mcp__orgx__list_entities type=initiative`
-   - `mcp__orgx__query_org_memory` for similar efforts or prior decisions
-3. Create the full hierarchy with `mcp__orgx__scaffold_initiative`.
+   - `mcp__orgx__orgx_search type=initiative`
+   - `mcp__orgx__orgx_search` for similar efforts or prior decisions
+3. Create the full hierarchy with `mcp__orgx__orgx_write`.
 4. If the user requests specific agent delegation:
-   - call `mcp__orgx__check_spawn_guard`
-   - then `mcp__orgx__spawn_agent_task`
-5. Launch with `mcp__orgx__entity_action type=initiative action=launch` when the initiative should go live immediately.
-6. Finish with `mcp__orgx__recommend_next_action` so the user knows the first move after kickoff.
+   - call `mcp__orgx__orgx_spawn`
+   - then `mcp__orgx__orgx_spawn`
+5. Launch with `mcp__orgx__orgx_act type=initiative action=launch` when the initiative should go live immediately.
+6. Finish with `mcp__orgx__orgx_recommend` so the user knows the first move after kickoff.
 
 ## Default Structure
 

@@ -124,8 +124,8 @@ This is a worked example of a delegation message from the orchestrator to the en
     ]
   },
   "handoff": {
-    "output_format": "RFC (for API design review at checkpoint 1) + deployed staging environment (at checkpoint 2) + production deployment with monitoring (at deadline). All artifacts published via mcp__orgx__create_entity linked to init-analytics-dash-001.",
-    "completion_signal": "Call mcp__orgx__entity_action to mark workstream ws-engineering as complete. Include artifact references for RFC, staging URL, production deployment confirmation, and monitoring dashboard URL."
+    "output_format": "RFC (for API design review at checkpoint 1) + deployed staging environment (at checkpoint 2) + production deployment with monitoring (at deadline). All artifacts published via mcp__orgx__orgx_write linked to init-analytics-dash-001.",
+    "completion_signal": "Call mcp__orgx__orgx_act to mark workstream ws-engineering as complete. Include artifact references for RFC, staging URL, production deployment confirmation, and monitoring dashboard URL."
   }
 }
 ```

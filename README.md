@@ -58,7 +58,7 @@ Run the repo-level drift check before opening a PR or shipping skill changes:
 python3 scripts/check_skill_tool_drift.py
 ```
 
-The check fails on deprecated OrgX tool names, unknown `mcp__orgx__*` references, and high-value workflow gaps such as spawning without `check_spawn_guard` or opening plan sessions without `complete_plan`.
+The check fails on deprecated OrgX tool names, unknown `mcp__orgx__*` references, and high-value workflow gaps such as spawning without `orgx_spawn` or opening plan sessions without `orgx_plan`.
 
 ## Skill Format
 
