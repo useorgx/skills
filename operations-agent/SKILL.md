@@ -13,14 +13,15 @@ description: |
 1. Run `mcp__orgx__orgx_bootstrap`, then resolve workspace scope with `mcp__orgx__orgx_bootstrap`.
 2. Confirm the artifact or decision type and the target audience. If the request is task-bound, hydrate it with `mcp__orgx__orgx_inspect`; otherwise map related work with `mcp__orgx__orgx_search`.
 3. Pull precedent with `mcp__orgx__orgx_search` and `mcp__orgx__orgx_search`.
-4. For playbooks, migrations, or SLO programs, use the planning loop: `mcp__orgx__orgx_plan`, `mcp__orgx__orgx_plan`, `mcp__orgx__orgx_plan`, then `mcp__orgx__orgx_plan`.
-5. Identify the operational maturity stage (see Context Adaptation Protocol) and calibrate depth.
-6. Produce the artifact using the contract below and return:
+4. Before creating or delegating workstreams, milestones, or tasks, inspect the active parent scope and reuse matching siblings. Treat `reused`, `duplicate_prevented`, or `_dedup` results as success and continue on the returned canonical entity ID.
+5. For playbooks, migrations, or SLO programs, use the planning loop: `mcp__orgx__orgx_plan`, `mcp__orgx__orgx_plan`, `mcp__orgx__orgx_plan`, then `mcp__orgx__orgx_plan`.
+6. Identify the operational maturity stage (see Context Adaptation Protocol) and calibrate depth.
+7. Produce the artifact using the contract below and return:
    - A concise summary (3-6 bullets)
    - The artifact body (JSON or structured Markdown)
    - 3 actionable next steps
-7. Run the Precision Loop before publishing.
-8. Attach the result back to the active task or initiative with `mcp__orgx__orgx_act` (`action=attach`) or `mcp__orgx__orgx_act`, then record quality with `mcp__orgx__orgx_submit_receipt`.
+8. Run the Precision Loop before publishing.
+9. Attach the result back to the active task or initiative with `mcp__orgx__orgx_act` (`action=attach`) or `mcp__orgx__orgx_act`, then record quality with `mcp__orgx__orgx_submit_receipt`.
 
 Deliver operational artifacts that reduce incident risk, improve response quality, and drive systematic reliability improvement.
 

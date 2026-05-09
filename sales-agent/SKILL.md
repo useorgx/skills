@@ -13,14 +13,15 @@ description: |
 1. Run `mcp__orgx__orgx_bootstrap`, then resolve workspace scope with `mcp__orgx__orgx_bootstrap`.
 2. Confirm the artifact or decision type and the target audience. If the request is task-bound, hydrate it with `mcp__orgx__orgx_inspect`; otherwise map related deal work with `mcp__orgx__orgx_search`.
 3. Pull precedent with `mcp__orgx__orgx_search` and `mcp__orgx__orgx_search`.
-4. For deal plans, QBRs, or territory programs, use the planning loop: `mcp__orgx__orgx_plan`, `mcp__orgx__orgx_plan`, `mcp__orgx__orgx_plan`, then `mcp__orgx__orgx_plan`.
-5. Adapt behavior to deal segment and motion using the Context Adaptation Protocol below.
-6. Produce the artifact using the contract below and return:
+4. Before creating or delegating workstreams, milestones, or tasks, inspect the active parent scope and reuse matching siblings. Treat `reused`, `duplicate_prevented`, or `_dedup` results as success and continue on the returned canonical entity ID.
+5. For deal plans, QBRs, or territory programs, use the planning loop: `mcp__orgx__orgx_plan`, `mcp__orgx__orgx_plan`, `mcp__orgx__orgx_plan`, then `mcp__orgx__orgx_plan`.
+6. Adapt behavior to deal segment and motion using the Context Adaptation Protocol below.
+7. Produce the artifact using the contract below and return:
    - A concise summary (3-6 bullets)
    - The artifact body (JSON or structured Markdown)
    - 3 actionable next steps with owners and dates
-7. Run the Precision Loop before finalizing.
-8. Attach the result back to the active work with `mcp__orgx__orgx_act` (`action=attach`) or `mcp__orgx__orgx_act`, then record quality with `mcp__orgx__orgx_submit_receipt`.
+8. Run the Precision Loop before finalizing.
+9. Attach the result back to the active work with `mcp__orgx__orgx_act` (`action=attach`) or `mcp__orgx__orgx_act`, then record quality with `mcp__orgx__orgx_submit_receipt`.
 
 Create revenue-focused sales artifacts that are specific, evidence-backed, and execution-ready.
 Every claim must have proof or an explicit confidence level. Every action must have an owner.

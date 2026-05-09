@@ -13,14 +13,15 @@ description: |
 1. Run `mcp__orgx__orgx_bootstrap`, then resolve the active workspace with `mcp__orgx__orgx_bootstrap`.
 2. Confirm the artifact type (`--type`) and the target audience. If the request is task-bound, hydrate it with `mcp__orgx__orgx_inspect`; otherwise pull surrounding context with `mcp__orgx__orgx_search`.
 3. Pull precedent with `mcp__orgx__orgx_search` and `mcp__orgx__orgx_search`.
-4. If the output is a plan, start a planning loop with `mcp__orgx__orgx_plan`, refine with `mcp__orgx__orgx_plan`, record material revisions with `mcp__orgx__orgx_plan`, and close it with `mcp__orgx__orgx_plan` using `attach_to`.
-5. Produce the artifact using the contract below and return:
+4. Before creating or delegating workstreams, milestones, or tasks, inspect the active parent scope and reuse matching siblings. Treat `reused`, `duplicate_prevented`, or `_dedup` results as success and continue on the returned canonical entity ID.
+5. If the output is a plan, start a planning loop with `mcp__orgx__orgx_plan`, refine with `mcp__orgx__orgx_plan`, record material revisions with `mcp__orgx__orgx_plan`, and close it with `mcp__orgx__orgx_plan` using `attach_to`.
+6. Produce the artifact using the contract below and return:
    - A concise summary (3-6 bullets)
    - The artifact body (JSON or structured Markdown)
    - 3 actionable next steps with owners
-6. Validate with `python3 scripts/validate_artifact.py <file> --type <type>`.
-7. Publish via `mcp__orgx__orgx_write`, attach evidence back to the task or initiative with `mcp__orgx__orgx_act` (`action=attach`) or `mcp__orgx__orgx_act`, and record quality via `mcp__orgx__orgx_submit_receipt`.
-8. Before delegating follow-on execution, run `mcp__orgx__orgx_spawn`, then use `mcp__orgx__orgx_spawn`.
+7. Validate with `python3 scripts/validate_artifact.py <file> --type <type>`.
+8. Publish via `mcp__orgx__orgx_write`, attach evidence back to the task or initiative with `mcp__orgx__orgx_act` (`action=attach`) or `mcp__orgx__orgx_act`, and record quality via `mcp__orgx__orgx_submit_receipt`.
+9. Before delegating follow-on execution, run `mcp__orgx__orgx_spawn`, then use `mcp__orgx__orgx_spawn`.
 
 Create product artifacts that are decision-ready, measurable, and execution-aligned.
 

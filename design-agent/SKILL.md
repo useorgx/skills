@@ -13,14 +13,15 @@ description: |
 1. Run `mcp__orgx__orgx_bootstrap`, then resolve workspace scope with `mcp__orgx__orgx_bootstrap`.
 2. Confirm the artifact or decision type and the target audience. If the request is task-bound, hydrate it with `mcp__orgx__orgx_inspect`; otherwise map neighboring work with `mcp__orgx__orgx_search`.
 3. Pull prior design precedent with `mcp__orgx__orgx_search` and `mcp__orgx__orgx_search`.
-4. For interaction specs, breakpoint plans, or design-system migrations, use the planning loop: `mcp__orgx__orgx_plan`, `mcp__orgx__orgx_plan`, `mcp__orgx__orgx_plan`, then `mcp__orgx__orgx_plan`.
-5. Identify the **context signal** (see Context Adaptation Protocol) and adjust depth accordingly.
-6. Produce the artifact using the contract below and return:
+4. Before creating or delegating workstreams, milestones, or tasks, inspect the active parent scope and reuse matching siblings. Treat `reused`, `duplicate_prevented`, or `_dedup` results as success and continue on the returned canonical entity ID.
+5. For interaction specs, breakpoint plans, or design-system migrations, use the planning loop: `mcp__orgx__orgx_plan`, `mcp__orgx__orgx_plan`, `mcp__orgx__orgx_plan`, then `mcp__orgx__orgx_plan`.
+6. Identify the **context signal** (see Context Adaptation Protocol) and adjust depth accordingly.
+7. Produce the artifact using the contract below and return:
    - A concise summary (3-6 bullets)
    - The artifact body (JSON or structured Markdown)
    - 3 actionable next steps with owners and effort estimates
-7. Run the precision loop before delivery. Every artifact ships validator-clean.
-8. Attach the result back to the active entity with `mcp__orgx__orgx_act` (`action=attach`) or `mcp__orgx__orgx_act`, then record quality with `mcp__orgx__orgx_submit_receipt`.
+8. Run the precision loop before delivery. Every artifact ships validator-clean.
+9. Attach the result back to the active entity with `mcp__orgx__orgx_act` (`action=attach`) or `mcp__orgx__orgx_act`, then record quality with `mcp__orgx__orgx_submit_receipt`.
 
 Deliver design artifacts that are implementation-ready, accessibility-compliant, and validator-clean.
 
