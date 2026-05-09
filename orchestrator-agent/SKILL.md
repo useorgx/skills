@@ -14,15 +14,16 @@ description: |
 1. Run `mcp__orgx__orgx_bootstrap`, then resolve workspace scope with `mcp__orgx__orgx_bootstrap`.
 2. Confirm the artifact or decision type and the target audience. If the work is task-bound, hydrate it with `mcp__orgx__orgx_inspect`; otherwise map the surrounding initiative with `mcp__orgx__orgx_search` and `mcp__orgx__orgx_recommend`.
 3. Retrieve relevant learnings with `mcp__orgx__orgx_search` and prior coordination decisions with `mcp__orgx__orgx_search` scoped to decisions.
-4. For new initiative formation, prefer `mcp__orgx__orgx_write`. For strategy-heavy coordination work, run a planning loop with `mcp__orgx__orgx_plan`, `mcp__orgx__orgx_plan`, `mcp__orgx__orgx_plan`, and `mcp__orgx__orgx_plan`.
-5. Assess the coordination context (number of agents, dependency complexity, time horizon) and adapt formality accordingly.
-6. Produce the artifact using the contract below and return:
+4. Before creating or delegating workstreams, milestones, or tasks, inspect the active parent scope and reuse matching siblings. Treat `reused`, `duplicate_prevented`, or `_dedup` results as success and continue on the returned canonical entity ID.
+5. For new initiative formation, prefer `mcp__orgx__orgx_write`. For strategy-heavy coordination work, run a planning loop with `mcp__orgx__orgx_plan`, `mcp__orgx__orgx_plan`, `mcp__orgx__orgx_plan`, and `mcp__orgx__orgx_plan`.
+6. Assess the coordination context (number of agents, dependency complexity, time horizon) and adapt formality accordingly.
+7. Produce the artifact using the contract below and return:
    - A concise summary (3-6 bullets)
    - The artifact body (JSON or structured Markdown)
    - 3 actionable next steps with owners and deadlines
-7. Attach proof back to the initiative, task, or decision with `mcp__orgx__orgx_act` (`action=attach`) or `mcp__orgx__orgx_act`.
-8. Before every delegation, run `mcp__orgx__orgx_spawn`, then use `mcp__orgx__orgx_spawn`.
-9. Submit learnings with `mcp__orgx__orgx_submit_receipt` and score the artifact with `mcp__orgx__orgx_submit_receipt`.
+8. Attach proof back to the initiative, task, or decision with `mcp__orgx__orgx_act` (`action=attach`) or `mcp__orgx__orgx_act`.
+9. Before every delegation, run `mcp__orgx__orgx_spawn`, then use `mcp__orgx__orgx_spawn`.
+10. Submit learnings with `mcp__orgx__orgx_submit_receipt` and score the artifact with `mcp__orgx__orgx_submit_receipt`.
 
 Drive multi-agent execution with clear dependencies, quality gates, and accountable handoffs. The orchestrator never does the domain work itself — it coordinates, sequences, unblocks, and synthesizes.
 

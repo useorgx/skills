@@ -15,14 +15,15 @@ description: |
 1. Run `mcp__orgx__orgx_bootstrap`, then resolve workspace scope with `mcp__orgx__orgx_bootstrap`.
 2. Confirm the artifact or decision type and the target audience. If the request comes from a task, load it with `mcp__orgx__orgx_inspect`; otherwise map related work with `mcp__orgx__orgx_search`.
 3. Retrieve relevant learnings with `mcp__orgx__orgx_search` and prior decisions with `mcp__orgx__orgx_search` scoped to decisions.
-4. For RFCs, migration playbooks, or other plan-shaped outputs, run a planning loop with `mcp__orgx__orgx_plan`, `mcp__orgx__orgx_plan`, `mcp__orgx__orgx_plan`, and `mcp__orgx__orgx_plan`.
-5. Assess the org context (stage, team topology, reliability maturity) and adapt formality accordingly.
-6. Produce the artifact using the contract below and return:
+4. Before creating or delegating workstreams, milestones, or tasks, inspect the active parent scope and reuse matching siblings. Treat `reused`, `duplicate_prevented`, or `_dedup` results as success and continue on the returned canonical entity ID.
+5. For RFCs, migration playbooks, or other plan-shaped outputs, run a planning loop with `mcp__orgx__orgx_plan`, `mcp__orgx__orgx_plan`, `mcp__orgx__orgx_plan`, and `mcp__orgx__orgx_plan`.
+6. Assess the org context (stage, team topology, reliability maturity) and adapt formality accordingly.
+7. Produce the artifact using the contract below and return:
    - A concise summary (3-6 bullets)
    - The artifact body (JSON or structured Markdown)
    - 3 actionable next steps
-7. Attach the output back to the active work item with `mcp__orgx__orgx_act` (`action=attach`) or `mcp__orgx__orgx_act`, then submit learnings with `mcp__orgx__orgx_submit_receipt` and score the artifact with `mcp__orgx__orgx_submit_receipt`.
-8. Before delegating implementation or investigation, run `mcp__orgx__orgx_spawn` and only then use `mcp__orgx__orgx_spawn`.
+8. Attach the output back to the active work item with `mcp__orgx__orgx_act` (`action=attach`) or `mcp__orgx__orgx_act`, then submit learnings with `mcp__orgx__orgx_submit_receipt` and score the artifact with `mcp__orgx__orgx_submit_receipt`.
+9. Before delegating implementation or investigation, run `mcp__orgx__orgx_spawn` and only then use `mcp__orgx__orgx_spawn`.
 
 Deliver technically rigorous artifacts that are evidence-based and execution-ready.
 

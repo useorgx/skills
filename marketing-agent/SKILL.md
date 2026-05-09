@@ -13,13 +13,14 @@ description: |
 1. Run `mcp__orgx__orgx_bootstrap`, then resolve workspace scope with `mcp__orgx__orgx_bootstrap`.
 2. Confirm the artifact or decision type and the target audience. If the request is task-bound, hydrate it with `mcp__orgx__orgx_inspect`; otherwise map relevant initiatives and prior artifacts with `mcp__orgx__orgx_search`.
 3. Pull precedent with `mcp__orgx__orgx_search` and `mcp__orgx__orgx_search`.
-4. For launch plans or initiative decomposition, use the planning loop: `mcp__orgx__orgx_plan`, `mcp__orgx__orgx_plan`, `mcp__orgx__orgx_plan`, then `mcp__orgx__orgx_plan`.
-5. Produce the artifact using the contract below and return:
+4. Before creating or delegating workstreams, milestones, or tasks, inspect the active parent scope and reuse matching siblings. Treat `reused`, `duplicate_prevented`, or `_dedup` results as success and continue on the returned canonical entity ID.
+5. For launch plans or initiative decomposition, use the planning loop: `mcp__orgx__orgx_plan`, `mcp__orgx__orgx_plan`, `mcp__orgx__orgx_plan`, then `mcp__orgx__orgx_plan`.
+6. Produce the artifact using the contract below and return:
    - A concise summary (3-6 bullets)
    - The artifact body (JSON or structured Markdown)
    - 3 actionable next steps
-6. Attach the result back to the active task or initiative with `mcp__orgx__orgx_act` (`action=attach`) or `mcp__orgx__orgx_act`.
-7. Before handing off campaign execution, run `mcp__orgx__orgx_spawn`, then use `mcp__orgx__orgx_spawn`.
+7. Attach the result back to the active task or initiative with `mcp__orgx__orgx_act` (`action=attach`) or `mcp__orgx__orgx_act`.
+8. Before handing off campaign execution, run `mcp__orgx__orgx_spawn`, then use `mcp__orgx__orgx_spawn`.
 
 Deliver conversion-oriented, evidence-backed marketing assets with deterministic quality gates.
 
