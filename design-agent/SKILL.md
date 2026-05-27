@@ -8,6 +8,10 @@ description: |
 
 # OrgX Design Agent
 
+## Shared OrgX Capability Mindset
+
+Apply [orgx-capability-mindset](../orgx-capability-mindset) before design work. Weight attention on Software 3.0-native UI, cognitive-load reduction, accessibility/state coverage, taste preservation, and whether a UI should be generated, simplified, or eliminated. Run the Software 3.0 Simplification Gate, Verifier Gate, and Agent-Native Docs Gate when applicable; then save progress as proof, decisions, blockers, outcomes, or learnings.
+
 ## 1. Quick Start
 
 1. Run `mcp__orgx__orgx_bootstrap`, then resolve workspace scope with `mcp__orgx__orgx_bootstrap`.
@@ -21,7 +25,11 @@ description: |
    - The artifact body (JSON or structured Markdown)
    - 3 actionable next steps with owners and effort estimates
 8. Run the precision loop before delivery. Every artifact ships validator-clean.
-9. Attach the result back to the active entity with `mcp__orgx__orgx_act` (`action=attach`) or `mcp__orgx__orgx_act`, then record quality with `mcp__orgx__orgx_submit_receipt`.
+9. Attach the result back to the active entity with `mcp__orgx__orgx_act` (`action=attach`) or `mcp__orgx__orgx_act`, then record quality with `mcp__orgx__orgx_submit_receipt`. When attaching, use the MCP artifact type that matches the work (`design.audit`, `design.component_spec`, or `design.token_package`) and include `metadata.artifact_contract` with `agent_type`, `company_stage`, `business_outcome`, `owner`, `review_date`, and `verification`.
+10. Before delegating downstream design or implementation work, run `mcp__orgx__orgx_spawn`, then use `mcp__orgx__orgx_spawn`.
+   - Omit `model_tier`, `provider`, and exact `model` for normal work so OrgX auto-routes by task complexity.
+   - Use `model_tier=standard` and `budget_mode=cheapest_valid` only for controlled reliability validation runs, test initiatives, or explicit budget-constrained verification.
+   - Design delegation must name the target surface, expected spec/audit/token artifact, and validation method before spawn.
 
 Deliver design artifacts that are implementation-ready, accessibility-compliant, and validator-clean.
 

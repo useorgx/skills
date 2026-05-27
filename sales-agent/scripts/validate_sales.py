@@ -21,6 +21,41 @@ from typing import List, Dict, Any, Tuple
 
 
 QUALITY_GATES = {
+    "strategy": [
+        ("has_objective", "Objective is required",
+         lambda d: bool(d.get("objective"))),
+        ("has_current_stage", "Current company/revenue stage is required",
+         lambda d: bool(d.get("current_stage"))),
+        ("has_icp", "ICP must include segment, buyer, pain, trigger_event, and disqualifiers",
+         lambda d: all(d.get("icp", {}).get(field) for field in [
+             "segment", "buyer", "pain", "trigger_event", "disqualifiers"
+         ])),
+        ("has_offer", "Offer must include promise, proof, risk reversal, and packaging hypothesis",
+         lambda d: all(d.get("offer", {}).get(field) for field in [
+             "promise", "proof", "risk_reversal", "pricing_or_packaging_hypothesis"
+         ])),
+        ("has_target_list_plan", "Target list plan must include source, filters, count, and first-account criteria",
+         lambda d: all(d.get("target_list_plan", {}).get(field) for field in [
+             "source", "filters", "target_account_count", "first_20_accounts_criteria"
+         ])),
+        ("has_outbound_summary", "Outbound sequence summary must include channels, touch_count, hook, and CTA",
+         lambda d: all(d.get("outbound_sequence_summary", {}).get(field) for field in [
+             "channels", "touch_count", "primary_hook", "cta"
+         ])),
+        ("has_objection_map", "At least 4 objections are required",
+         lambda d: len(d.get("objection_map", [])) >= 4),
+        ("objections_have_responses", "All objections must include response and proof_needed",
+         lambda d: all(o.get("response") and o.get("proof_needed")
+                       for o in d.get("objection_map", []))),
+        ("has_daily_execution_plan", "Daily execution plan is required",
+         lambda d: all(d.get("daily_execution_plan", {}).get(field) for field in [
+             "send_volume", "research_time", "follow_up_cadence", "review_metric"
+         ])),
+        ("has_success_metrics", "Success metrics are required",
+         lambda d: bool(d.get("success_metrics"))),
+        ("has_next_actions", "At least 5 next actions required",
+         lambda d: len(d.get("next_5_actions", [])) >= 5),
+    ],
     "battlecard": [
         ("has_competitor", "Competitor name is required",
          lambda d: bool(d.get("competitor", "").strip())),
@@ -185,7 +220,7 @@ def main():
     parser = argparse.ArgumentParser(description="Validate OrgX sales artifacts")
     parser.add_argument("file", type=Path, help="Path to artifact file")
     parser.add_argument("--type", "-t", required=True,
-                       choices=["battlecard", "meddic", "sequence"],
+                       choices=["strategy", "battlecard", "meddic", "sequence"],
                        help="Artifact type to validate")
     parser.add_argument("--json", action="store_true", help="Output results as JSON")
 
