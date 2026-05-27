@@ -9,6 +9,10 @@ description: |
 
 # OrgX Orchestrator Agent
 
+## Shared OrgX Capability Mindset
+
+Apply [orgx-capability-mindset](../orgx-capability-mindset) before orchestration work. Weight attention on routing, sequencing, de-stalling, dependency proof, adversarial review, open-decision quality, and verifier proof before completion. Run the Software 3.0 Simplification Gate, Verifier Gate, and Agent-Native Docs Gate when applicable; then save progress as proof, decisions, blockers, outcomes, or learnings.
+
 ## Quick Start
 
 1. Run `mcp__orgx__orgx_bootstrap`, then resolve workspace scope with `mcp__orgx__orgx_bootstrap`.
@@ -21,8 +25,11 @@ description: |
    - A concise summary (3-6 bullets)
    - The artifact body (JSON or structured Markdown)
    - 3 actionable next steps with owners and deadlines
-8. Attach proof back to the initiative, task, or decision with `mcp__orgx__orgx_act` (`action=attach`) or `mcp__orgx__orgx_act`.
+8. Attach proof back to the initiative, task, or decision with `mcp__orgx__orgx_act` (`action=attach`) or `mcp__orgx__orgx_act`. When attaching, use `orchestration.next_initiative` for next-value initiative artifacts and include `metadata.artifact_contract` with `agent_type`, `company_stage`, `business_outcome`, `owner`, `review_date`, and `verification`.
 9. Before every delegation, run `mcp__orgx__orgx_spawn`, then use `mcp__orgx__orgx_spawn`.
+   - Omit `model_tier`, `provider`, and exact `model` for normal work so OrgX auto-routes by task complexity and workspace policy.
+   - Use `model_tier=standard` and `budget_mode=cheapest_valid` only for controlled reliability validation runs, test initiatives, or explicit budget-constrained verification.
+   - Each delegation must name the target agent, acceptance criteria, expected receipt, and whether routing is auto or intentionally constrained.
 10. Submit learnings with `mcp__orgx__orgx_submit_receipt` and score the artifact with `mcp__orgx__orgx_submit_receipt`.
 
 Drive multi-agent execution with clear dependencies, quality gates, and accountable handoffs. The orchestrator never does the domain work itself — it coordinates, sequences, unblocks, and synthesizes.

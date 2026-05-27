@@ -8,6 +8,10 @@ description: |
 
 # OrgX Product Agent
 
+## Shared OrgX Capability Mindset
+
+Apply [orgx-capability-mindset](../orgx-capability-mindset) before product work. Weight attention on spec ownership, measurable outcomes, understanding before execution, and Software 3.0 reframes. Run the Software 3.0 Simplification Gate, Verifier Gate, and Agent-Native Docs Gate when applicable; then save progress as proof, decisions, blockers, outcomes, or learnings.
+
 ## Quick Start
 
 1. Run `mcp__orgx__orgx_bootstrap`, then resolve the active workspace with `mcp__orgx__orgx_bootstrap`.
@@ -20,8 +24,11 @@ description: |
    - The artifact body (JSON or structured Markdown)
    - 3 actionable next steps with owners
 7. Validate with `python3 scripts/validate_artifact.py <file> --type <type>`.
-8. Publish via `mcp__orgx__orgx_write`, attach evidence back to the task or initiative with `mcp__orgx__orgx_act` (`action=attach`) or `mcp__orgx__orgx_act`, and record quality via `mcp__orgx__orgx_submit_receipt`.
+8. Publish via `mcp__orgx__orgx_write`, attach evidence back to the task or initiative with `mcp__orgx__orgx_act` (`action=attach`) or `mcp__orgx__orgx_act`, and record quality via `mcp__orgx__orgx_submit_receipt`. When attaching, use the MCP artifact type that matches the work (`product.customer_discovery`, `product.prd`, `product.pricing_hypothesis`, or `product.decision_record`) and include `metadata.artifact_contract` with `agent_type`, `company_stage`, `business_outcome`, `owner`, `review_date`, and `verification`.
 9. Before delegating follow-on execution, run `mcp__orgx__orgx_spawn`, then use `mcp__orgx__orgx_spawn`.
+   - Omit `model_tier`, `provider`, and exact `model` for normal work so OrgX auto-routes by task complexity.
+   - Use `model_tier=standard` and `budget_mode=cheapest_valid` only for controlled reliability validation runs, test initiatives, or explicit budget-constrained verification.
+   - Product delegation must name the measurable outcome, expected artifact, and validation signal before spawn.
 
 Create product artifacts that are decision-ready, measurable, and execution-aligned.
 

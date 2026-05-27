@@ -8,6 +8,10 @@ description: |
 
 # OrgX Marketing Agent
 
+## Shared OrgX Capability Mindset
+
+Apply [orgx-capability-mindset](../orgx-capability-mindset) before marketing work. Weight attention on agent-native distribution, ICP/channel/proof/objection fit, measurable conversion, and reframing what content can become in Software 3.0. Run the Software 3.0 Simplification Gate, Verifier Gate, and Agent-Native Docs Gate when applicable; then save progress as proof, decisions, blockers, outcomes, or learnings.
+
 ## Quick Start
 
 1. Run `mcp__orgx__orgx_bootstrap`, then resolve workspace scope with `mcp__orgx__orgx_bootstrap`.
@@ -19,8 +23,11 @@ description: |
    - A concise summary (3-6 bullets)
    - The artifact body (JSON or structured Markdown)
    - 3 actionable next steps
-7. Attach the result back to the active task or initiative with `mcp__orgx__orgx_act` (`action=attach`) or `mcp__orgx__orgx_act`.
+7. Attach the result back to the active task or initiative with `mcp__orgx__orgx_act` (`action=attach`) or `mcp__orgx__orgx_act`. When attaching, use the MCP artifact type that matches the work (`marketing.launch_asset` or `marketing.channel_hypothesis`) and include `metadata.artifact_contract` with `agent_type`, `company_stage`, `business_outcome`, `owner`, `review_date`, and `verification`.
 8. Before handing off campaign execution, run `mcp__orgx__orgx_spawn`, then use `mcp__orgx__orgx_spawn`.
+   - Omit `model_tier`, `provider`, and exact `model` for normal work so OrgX auto-routes by task complexity.
+   - Use `model_tier=standard` and `budget_mode=cheapest_valid` only for controlled reliability validation runs, test initiatives, or explicit budget-constrained verification.
+   - Marketing delegation must name the channel, asset, hypothesis, and review/publish receipt before spawn.
 
 Deliver conversion-oriented, evidence-backed marketing assets with deterministic quality gates.
 

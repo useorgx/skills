@@ -23,6 +23,7 @@ npx add-skill useorgx/skills --list
 | [initiative-kickoff](./initiative-kickoff) | Create complete initiatives from a one-line goal                            |
 | [bulk-create](./bulk-create)               | Create multiple tasks from markdown checklists                              |
 | [nightly-recap](./nightly-recap)           | End-of-day activity summary                                                 |
+| [orgx-capability-mindset](./orgx-capability-mindset) | Shared Software 3.0 judgment layer: verifier gates, agent-native outputs, jagged-risk routing, adversarial review, and MCP progress ledger |
 | [product-agent](./product-agent)           | 100x product domain expert: PRDs, initiatives, canvases, research briefs, competitive analyses, prioritization matrices, pivot evaluations, dashboard specs, launch readiness |
 | [engineering-agent](./engineering-agent)   | 100x engineering domain expert: RFCs, ADRs, code reviews, postmortems, tech debt inventories, capacity plans, runbooks, migration playbooks, dependency audits, perf budgets |
 | [marketing-agent](./marketing-agent)       | 100x marketing domain expert: campaign briefs, content packs, nurture sequences, positioning docs, messaging matrices, competitive narratives, launch plans, analyst briefs, community strategies |
@@ -49,6 +50,33 @@ These skills require the [OrgX MCP server](https://mcp.useorgx.com) to be config
   }
 }
 ```
+
+## Founder/Team Artifact Contract
+
+All role agents inherit the shared
+[orgx-capability-mindset](./orgx-capability-mindset) contract. Agents should
+first identify whether the workspace is acting like an early founder,
+founder-led company, or operating team, then produce the practical artifact that
+moves the company forward now.
+
+When attaching artifacts or receipts through OrgX MCP, use the canonical
+cross-domain artifact type where possible:
+
+| Agent | MCP artifact_type examples |
+| --- | --- |
+| Orchestrator | `orchestration.next_initiative` |
+| Engineering | `eng.pull_request`, `eng.deploy_proof`, `eng.structured_blocker` |
+| Sales | `sales.strategy`, `sales.icp_offer_sequence`, `sales.send_plan` |
+| Marketing | `marketing.launch_asset`, `marketing.channel_hypothesis` |
+| Product | `product.customer_discovery`, `product.prd`, `product.pricing_hypothesis`, `product.decision_record` |
+| Design | `design.audit`, `design.component_spec`, `design.token_package` |
+| Operations | `ops.operator_brief`, `ops.runbook`, `ops.budget_envelope`, `ops.incident_status` |
+
+Attach `agent_type`, `company_stage`, `business_outcome`, `owner`,
+`review_date`, and `verification` metadata so OrgX can connect artifacts to
+proof, recommendations, morning briefs, and skill improvement. Use local
+validator `--type` names inside each skill; use the MCP `artifact_type` values
+when saving the artifact to OrgX.
 
 ## Verification
 

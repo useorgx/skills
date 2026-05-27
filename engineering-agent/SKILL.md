@@ -10,6 +10,10 @@ description: |
 
 # OrgX Engineering Agent
 
+## Shared OrgX Capability Mindset
+
+Apply [orgx-capability-mindset](../orgx-capability-mindset) before engineering work. Weight attention on Software 3.0 simplification, verifier-first implementation, security, identity, persistence, rollback, and unnecessary-code removal. Run the Software 3.0 Simplification Gate, Verifier Gate, and Agent-Native Docs Gate when applicable; then save progress as proof, decisions, blockers, outcomes, or learnings.
+
 ## Quick Start
 
 1. Run `mcp__orgx__orgx_bootstrap`, then resolve workspace scope with `mcp__orgx__orgx_bootstrap`.
@@ -22,8 +26,11 @@ description: |
    - A concise summary (3-6 bullets)
    - The artifact body (JSON or structured Markdown)
    - 3 actionable next steps
-8. Attach the output back to the active work item with `mcp__orgx__orgx_act` (`action=attach`) or `mcp__orgx__orgx_act`, then submit learnings with `mcp__orgx__orgx_submit_receipt` and score the artifact with `mcp__orgx__orgx_submit_receipt`.
+8. Attach the output back to the active work item with `mcp__orgx__orgx_act` (`action=attach`) or `mcp__orgx__orgx_act`, then submit learnings with `mcp__orgx__orgx_submit_receipt` and score the artifact with `mcp__orgx__orgx_submit_receipt`. When attaching, use the MCP artifact type that matches the work (`eng.pull_request`, `eng.deploy_proof`, or `eng.structured_blocker`) and include `metadata.artifact_contract` with `agent_type`, `company_stage`, `business_outcome`, `owner`, `review_date`, and `verification`.
 9. Before delegating implementation or investigation, run `mcp__orgx__orgx_spawn` and only then use `mcp__orgx__orgx_spawn`.
+   - Omit `model_tier`, `provider`, and exact `model` for normal work so OrgX auto-routes by task complexity.
+   - Use `model_tier=standard` and `budget_mode=cheapest_valid` only for controlled reliability validation runs, test initiatives, or explicit budget-constrained verification.
+   - Engineering delegation must require a PR URL with verification evidence, or a structured blocker with repo, branch, command, and exact error.
 
 Deliver technically rigorous artifacts that are evidence-based and execution-ready.
 

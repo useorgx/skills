@@ -8,6 +8,10 @@ description: |
 
 # OrgX Sales Agent
 
+## Shared OrgX Capability Mindset
+
+Apply [orgx-capability-mindset](../orgx-capability-mindset) before sales work. Weight attention on spec-first deal qualification, buyer-context preservation, measurable outreach, jaggedness in account research, and explicit sensor-to-actuator discipline before any outreach recommendation. Run the Software 3.0 Simplification Gate, Verifier Gate, and Agent-Native Docs Gate when applicable; then save progress as proof, decisions, blockers, outcomes, or learnings.
+
 ## Quick Start
 
 1. Run `mcp__orgx__orgx_bootstrap`, then resolve workspace scope with `mcp__orgx__orgx_bootstrap`.
@@ -21,7 +25,11 @@ description: |
    - The artifact body (JSON or structured Markdown)
    - 3 actionable next steps with owners and dates
 8. Run the Precision Loop before finalizing.
-9. Attach the result back to the active work with `mcp__orgx__orgx_act` (`action=attach`) or `mcp__orgx__orgx_act`, then record quality with `mcp__orgx__orgx_submit_receipt`.
+9. Attach the result back to the active work with `mcp__orgx__orgx_act` (`action=attach`) or `mcp__orgx__orgx_act`, then record quality with `mcp__orgx__orgx_submit_receipt`. When attaching, use the MCP artifact type that matches the work (`sales.strategy`, `sales.icp_offer_sequence`, or `sales.send_plan`) and include `metadata.artifact_contract` with `agent_type`, `company_stage`, `business_outcome`, `owner`, `review_date`, and `verification`.
+10. Before delegating sales follow-up, research, or execution, run `mcp__orgx__orgx_spawn`, then use `mcp__orgx__orgx_spawn`.
+   - Omit `model_tier`, `provider`, and exact `model` for normal work so OrgX auto-routes by task complexity.
+   - Use `model_tier=standard` and `budget_mode=cheapest_valid` only for controlled reliability validation runs, test initiatives, or explicit budget-constrained verification.
+   - Sales delegation must require a concrete sales receipt: ICP, offer, target segment/list, sequence, objections, send plan, or structured blocker.
 
 Create revenue-focused sales artifacts that are specific, evidence-backed, and execution-ready.
 Every claim must have proof or an explicit confidence level. Every action must have an owner.
@@ -51,7 +59,7 @@ Do not use this skill for:
 
 Collect before drafting:
 
-- `artifact_type`: `battlecard` | `meddic` | `sequence` | `territory` | `qbr` | `deal-review` | `win-loss` | `pricing` | `partner-pitch`
+- `artifact_type`: `strategy` | `battlecard` | `meddic` | `sequence` | `territory` | `qbr` | `deal-review` | `win-loss` | `pricing` | `partner-pitch`
 - Deal context (segment, ACV, stage, timeline)
 - Stakeholder map and known pain points
 - Competitive evidence and objections
@@ -197,6 +205,28 @@ Adapt artifact tone, depth, and structure based on the deal context signals belo
 ---
 
 ## Artifact Contracts
+
+### Sales Strategy (`--type strategy`)
+
+Required fields:
+
+- `objective` -- revenue or learning goal, with time horizon
+- `current_stage` -- company/revenue stage and execution constraints
+- `icp`:
+  - `segment`, `buyer`, `pain`, `trigger_event`, `disqualifiers`
+- `offer`:
+  - `promise`, `proof`, `risk_reversal`, `pricing_or_packaging_hypothesis`
+- `target_list_plan`:
+  - `source`, `filters`, `target_account_count`, `first_20_accounts_criteria`
+- `outbound_sequence_summary`:
+  - `channels`, `touch_count`, `primary_hook`, `cta`
+- `objection_map` (>=4), each with `objection`, `response`, and `proof_needed`
+- `daily_execution_plan`:
+  - `send_volume`, `research_time`, `follow_up_cadence`, `review_metric`
+- `success_metrics`:
+  - meetings booked, replies, qualified opportunities, or learning targets
+- `next_5_actions` -- concrete actions with owner and due date
+- `blockers_or_assumptions` -- what would prevent execution or lower confidence
 
 ### Battlecard (`--type battlecard`)
 

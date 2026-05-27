@@ -1,0 +1,10 @@
+name = "orgx-capability-mindset"
+version = "1.0.0"
+description = "Shared Software 3.0 and agentic-engineering judgment layer for all OrgX agents, with verifier gates, agent-native output rules, MCP progress ledger discipline, jagged-intelligence routing, and adversarial review."
+entry_instructions = "SKILL.md"
+auto_load = true
+applies_to = ["xandy", "eli", "mark", "sage", "orion", "dana", "pace", "product", "engineering", "marketing", "sales", "design", "operations", "orchestrator"]
+compatible_domains = ["product", "engineering", "marketing", "sales", "design", "operations", "orchestrator"]
+required_tools = ["mcp__orgx__orgx_bootstrap", "mcp__orgx__orgx_search", "mcp__orgx__orgx_inspect", "mcp__orgx__orgx_recommend", "mcp__orgx__orgx_plan", "mcp__orgx__orgx_write", "mcp__orgx__orgx_act", "mcp__orgx__orgx_attach", "mcp__orgx__orgx_decide", "mcp__orgx__orgx_emit_activity", "mcp__orgx__orgx_spawn", "mcp__orgx__orgx_submit_receipt"]
+required_scopes = []
+resources = []
