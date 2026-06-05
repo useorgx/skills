@@ -10,7 +10,7 @@ description: |
 
 ## Shared OrgX Capability Mindset
 
-Apply [orgx-capability-mindset](../orgx-capability-mindset) before product work. Weight attention on spec ownership, measurable outcomes, understanding before execution, and Software 3.0 reframes. Run the Software 3.0 Simplification Gate, Verifier Gate, and Agent-Native Docs Gate when applicable; then save progress as proof, decisions, blockers, outcomes, or learnings.
+Apply [orgx-capability-mindset](../orgx-capability-mindset) before product work. Weight attention on spec ownership, measurable outcomes, understanding before execution, Software 3.0 reframes, and buyer-path/GTM mechanics for public or revenue-facing work. Run the Software 3.0 Simplification Gate, Verifier Gate, GTM Outcome Gate, and Agent-Native Docs Gate when applicable; then save progress as proof, decisions, blockers, outcomes, or learnings.
 
 ## Quick Start
 
@@ -153,6 +153,7 @@ The agent must detect the product's stage and context, then adjust its behavior 
 | **Enterprise** | Compliance requirements, procurement cycles, security reviews | Add compliance sections to every PRD, include procurement requirements in launch readiness, trigger security review gates. Buyer and user are different people — address both. |
 | **Platform / API product** | Developer users, integration ecosystem, versioning concerns | Developer experience metrics (time-to-first-API-call, error rate, docs coverage), integration complexity assessment, backward compatibility as a hard constraint in every PRD. |
 | **B2B** | Business buyers, multi-stakeholder decisions, contract cycles | Buyer is not User distinction in every artifact. Champion enablement section. Procurement friction analysis. Success metrics include both user-level and buyer-level outcomes. |
+| **Revenue-facing public surface** | Live/proof, landing, onboarding, pricing, demo, comparison, deck, or signup work | Product scope is incomplete without buyer path, capture mechanic, attribution, follow-up owner, conversion metric, proof asset, and objection coverage. Treat these as acceptance criteria, not launch extras. |
 | **B2C** | Consumer users, high volume, behavioral patterns | Behavioral psychology in feature design (habit loops, variable rewards, social proof). Activation funnel detail. Retention through habit formation, not contractual obligation. |
 | **Solo PM** | Small team, one PM covering everything | Combine canvas + PRD into single doc. Skip RACI. Emphasize async decision documents. Reduce ceremony. Every artifact should be completable in under 2 hours. |
 | **Large PM org** | Multiple PMs, shared platform, dependencies | Explicit dependency mapping in every initiative. Portfolio-level metrics. Team topology alignment (stream-aligned, platform, enabling, complicated-subsystem). Cross-team handoff contracts. |
@@ -168,6 +169,7 @@ The agent must detect the product's stage and context, then adjust its behavior 
 - Existing evidence (research, support insights, usage metrics)
 - Delivery constraints (timeline, dependencies, non-goals)
 - Success metric expectations
+- GTM context when public or revenue-facing: ICP, buyer stage, capture path, attribution source, follow-up owner, conversion metric, proof asset, and objections
 
 If core evidence is missing, declare assumptions explicitly and downgrade confidence in the artifact header.
 
@@ -400,8 +402,9 @@ python3 scripts/validate_artifact.py <artifact_file> --type <type>
 1. **Framing pass** — Problem, user, and value proposition are coherent. The problem is stated from the user's perspective, not the builder's. Apply JTBD framing: does the problem statement describe a job the user is trying to do?
 2. **Evidence pass** — Every claim ties to data, research, or a declared assumption. No unsupported assertions. Apply the heuristics: flag any pattern matches (feature request without evidence, metric without baseline, etc.).
 3. **Prioritization pass** — Milestones, criteria, and scope are realistic and testable. Apply the relevant prioritization framework. Check for anti-patterns (feature factory, HiPPO-driven, vanity metrics).
-4. **Delivery pass** — Validator runs clean. Artifact is implementation-ready. Handoff contracts are complete. Every downstream agent has what they need.
-5. **Learning pass** — Artifact references prior learnings. New learnings are documented. Quality score is recorded.
+4. **GTM pass** — Public or revenue-facing work has buyer path, capture, attribution, follow-up owner, conversion metric, proof asset, and objection coverage. If not applicable, the artifact says why.
+5. **Delivery pass** — Validator runs clean. Artifact is implementation-ready. Handoff contracts are complete. Every downstream agent has what they need.
+6. **Learning pass** — Artifact references prior learnings. New learnings are documented. Quality score is recorded.
 
 ---
 
@@ -460,3 +463,4 @@ python3 scripts/validate_artifact.py <artifact_file> --type <type>
 - The artifact passes the **Problem-First Test**: the first section describes the user's pain, not the team's solution.
 - The artifact passes the **Stranger Test**: someone outside the team could read it and understand what to build and why.
 - The artifact passes the **Measurement Test**: every success metric has a baseline (or a plan to get one), a target, and a method.
+- Public or revenue-facing work passes the **GTM Outcome Test**: the buyer path, capture mechanic, attribution, follow-up owner, conversion metric, proof asset, and objections are explicit.

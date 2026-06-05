@@ -10,7 +10,7 @@ description: |
 
 ## Shared OrgX Capability Mindset
 
-Apply [orgx-capability-mindset](../orgx-capability-mindset) before design work. Weight attention on Software 3.0-native UI, cognitive-load reduction, accessibility/state coverage, taste preservation, and whether a UI should be generated, simplified, or eliminated. Run the Software 3.0 Simplification Gate, Verifier Gate, and Agent-Native Docs Gate when applicable; then save progress as proof, decisions, blockers, outcomes, or learnings.
+Apply [orgx-capability-mindset](../orgx-capability-mindset) before design work. Weight attention on Software 3.0-native UI, cognitive-load reduction, accessibility/state coverage, taste preservation, whether a UI should be generated, simplified, or eliminated, and whether public/revenue-facing surfaces expose the buyer path and GTM mechanics. Run the Software 3.0 Simplification Gate, Verifier Gate, GTM Outcome Gate, and Agent-Native Docs Gate when applicable; then save progress as proof, decisions, blockers, outcomes, or learnings.
 
 ## 1. Quick Start
 
@@ -111,7 +111,8 @@ Read the workspace signal and adjust your artifact depth, complexity, and recomm
 | Enterprise product | Consider WCAG AAA where feasible. Plan for multi-brand theming, RTL layout support, and i18n string expansion (30-40% longer in German). |
 | Mobile-first product | Touch targets 48px minimum. Design for thumb zone (bottom-third of screen). Plan gesture patterns and swipe affordances. |
 | Web application (productivity) | Keyboard shortcuts are essential. Offer density modes (compact, comfortable, spacious). Optimize for extended sessions and repeated tasks. |
-| Marketing site | Visual storytelling and scroll choreography. Conversion-optimized layout with clear CTA hierarchy. Performance budget for above-fold LCP. |
+| Marketing site | Visual storytelling and scroll choreography. Conversion-optimized layout with clear CTA hierarchy. Performance budget for above-fold LCP. Include capture, attribution, follow-up, and proof reuse mechanics. |
+| Revenue-facing proof surface | Treat GTM as part of the interaction model. The design must show the buyer path, gated deep interaction, attribution source, follow-up owner, conversion metric, reusable proof asset, and objection coverage without overwhelming first-glance comprehension. |
 | Agent-first UI | Status visualization for async operations. Confidence indicators for AI-generated content. Progressive disclosure of AI reasoning chains. Streaming state patterns. |
 | Dark mode required | Dual palette from day one. Test every component in both modes. Avoid pure black (#000000); use #121212 or similar. Elevation via surface lightening, not shadows. |
 
@@ -123,6 +124,7 @@ Collect before drafting any artifact:
 - System context: product area, platform, release phase
 - Source evidence: Figma links, screenshots, code snippets, or existing documentation
 - Constraints: WCAG target (`AA` by default), brand constraints, deadline, platform targets
+- GTM context for public/revenue-facing surfaces: buyer path, capture trigger, attribution source, follow-up owner, conversion metric, proof assets, and objections to address
 
 If inputs are incomplete, declare assumptions explicitly at the top of the artifact with a confidence rating (high, medium, low) for each assumption.
 
@@ -836,7 +838,7 @@ python3 scripts/validate_design.py <artifact_file> --type <audit|tokens|componen
 
 ## 12. Precision Loop (Run Every Artifact)
 
-Execute this checklist on every artifact before delivery. All five passes must clear.
+Execute this checklist on every artifact before delivery. All passes must clear.
 
 ### Pass 1 — Completeness
 
@@ -867,7 +869,14 @@ Execute this checklist on every artifact before delivery. All five passes must c
 - Priority order is clear (critical before major before minor)
 - Code examples are syntactically valid
 
-### Pass 5 — Validator
+### Pass 5 — GTM Outcome
+
+- Revenue-facing surfaces state the buyer path and primary conversion action
+- Deep interaction gates preserve first-glance value and return users to intent
+- Attribution, capture, follow-up owner, and conversion metric are specified
+- Proof assets and objection coverage are built into the design, not bolted on
+
+### Pass 6 — Validator
 
 - Run `python3 scripts/validate_design.py` and confirm zero errors
 - No warnings that indicate missing recommended fields
@@ -878,9 +887,10 @@ Execute this checklist on every artifact before delivery. All five passes must c
 An artifact is done when all of the following are true:
 
 - Artifact type matches the request and conforms to its schema contract
-- All five precision loop passes clear
+- All precision loop passes clear
 - Validator passes with zero errors
 - Findings and recommendations are specific, actionable, and evidence-backed
+- Public or revenue-facing work passes the GTM Outcome Gate or explicitly documents why it is not applicable
 - Downstream agent handoff requirements are met
 - Final artifact is saved via `mcp__orgx__orgx_write` and linked to related entities
 - At least one learning has been recorded via `mcp__orgx__orgx_submit_receipt`
