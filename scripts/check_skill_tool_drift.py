@@ -32,6 +32,7 @@ KNOWN_ORGX_TOOLS = {
     "orgx_bootstrap",
     "orgx_decide",
     "orgx_emit_activity",
+    "get_operator_chronicle",
     "orgx_inspect",
     "orgx_plan",
     "orgx_recommend",
@@ -123,7 +124,11 @@ LOOP_VALIDATION_FIELDS = {
 ROLE_AGENT_ARTIFACT_TYPES = {
     "design-agent": {"design.audit", "design.component_spec", "design.token_package"},
     "engineering-agent": {"eng.pull_request", "eng.deploy_proof", "eng.structured_blocker"},
-    "marketing-agent": {"marketing.launch_asset", "marketing.channel_hypothesis"},
+    "marketing-agent": {
+        "marketing.launch_asset",
+        "marketing.channel_hypothesis",
+        "marketing.offer_package",
+    },
     "operations-agent": {
         "ops.operator_brief",
         "ops.runbook",
@@ -137,7 +142,12 @@ ROLE_AGENT_ARTIFACT_TYPES = {
         "product.pricing_hypothesis",
         "product.decision_record",
     },
-    "sales-agent": {"sales.strategy", "sales.icp_offer_sequence", "sales.send_plan"},
+    "sales-agent": {
+        "sales.strategy",
+        "sales.icp_offer_sequence",
+        "sales.follow_up_sequence",
+        "sales.send_plan",
+    },
 }
 
 

@@ -23,7 +23,8 @@ Apply [orgx-capability-mindset](../orgx-capability-mindset) before marketing wor
    - A concise summary (3-6 bullets)
    - The artifact body (JSON or structured Markdown)
    - 3 actionable next steps
-7. Attach the result back to the active task or initiative with `mcp__orgx__orgx_act` (`action=attach`) or `mcp__orgx__orgx_act`. When attaching, use the MCP artifact type that matches the work (`marketing.launch_asset` or `marketing.channel_hypothesis`) and include `metadata.artifact_contract` with `agent_type`, `company_stage`, `business_outcome`, `owner`, `review_date`, and `verification`.
+7. Attach the result back to the active task or initiative with `mcp__orgx__orgx_act` (`action=attach`) or `mcp__orgx__orgx_act`. When attaching, use the MCP artifact type that matches the work (`marketing.launch_asset`, `marketing.channel_hypothesis`, or `marketing.offer_package`) and include `metadata.artifact_contract` with `agent_type`, `company_stage`, `business_outcome`, `owner`, `review_date`, and `verification`.
+   - If the work packages public proof into a buyer-facing signup, audit, checkout, pricing, or CTA path, emit `marketing.offer_package` explicitly. The artifact must include proof source, ICP, offer promise, CTA target, signup path, expected intent signal, review/publish status, and stop condition.
 8. Before handing off campaign execution, run `mcp__orgx__orgx_spawn`, then use `mcp__orgx__orgx_spawn`.
    - Omit `model_tier`, `provider`, and exact `model` for normal work so OrgX auto-routes by task complexity.
    - Use `model_tier=standard` and `budget_mode=cheapest_valid` only for controlled reliability validation runs, test initiatives, or explicit budget-constrained verification.
@@ -62,6 +63,7 @@ Collect before drafting:
 - `artifact_type`: `campaign` | `content` | `sequence` | `positioning` | `messaging` | `competitive-narrative` | `launch` | `analyst-brief` | `community`
 - Audience and segment context (ICP, pain, buying stage)
 - Offer and positioning (problem, value prop, proof)
+- Buyer CTA path when the work will feed `/live` or a public proof room
 - Performance target (pipeline, conversion, CAC/LTV, adoption)
 - Brand constraints and legal/compliance notes
 

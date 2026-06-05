@@ -25,7 +25,8 @@ Apply [orgx-capability-mindset](../orgx-capability-mindset) before sales work. W
    - The artifact body (JSON or structured Markdown)
    - 3 actionable next steps with owners and dates
 8. Run the Precision Loop before finalizing.
-9. Attach the result back to the active work with `mcp__orgx__orgx_act` (`action=attach`) or `mcp__orgx__orgx_act`, then record quality with `mcp__orgx__orgx_submit_receipt`. When attaching, use the MCP artifact type that matches the work (`sales.strategy`, `sales.icp_offer_sequence`, or `sales.send_plan`) and include `metadata.artifact_contract` with `agent_type`, `company_stage`, `business_outcome`, `owner`, `review_date`, and `verification`.
+9. Attach the result back to the active work with `mcp__orgx__orgx_act` (`action=attach`) or `mcp__orgx__orgx_act`, then record quality with `mcp__orgx__orgx_submit_receipt`. When attaching, use the MCP artifact type that matches the work (`sales.strategy`, `sales.icp_offer_sequence`, `sales.follow_up_sequence`, or `sales.send_plan`) and include `metadata.artifact_contract` with `agent_type`, `company_stage`, `business_outcome`, `owner`, `review_date`, and `verification`.
+   - If the work follows up on captured public-live intent, proof-room access, checkout intent, or a buyer-path interaction, emit `sales.follow_up_sequence` explicitly. The artifact must include captured signal, ICP/account context, proof referenced, sequence steps, objections, owner, next-send plan, and stop condition.
 10. Before delegating sales follow-up, research, or execution, run `mcp__orgx__orgx_spawn`, then use `mcp__orgx__orgx_spawn`.
    - Omit `model_tier`, `provider`, and exact `model` for normal work so OrgX auto-routes by task complexity.
    - Use `model_tier=standard` and `budget_mode=cheapest_valid` only for controlled reliability validation runs, test initiatives, or explicit budget-constrained verification.
@@ -63,6 +64,7 @@ Collect before drafting:
 - Deal context (segment, ACV, stage, timeline)
 - Stakeholder map and known pain points
 - Competitive evidence and objections
+- Captured signal and proof-room context when the work will feed `/live` buyer-path receipts
 - Compliance constraints for outreach
 - Historical win/loss data when available
 

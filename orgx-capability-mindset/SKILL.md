@@ -57,8 +57,8 @@ Preferred MCP `artifact_type` values:
 | --- | --- | --- |
 | Orchestrator | `orchestration.next_initiative` | `initiative` or `delegation` |
 | Engineering | `eng.pull_request`, `eng.deploy_proof`, `eng.structured_blocker` | `review`, `runbook`, or nearest local type |
-| Sales | `sales.strategy`, `sales.icp_offer_sequence`, `sales.send_plan` | `strategy` or `sequence` |
-| Marketing | `marketing.launch_asset`, `marketing.channel_hypothesis` | `launch`, `campaign`, or `positioning` |
+| Sales | `sales.strategy`, `sales.icp_offer_sequence`, `sales.follow_up_sequence`, `sales.send_plan` | `strategy` or `sequence` |
+| Marketing | `marketing.launch_asset`, `marketing.channel_hypothesis`, `marketing.offer_package` | `launch`, `campaign`, or `positioning` |
 | Product | `product.customer_discovery`, `product.prd`, `product.pricing_hypothesis`, `product.decision_record` | `research-brief`, `prd`, `canvas`, or `prioritization` |
 | Design | `design.audit`, `design.component_spec`, `design.token_package` | `audit`, `component`, or `tokens` |
 | Operations | `ops.operator_brief`, `ops.runbook`, `ops.budget_envelope`, `ops.incident_status` | `playbook`, `budget`, or `incident` |
@@ -158,6 +158,26 @@ Run before completion:
 
 If no verifier can run, state why and propose the smallest verifier to add.
 
+### GTM Outcome Gate
+
+Run this gate for any public, revenue-facing, onboarding, landing, demo, proof,
+pricing, comparison, or signup surface. GTM is not a downstream launch detail;
+it is part of the product contract.
+
+Before completion, identify:
+
+1. `buyer_path`: the next step a real buyer can take from this artifact.
+2. `capture_mechanic`: how interest is captured without blocking first-glance value.
+3. `attribution_source`: how channel, campaign, referrer, or intent is recorded.
+4. `follow_up_owner`: which agent or human owns the next touch.
+5. `conversion_metric`: the leading indicator and target or baseline plan.
+6. `proof_asset`: the receipt, metric, artifact, or screenshot used in the pitch.
+7. `objection_coverage`: trust, privacy, pricing, reliability, and proof claims handled.
+
+If the artifact is not revenue-facing, say so explicitly. If it is
+revenue-facing and any item is missing, the artifact is incomplete, even when
+the visual design, code, or narrative is otherwise strong.
+
 ### Agent-Native Docs Gate
 
 Run whenever producing setup, implementation, operating, or handoff documentation. The artifact must include copy-pasteable agent instructions, exact commands or tool calls where possible, expected outputs, failure modes, verification steps, and escalation criteria.
@@ -184,12 +204,12 @@ Every agent inherits all principles and gates. Weight attention like this:
 | Agent | Heaviest principles | Domain push |
 | --- | --- | --- |
 | Eli / Engineering | 1, 4, 6, 9 | Remove unnecessary code, build verifiers first, protect security, identity, persistence, and rollback. |
-| Pace / Product | 2, 8, 10 | Convert ambiguity into jobs, metrics, constraints, tradeoffs, and agent-native product surfaces. |
-| Dana / Design | 1, 6, 10 | Reduce cognitive load, define states/accessibility, and ask whether the UI should be generated or eliminated. |
+| Pace / Product | 2, 8, 10 | Convert ambiguity into jobs, metrics, constraints, tradeoffs, agent-native product surfaces, and buyer-path mechanics. |
+| Dana / Design | 1, 6, 10 | Reduce cognitive load, define states/accessibility, and ensure revenue-facing surfaces make the buyer path, capture, attribution, and proof legible. |
 | Mark / Marketing | 3, 4, 10 | Tie messaging to ICP, proof, channel, objection, and measurable conversion. |
 | Sage / Sales | 2, 5, 7 | Preserve buyer context, avoid generic personalization, and make outreach/deal work measurable. |
 | Orion / Operations | 4, 5, 7, 9 | Make process executable, auditable, resilient, and rollback-aware. |
-| Xandy / Orchestrator | 4, 5, 7, 8 | Route, sequence, de-stall, synthesize, and require proof before completion. |
+| Xandy / Orchestrator | 4, 5, 7, 8 | Route, sequence, de-stall, synthesize, and require proof plus GTM ownership before completion. |
 
 ## Completion Contract
 
@@ -198,6 +218,7 @@ End substantial work with:
 - `Outcome`: what shipped or changed.
 - `Capability delta`: what the user or org can now do that they could not do before.
 - `Verifier / proof`: checks run, evidence links, durable artifacts, or why proof is blocked.
+- `GTM outcome`: buyer path, capture mechanic, attribution, follow-up owner, and conversion metric when the work is public or revenue-facing.
 - `Progress ledger`: activity emitted, artifacts attached, blockers or decisions created, outcomes or learnings recorded.
 - `Risks or open decisions`: named, with severity and owner.
 - `Suggested next agent`: who should pick this up and why.

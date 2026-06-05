@@ -11,7 +11,7 @@ description: |
 
 ## Shared OrgX Capability Mindset
 
-Apply [orgx-capability-mindset](../orgx-capability-mindset) before orchestration work. Weight attention on routing, sequencing, de-stalling, dependency proof, adversarial review, open-decision quality, and verifier proof before completion. Run the Software 3.0 Simplification Gate, Verifier Gate, and Agent-Native Docs Gate when applicable; then save progress as proof, decisions, blockers, outcomes, or learnings.
+Apply [orgx-capability-mindset](../orgx-capability-mindset) before orchestration work. Weight attention on routing, sequencing, de-stalling, dependency proof, adversarial review, open-decision quality, verifier proof, and required GTM mechanics before completion. Run the Software 3.0 Simplification Gate, Verifier Gate, GTM Outcome Gate, and Agent-Native Docs Gate when applicable; then save progress as proof, decisions, blockers, outcomes, or learnings.
 
 ## Quick Start
 
@@ -153,6 +153,7 @@ Before planning any coordination, assess the situation. Different contexts deman
 | **Time-critical (< 1 week)** | Hard deadline within 7 days, external forcing function | War room mode. Synchronous coordination. Rapid OODA cycles. Scope ruthlessly to critical path only. Escalate blockers within hours, not days. |
 | **Strategic (multi-month)** | Timeline exceeds 4 weeks, strategic importance, multiple phases | Phased planning with phase gates. Milestone reviews. Stakeholder update cadence (weekly exec, daily team). Risk register with monthly review. |
 | **Cross-functional conflict** | Agents disagree on approach, priorities, or resource allocation | Facilitate explicit tradeoff decisions. Document rationale. Use success metrics as tiebreaker. Escalate to stakeholder if metrics do not resolve. |
+| **Public or revenue-facing initiative** | Live/proof, landing, onboarding, pricing, deck, comparison, launch, or signup work | Require marketing and sales mechanics as first-class workstreams or acceptance criteria: buyer path, capture, attribution, follow-up owner, conversion metric, proof asset, and objection coverage. |
 | **New team (forming)** | Agents have not worked together before, unclear norms | More prescriptive delegation. Tighter checkpoints. Build trust through small wins first. Explicit communication norms. |
 | **Mature team (performing)** | Agents have track record together, established norms, self-organizing | Lighter touch. Outcome-based delegation. Trust agent judgment on approach. Orchestrator focuses on cross-initiative coordination. |
 | **Recovery/incident** | Initiative is off track, missed milestones, stakeholder trust eroded | OODA loop at maximum speed. Clear command structure. Scope to minimum viable recovery. Daily stakeholder communication. Retrospective after stabilization. |
@@ -167,6 +168,7 @@ Collect before drafting:
 - Required participating agents
 - Constraints: budget, deadlines, compliance, dependencies
 - Coordination context: number of agents, dependency complexity, time horizon
+- GTM context for public or revenue-facing initiatives: buyer path, capture mechanic, attribution source, follow-up owner, conversion metric, proof asset, and objection coverage
 
 If unknown, state assumptions explicitly and request missing owners or dates. Never fabricate coordination context.
 
@@ -502,6 +504,17 @@ Verify that the risk register covers all categories (technical, resource, extern
 
 Run the validator script and confirm zero errors. Verify that all spawned tasks are traceable and linked to the initiative. Confirm that stakeholder updates are scheduled and the first update is drafted. Check that the artifact can be understood by its target audience without additional context. Verify that flywheel learnings have been submitted.
 
+### Pass 6: GTM Outcome
+
+For public or revenue-facing initiatives, verify that marketing and sales mechanics are not optional backlog:
+
+- The buyer path is explicit from first public touch to signup, demo, checkout, or workspace start
+- Capture, attribution, follow-up owner, conversion metric, proof asset, and objection coverage each have an owner
+- Mark/Sage or equivalent GTM owners are assigned where content, channel, lead, qualification, or follow-up work exists
+- GTM metrics appear in the operating record alongside artifacts, runs, blockers, and ARR
+
+If the initiative is not revenue-facing, document that non-applicability in the synthesis.
+
 ## Tooling
 
 ### Primary
@@ -557,6 +570,7 @@ Run the validator script and confirm zero errors. Verify that all spawned tasks 
 - Every workstream has an accountable owner, a measurable objective, and a deadline.
 - Dependency graph is acyclic with critical path identified.
 - Delegations meet the 7-element Delegation Quality Standard.
+- Public or revenue-facing initiatives pass the GTM Outcome Gate with marketing/sales owners and measurable conversion mechanics.
 - All agent inputs are synthesized with conflicts explicitly resolved.
 - Risk register covers all relevant categories with mitigations for high-severity risks.
 - Initiative state is updated in OrgX and progress is observable via activity feed.

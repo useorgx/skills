@@ -66,8 +66,8 @@ cross-domain artifact type where possible:
 | --- | --- |
 | Orchestrator | `orchestration.next_initiative` |
 | Engineering | `eng.pull_request`, `eng.deploy_proof`, `eng.structured_blocker` |
-| Sales | `sales.strategy`, `sales.icp_offer_sequence`, `sales.send_plan` |
-| Marketing | `marketing.launch_asset`, `marketing.channel_hypothesis` |
+| Sales | `sales.strategy`, `sales.icp_offer_sequence`, `sales.follow_up_sequence`, `sales.send_plan` |
+| Marketing | `marketing.launch_asset`, `marketing.channel_hypothesis`, `marketing.offer_package` |
 | Product | `product.customer_discovery`, `product.prd`, `product.pricing_hypothesis`, `product.decision_record` |
 | Design | `design.audit`, `design.component_spec`, `design.token_package` |
 | Operations | `ops.operator_brief`, `ops.runbook`, `ops.budget_envelope`, `ops.incident_status` |
