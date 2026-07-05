@@ -28,10 +28,13 @@ ROLE_AGENT_DIRS = {
 
 KNOWN_ORGX_TOOLS = {
     "orgx_act",
+    "orgx_apply_changeset",
     "orgx_attach",
     "orgx_bootstrap",
     "orgx_decide",
     "orgx_emit_activity",
+    "get_agent_status",
+    "get_initiative_pulse",
     "get_operator_chronicle",
     "orgx_inspect",
     "orgx_plan",
@@ -40,6 +43,7 @@ KNOWN_ORGX_TOOLS = {
     "orgx_spawn",
     "orgx_submit_receipt",
     "orgx_write",
+    "scaffold_initiative",
 }
 
 DEPRECATED_ORGX_TOOLS = {
@@ -61,9 +65,7 @@ DEPRECATED_ORGX_TOOLS = {
     "create_task",
     "entity_action",
     "get_active_sessions",
-    "get_agent_status",
     "get_decision_history",
-    "get_initiative_pulse",
     "get_initiative_stream_state",
     "get_morning_brief",
     "get_my_trust_context",
