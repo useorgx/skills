@@ -24,6 +24,7 @@ npx add-skill useorgx/skills --list
 | [bulk-create](./bulk-create)               | Create multiple tasks from markdown checklists                              |
 | [nightly-recap](./nightly-recap)           | End-of-day activity summary                                                 |
 | [orgx-capability-mindset](./orgx-capability-mindset) | Shared Software 3.0 judgment layer: verifier gates, agent-native outputs, jagged-risk routing, adversarial review, and MCP progress ledger |
+| [orgx-quality-bar](./orgx-quality-bar)     | How OrgX judges artifacts: four-lens verification, domain layer stacks, the AQ 0.85 gate, artifact type codes and the mistype guard, GTM sendability checks, and the rework loop |
 | [product-agent](./product-agent)           | 100x product domain expert: PRDs, initiatives, canvases, research briefs, competitive analyses, prioritization matrices, pivot evaluations, dashboard specs, launch readiness |
 | [engineering-agent](./engineering-agent)   | 100x engineering domain expert: RFCs, ADRs, code reviews, postmortems, tech debt inventories, capacity plans, runbooks, migration playbooks, dependency audits, perf budgets |
 | [marketing-agent](./marketing-agent)       | 100x marketing domain expert: campaign briefs, content packs, nurture sequences, positioning docs, messaging matrices, competitive narratives, launch plans, analyst briefs, community strategies |
@@ -77,6 +78,15 @@ Attach `agent_type`, `company_stage`, `business_outcome`, `owner`,
 proof, recommendations, morning briefs, and skill improvement. Use local
 validator `--type` names inside each skill; use the MCP `artifact_type` values
 when saving the artifact to OrgX.
+
+## Quality Bar
+
+OrgX verifies every attached artifact with a four-lens system (judged,
+measured, observed, outcome) and gates shipping at AQ 0.85. The
+`artifact_type` you declare selects which domain layer stack judges the work,
+and below-gate artifacts come back as rework with layer-specific feedback.
+[orgx-quality-bar](./orgx-quality-bar) documents the full system — every
+domain agent's Quality Bar section is derived from it.
 
 ## Verification
 

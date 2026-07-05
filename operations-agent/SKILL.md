@@ -1,6 +1,6 @@
 ---
 name: orgx-operations-agent
-version: "2.0.0"
+version: "2.1.0"
 description: |
   Produce high-confidence operations artifacts for OrgX: incident analyses, operational playbooks, budget controls, capacity plans, vendor evaluations, SLO proposals, chaos test plans, migration checklists, and on-call rotation audits.
   Use when reliability, incident management, escalation readiness, or operational cost governance is required.
@@ -14,19 +14,19 @@ Apply [orgx-capability-mindset](../orgx-capability-mindset) before operations wo
 
 ## Quick Start
 
-1. Run `mcp__orgx__orgx_bootstrap`, then resolve workspace scope with `mcp__orgx__orgx_bootstrap`.
+1. Run `mcp__orgx__orgx_bootstrap` (it auto-resolves the workspace — no second call needed).
 2. Confirm the artifact or decision type and the target audience. If the request is task-bound, hydrate it with `mcp__orgx__orgx_inspect`; otherwise map related work with `mcp__orgx__orgx_search`.
-3. Pull precedent with `mcp__orgx__orgx_search` and `mcp__orgx__orgx_search`.
+3. Pull precedent with `mcp__orgx__orgx_search` (prior incidents, playbooks, decisions, and learnings).
 4. Before creating or delegating workstreams, milestones, or tasks, inspect the active parent scope and reuse matching siblings. Treat `reused`, `duplicate_prevented`, or `_dedup` results as success and continue on the returned canonical entity ID.
-5. For playbooks, migrations, or SLO programs, use the planning loop: `mcp__orgx__orgx_plan`, `mcp__orgx__orgx_plan`, `mcp__orgx__orgx_plan`, then `mcp__orgx__orgx_plan`.
+5. For playbooks, migrations, or SLO programs, use the planning loop: `mcp__orgx__orgx_plan` (`action=start`), refine with `action=improve`, capture major revisions with `action=record_edit`, then finalize with `action=complete` and `attach_to=[...]`.
 6. Identify the operational maturity stage (see Context Adaptation Protocol) and calibrate depth.
 7. Produce the artifact using the contract below and return:
    - A concise summary (3-6 bullets)
    - The artifact body (JSON or structured Markdown)
    - 3 actionable next steps
 8. Run the Precision Loop before publishing.
-9. Attach the result back to the active task or initiative with `mcp__orgx__orgx_act` (`action=attach`) or `mcp__orgx__orgx_act`, then record quality with `mcp__orgx__orgx_submit_receipt`. When attaching, use the MCP artifact type that matches the work (`ops.operator_brief`, `ops.runbook`, `ops.budget_envelope`, or `ops.incident_status`) and include `metadata.artifact_contract` with `agent_type`, `company_stage`, `business_outcome`, `owner`, `review_date`, and `verification`.
-10. Before delegating operational follow-up work, run `mcp__orgx__orgx_spawn`, then use `mcp__orgx__orgx_spawn`.
+9. Attach the result back to the active task or initiative with `mcp__orgx__orgx_attach`, then record quality with `mcp__orgx__orgx_submit_receipt` (`receipt_type=quality`). When attaching, use the MCP artifact type that matches the work (`ops.operator_brief`, `ops.runbook`, `ops.budget_envelope`, or `ops.incident_status`) and include `metadata.artifact_contract` with `agent_type`, `company_stage`, `business_outcome`, `owner`, `review_date`, and `verification`.
+10. Before delegating operational follow-up work, run `mcp__orgx__orgx_spawn` (`action=guard`), then dispatch with `mcp__orgx__orgx_spawn` (`action=spawn`).
    - Omit `model_tier`, `provider`, and exact `model` for normal work so OrgX auto-routes by task complexity.
    - Use `model_tier=standard` and `budget_mode=cheapest_valid` only for controlled reliability validation runs, test initiatives, or explicit budget-constrained verification.
    - Operations delegation must name the reliability/cost outcome, expected report/runbook/fix, and verification evidence before spawn.
@@ -188,19 +188,19 @@ When producing any artifact, identify the applicable signals first and adjust ar
 
 ## Operating Workflow
 
-1. Run `mcp__orgx__orgx_bootstrap` and resolve workspace with `mcp__orgx__orgx_bootstrap`.
+1. Run `mcp__orgx__orgx_bootstrap` (workspace scope resolves automatically).
 2. Pick `artifact_type` and define success condition.
 3. Hydrate the active task or parent entity:
-   - `mcp__orgx__orgx_inspect` for task-bound work
+   - `mcp__orgx__orgx_inspect` (`type=task`, `hydrate_context=true`) for task-bound work
    - `mcp__orgx__orgx_search` for surrounding initiatives, milestones, and prior incidents or playbooks
 4. Identify organizational maturity signals from Context Adaptation Protocol.
 5. Gather evidence:
-   - OrgX context: `mcp__orgx__orgx_search`, `mcp__orgx__orgx_search`
+   - OrgX context: `mcp__orgx__orgx_search`
    - Prior learnings: `mcp__orgx__orgx_search`
    - Incident context: PagerDuty/observability tools when available
    - Cost data: cloud provider billing, FinOps tooling
    - Capacity data: APM, load balancer metrics, database metrics
-6. For programmatic operational plans, open a plan session with `mcp__orgx__orgx_plan`, refine with `mcp__orgx__orgx_plan`, and record major revisions with `mcp__orgx__orgx_plan`.
+6. For programmatic operational plans, open a plan session with `mcp__orgx__orgx_plan` (`action=start`), refine with `action=improve`, and record major revisions with `action=record_edit`.
 7. Apply relevant frameworks from Domain Expertise Canon.
 8. Draft JSON-first artifact following the contract for the selected type.
 9. Run the Precision Loop (all 4 passes).
@@ -212,12 +212,12 @@ python3 scripts/validate_ops.py <artifact_file> --type <artifact_type>
 
 11. Resolve all failed gates, then publish via `mcp__orgx__orgx_write`.
 12. Attach proof or conclusions back to the active work:
-    - `mcp__orgx__orgx_plan` with `attach_to` for plan sessions
-    - `mcp__orgx__orgx_act` with `action=attach` for incidents, SLOs, budgets, and playbooks
-    - `mcp__orgx__orgx_act` for reviews or escalation notes
-13. Submit learnings via `mcp__orgx__orgx_submit_receipt`.
-14. Record measurable outcomes with `mcp__orgx__orgx_submit_receipt` when the artifact closes a reliability or cost event.
-15. Record artifact quality with `mcp__orgx__orgx_submit_receipt`.
+    - `mcp__orgx__orgx_plan` (`action=complete`) with `attach_to=[...]` for plan sessions
+    - `mcp__orgx__orgx_attach` for incidents, SLOs, budgets, and playbooks
+    - `mcp__orgx__orgx_act` (`action=flag_risk` or `action=update`) for escalation notes and state changes
+13. Submit learnings via `mcp__orgx__orgx_submit_receipt` (`receipt_type=learning`).
+14. Record measurable outcomes with `mcp__orgx__orgx_submit_receipt` (`receipt_type=outcome`) when the artifact closes a reliability or cost event.
+15. Record artifact quality with `mcp__orgx__orgx_submit_receipt` (`receipt_type=quality`, with a self-assessed score you can defend layer by layer and at least one verifiable evidence URL).
 
 ---
 
@@ -472,6 +472,43 @@ python3 scripts/validate_ops.py <artifact_file> --type <artifact_type>
 
 ---
 
+## Quality Bar (Four-Lens Verification)
+
+Every artifact you attach is verified by a four-lens system — judged (layered LLM judge), measured (deterministic checks), observed (flagged issues that cap confidence), and outcome (reality events recorded separately) — and gated at AQ >= 0.85. Below-gate work parks in `changes_requested` and comes back as rework; see the `orgx-quality-bar` skill for the full system.
+
+### Ops layer stack
+
+| Layer | Weight | Question |
+|-------|--------|----------|
+| actionability_under_stress | 0.30 | Usable by a stressed human at 3am — steps, not essays? |
+| failure_paths | 0.25 | Does it cover what happens when the step FAILS? |
+| ownership_clarity | 0.15 | Who acts, who decides, who is informed — by name? |
+| timeliness | 0.15 | Are time bounds explicit — SLAs, escalation clocks? |
+| evidence | 0.15 | Are claims backed by logs, queries, receipts? |
+
+This agent owns this bar for more than ops artifacts: any `*.structured_blocker` artifact from ANY domain is judged on this stack. A marketing blocker at 3am must still be actionable — the same steps, failure-path, and ownership discipline applies.
+
+### Declare the type
+
+Declare `artifact_type` on `mcp__orgx__orgx_attach` and on receipts so the right stack and measured checks apply: `ops.operator_brief`, `ops.runbook`, `ops.budget_envelope`, `ops.incident_status`. An undeclared artifact is classified for you and may be judged on the general fallback stack; a flattering type gets re-classified by the mistype guard and produces feedback you cannot act on.
+
+### Score honestly (ops)
+
+- Numbered steps with an expected output per step beat prose; every step carries an `if_fails` branch — failure_paths is a quarter of your score.
+- Time bounds are explicit: "escalate within 5 minutes", never "promptly". SLAs and escalation clocks are timeliness evidence.
+- Owners are named people or role titles, never bare teams or "TBD" — ownership_clarity fails on placeholders.
+- Back claims with logs, queries, dashboards, and ticket IDs. A root cause without a receipt is a hypothesis.
+- Write for the 3am responder: no step may assume knowledge that is not in the document itself.
+- Layer scores are never averaged — a strong runbook body cannot hide a missing rollback path or an unowned action item.
+
+### Rework
+
+On a rework run, read `metadata.rework_feedback` on the task before doing anything else. Change what the feedback names — it is specific (layer + quoted evidence). Never resubmit near-identical work; it fails the same layers again. Version lineage records the chain (v1 → changes_requested → v2 → approved), so make each version a real response.
+
+Honesty caution: no self-describing quality preambles ("This thorough runbook…") — they can prime the judge and are never evidence. No grade-shopping: re-running evaluation on unchanged content is visible in the audit trail.
+
+---
+
 ## Cross-Agent Handoff Contracts
 
 ### I receive from:
@@ -521,10 +558,10 @@ When handing off to another agent, structure the handoff as:
 Every operations artifact should feed the organizational learning loop:
 
 ### After Incident Analysis
-- Submit key finding as learning: `mcp__orgx__orgx_submit_receipt` with category `incident_pattern`
+- Submit key finding as learning: `mcp__orgx__orgx_submit_receipt` (`receipt_type=learning`)
 - If this incident matches a previous pattern, reference the prior incident and note what was (or was not) fixed
 - Update the relevant runbook if the response uncovered gaps
-- Record outcome via `mcp__orgx__orgx_submit_receipt` with measurable impact
+- Record outcome via `mcp__orgx__orgx_submit_receipt` (`receipt_type=outcome`) with measurable impact
 
 ### After Playbook Creation
 - Link playbook to the alert or trigger condition it addresses
@@ -561,23 +598,15 @@ Incorporate relevant prior learnings into the artifact. Reference them explicitl
 
 ### Primary
 
-- `mcp__orgx__orgx_bootstrap` — initialize OrgX session scope and recommended workflow
-- `mcp__orgx__orgx_bootstrap` — resolve workspace scope before reading or writing
-- `mcp__orgx__orgx_inspect` — hydrate task-bound context, attachments, and prior plan sessions
-- `mcp__orgx__orgx_search` — Retrieve organizational context and prior decisions
-- `mcp__orgx__orgx_search` — List initiatives, workstreams, tasks, milestones
-- `mcp__orgx__orgx_plan` — open tracked planning sessions for playbooks, migrations, and SLO programs
-- `mcp__orgx__orgx_plan` — refine operational plans with historical patterns
-- `mcp__orgx__orgx_plan` — capture major planning revisions
-- `mcp__orgx__orgx_plan` — persist and attach finalized operational plans
-- `mcp__orgx__orgx_write` — Publish artifacts and create operational tasks
-- `mcp__orgx__orgx_act` — attach evidence and update operational state
-- `mcp__orgx__orgx_act` — add operational notes and review feedback to active work
-- `mcp__orgx__orgx_write` — Update existing operational entities
-- `mcp__orgx__orgx_submit_receipt` — Feed findings into the learning loop
-- `mcp__orgx__orgx_submit_receipt` — Record measurable operational outcomes
-- `mcp__orgx__orgx_submit_receipt` — score artifact quality for calibration
-- `mcp__orgx__orgx_search` — Check for prior learnings before drafting
+- `mcp__orgx__orgx_bootstrap` — initialize OrgX session scope and recommended workflow (auto-resolves the workspace)
+- `mcp__orgx__orgx_inspect` — hydrate context (`type=initiative | workstream | milestone | task | decision | artifact | plan_session`; `hydrate_context=true` for full context)
+- `mcp__orgx__orgx_search` — Retrieve organizational context, prior decisions, entity lists, and prior learnings before drafting
+- `mcp__orgx__orgx_plan` — tracked planning sessions for playbooks, migrations, and SLO programs (`action=start | resume | improve | record_edit | complete`; `complete` takes `attach_to=[...]`)
+- `mcp__orgx__orgx_write` — Publish or update one operational entity (`operation=create | update`); for multi-entity batches use `orgx_apply_changeset` with ref keys + `idempotency_key`
+- `mcp__orgx__orgx_attach` — attach artifacts and evidence (`artifact_type`, `artifact_url`, `description`, `owner`, `verification`, `metadata`)
+- `mcp__orgx__orgx_act` — update operational state (`action=complete_with_proof | flag_risk | block | unblock | update`, among others; `action=validate` with `dry_run=true` for readiness checks)
+- `mcp__orgx__orgx_spawn` — delegate operational follow-up (`action=guard` before `action=spawn`; also `estimate | handoff | classify`)
+- `mcp__orgx__orgx_submit_receipt` — feed the learning loop and score quality (`receipt_type=proof | outcome | quality | attribution | learning`; `verification_status=passed | failed | blocked | not_run`; evidence includes at least one verifiable URL)
 
 ### Optional (if configured)
 
@@ -618,5 +647,5 @@ Incorporate relevant prior learnings into the artifact. Reference them explicitl
 - Migration checklists include rollback procedure for every phase.
 - On-call audits include burnout indicators and compensation fairness assessment.
 - Artifact is persisted in OrgX with traceable evidence links.
-- Relevant learnings submitted to the flywheel via `mcp__orgx__orgx_submit_receipt`.
+- Relevant learnings submitted to the flywheel via `mcp__orgx__orgx_submit_receipt` (`receipt_type=learning`).
 - Cross-agent handoffs dispatched if the artifact reveals work for another agent.

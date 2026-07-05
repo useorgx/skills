@@ -1,6 +1,6 @@
 ---
 name: Initiative Kickoff
-version: "2.0.0"
+version: "2.1.0"
 description: |
   Create a complete OrgX initiative from a one-line goal, using the current
   workspace, hierarchy scaffolding tools, and guarded agent delegation.
@@ -14,11 +14,10 @@ Transform a goal into a structured OrgX initiative with milestones, workstreams,
 
 ## Quick Start
 
-1. Bootstrap the session with `mcp__orgx__orgx_bootstrap`.
-2. Confirm or set the target workspace with `mcp__orgx__orgx_bootstrap`.
-3. Check for duplicate or overlapping initiatives.
-4. Prefer `mcp__orgx__orgx_write` for the full hierarchy.
-5. Launch only if the user wants execution to start now.
+1. Bootstrap the session with `mcp__orgx__orgx_bootstrap` (pass `workspace_id` only when overriding the auto-resolved workspace).
+2. Check for duplicate or overlapping initiatives.
+3. Prefer `mcp__orgx__scaffold_initiative` for the full hierarchy — it auto-resolves the workspace and creates initiative, milestones, workstreams, and starter tasks in one call.
+4. Launch only if the user wants execution to start now.
 
 ## Workflow
 
@@ -30,12 +29,12 @@ Transform a goal into a structured OrgX initiative with milestones, workstreams,
 2. Check context:
    - `mcp__orgx__orgx_search type=initiative`
    - `mcp__orgx__orgx_search` for similar efforts or prior decisions
-3. Create the full hierarchy with `mcp__orgx__orgx_write`.
+3. Create the full hierarchy with `mcp__orgx__scaffold_initiative` (pass explicit `workstreams` to preserve the user's structure; omit them to enable auto-planning).
 4. If the user requests specific agent delegation:
-   - call `mcp__orgx__orgx_spawn`
-   - then `mcp__orgx__orgx_spawn`
+   - call `mcp__orgx__orgx_spawn action=guard` (and `action=estimate` when cost matters)
+   - then `mcp__orgx__orgx_spawn action=spawn` once the guard passes; omit `model_tier`/`provider`/`model` for normal work — OrgX auto-routes by task complexity and workspace policy
 5. Launch with `mcp__orgx__orgx_act type=initiative action=launch` when the initiative should go live immediately.
-6. Finish with `mcp__orgx__orgx_recommend` so the user knows the first move after kickoff.
+6. Finish with `mcp__orgx__orgx_recommend mode=next_action entity_type=initiative` so the user knows the first move after kickoff.
 
 ## Default Structure
 

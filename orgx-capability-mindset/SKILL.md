@@ -1,6 +1,6 @@
 ---
 name: orgx-capability-mindset
-version: "1.0.0"
+version: "2.0.0"
 description: |
   Shared Software 3.0 operating mindset for every OrgX agent. Use whenever an agent plans, implements, reviews, delegates, ships, or produces an artifact. Pushes capability by enforcing agent-native outputs, verifier-first execution, jagged-intelligence routing, adversarial review, durable progress artifacts, and human-governed decisions.
 ---
@@ -27,7 +27,7 @@ Always bind the mindset to the current OrgX MCP surface.
 - Use sensors before actuators: `mcp__orgx__orgx_search`, `mcp__orgx__orgx_inspect`, `mcp__orgx__orgx_recommend`, and `mcp__orgx__orgx_plan` when the exact state or contract matters.
 - Use actuators deliberately: `mcp__orgx__orgx_write`, `mcp__orgx__orgx_act`, `mcp__orgx__orgx_attach`, `mcp__orgx__orgx_decide`, and `mcp__orgx__orgx_emit_activity`.
 - Use verification and flywheel receipts: `mcp__orgx__orgx_inspect` for completion evidence and `mcp__orgx__orgx_submit_receipt` for quality, outcomes, learnings, and loop validation.
-- Before delegation, use `mcp__orgx__orgx_spawn` for guard/estimate checks; then use `mcp__orgx__orgx_spawn` for dispatch when allowed.
+- Before delegation, run `mcp__orgx__orgx_spawn action=guard` (and `action=estimate` when cost matters); then dispatch with `mcp__orgx__orgx_spawn action=spawn` when allowed.
 
 Log the sensor-to-actuator transition in the work record. This is where stale state and hidden assumptions compound.
 
@@ -66,6 +66,11 @@ Preferred MCP `artifact_type` values:
 Use local validator types for each skill's validation scripts; use MCP
 artifact_type values when attaching artifacts or receipts so cross-agent
 recommendations, proof cards, and morning briefs can reason across domains.
+The `artifact_type` also selects the layer stack OrgX's four-lens verification
+judges the artifact on — a mistyped artifact is judged on the wrong bar and
+may be flagged provisional by the mistype guard. See the `orgx-quality-bar`
+skill for the four lenses, domain layer stacks, the AQ 0.85 gate, GTM
+sendability checks, and the rework loop.
 Cost controls are execution constraints, not an agent mindset: use
 `model_tier=standard` plus `budget_mode=cheapest_valid` only for controlled
 reliability validation, test initiatives, or explicit budget pressure.
@@ -144,7 +149,10 @@ If any answer is yes, compare the Software 3.0 path against the conventional pat
 
 ### Verifier Gate
 
-Run before completion:
+Run before completion. OrgX will independently verify attached artifacts with
+its four-lens system (judged, measured, observed, outcome) and gate at
+AQ 0.85 — the verifier gate below is how you pass that honestly on the first
+attempt rather than through rework cycles.
 
 | Domain | Verifier examples |
 | --- | --- |

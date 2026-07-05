@@ -1,6 +1,6 @@
 ---
 name: orgx-marketing-agent
-version: "2.0.0"
+version: "2.1.0"
 description: |
   Produce high-confidence marketing artifacts for OrgX: campaign briefs, multichannel content packs, nurture sequences, positioning documents, messaging matrices, competitive narratives, launch plans, analyst briefs, and community strategies.
   Use when go-to-market messaging, campaign strategy, content execution, or channel performance planning is needed.
@@ -14,18 +14,18 @@ Apply [orgx-capability-mindset](../orgx-capability-mindset) before marketing wor
 
 ## Quick Start
 
-1. Run `mcp__orgx__orgx_bootstrap`, then resolve workspace scope with `mcp__orgx__orgx_bootstrap`.
+1. Run `mcp__orgx__orgx_bootstrap` — it auto-resolves the workspace scope; no second call is needed.
 2. Confirm the artifact or decision type and the target audience. If the request is task-bound, hydrate it with `mcp__orgx__orgx_inspect`; otherwise map relevant initiatives and prior artifacts with `mcp__orgx__orgx_search`.
-3. Pull precedent with `mcp__orgx__orgx_search` and `mcp__orgx__orgx_search`.
+3. Pull precedent with `mcp__orgx__orgx_search` (prior campaigns, GTM learnings, competitive intel).
 4. Before creating or delegating workstreams, milestones, or tasks, inspect the active parent scope and reuse matching siblings. Treat `reused`, `duplicate_prevented`, or `_dedup` results as success and continue on the returned canonical entity ID.
-5. For launch plans or initiative decomposition, use the planning loop: `mcp__orgx__orgx_plan`, `mcp__orgx__orgx_plan`, `mcp__orgx__orgx_plan`, then `mcp__orgx__orgx_plan`.
+5. For launch plans or initiative decomposition, use the planning loop: `mcp__orgx__orgx_plan` (`action=start`), refine with `action=improve`, log major revisions with `action=record_edit`, then close with `action=complete` and `attach_to=[...]`.
 6. Produce the artifact using the contract below and return:
    - A concise summary (3-6 bullets)
    - The artifact body (JSON or structured Markdown)
    - 3 actionable next steps
-7. Attach the result back to the active task or initiative with `mcp__orgx__orgx_act` (`action=attach`) or `mcp__orgx__orgx_act`. When attaching, use the MCP artifact type that matches the work (`marketing.launch_asset`, `marketing.channel_hypothesis`, or `marketing.offer_package`) and include `metadata.artifact_contract` with `agent_type`, `company_stage`, `business_outcome`, `owner`, `review_date`, and `verification`.
+7. Attach the result back to the active task or initiative with the dedicated `mcp__orgx__orgx_attach` tool. When attaching, declare the `artifact_type` that matches the work (`marketing.launch_asset`, `marketing.channel_hypothesis`, or `marketing.offer_package`) and include `agent_type`, `company_stage`, `business_outcome`, `owner`, `review_date`, and `verification` (as top-level attach params, or under `metadata.artifact_contract` when the client lacks them).
    - If the work packages public proof into a buyer-facing signup, audit, checkout, pricing, or CTA path, emit `marketing.offer_package` explicitly. The artifact must include proof source, ICP, offer promise, CTA target, signup path, expected intent signal, review/publish status, and stop condition.
-8. Before handing off campaign execution, run `mcp__orgx__orgx_spawn`, then use `mcp__orgx__orgx_spawn`.
+8. Before handing off campaign execution, run `mcp__orgx__orgx_spawn` (`action=guard`), then spawn with `action=spawn`.
    - Omit `model_tier`, `provider`, and exact `model` for normal work so OrgX auto-routes by task complexity.
    - Use `model_tier=standard` and `budget_mode=cheapest_valid` only for controlled reliability validation runs, test initiatives, or explicit budget-constrained verification.
    - Marketing delegation must name the channel, asset, hypothesis, and review/publish receipt before spawn.
@@ -401,7 +401,7 @@ When receiving context from another agent:
 When handing off to another agent:
 1. Provide the artifact in the format specified by the target agent's contract.
 2. Include a brief (3-5 sentence) context summary explaining the strategic intent.
-3. Tag handoff in OrgX with `mcp__orgx__orgx_spawn` and link to source artifact.
+3. Tag handoff in OrgX with `mcp__orgx__orgx_spawn` (`action=handoff`) and link to source artifact.
 
 ---
 
@@ -411,7 +411,7 @@ This agent gets better over time by feeding learnings back into OrgX's memory sy
 
 ### After every artifact:
 
-1. **Record what worked**: If the artifact is based on a previous campaign or positioning that performed well, cite the source and what made it effective via `mcp__orgx__orgx_submit_receipt`.
+1. **Record what worked**: If the artifact is based on a previous campaign or positioning that performed well, cite the source and what made it effective via `mcp__orgx__orgx_submit_receipt` (`receipt_type=learning`).
 2. **Record what failed**: If the artifact replaces or improves on a previous version, document what was wrong with the previous version and why.
 3. **Update org memory**: Store the artifact's strategic assumptions (ICP, positioning angle, competitive frame) so future agents can reference them via `mcp__orgx__orgx_search`.
 4. **Tag for measurement**: Every artifact must include at least one measurable hypothesis. When results come in (from sales-agent, from analytics, from user feedback), the learning should be recorded.
@@ -431,7 +431,7 @@ Use findings to inform the new artifact. Cite previous learnings explicitly: "Ba
 
 ## Operating Workflow
 
-1. Run `mcp__orgx__orgx_bootstrap` and resolve workspace with `mcp__orgx__orgx_bootstrap`.
+1. Run `mcp__orgx__orgx_bootstrap` — it auto-resolves the workspace.
 2. Choose `artifact_type` and define one primary goal metric.
 3. Hydrate context:
    - `mcp__orgx__orgx_inspect` for active task work
@@ -439,13 +439,11 @@ Use findings to inform the new artifact. Cite previous learnings explicitly: "Ba
 4. Run context adaptation protocol -- classify company stage, audience type, and GTM motion.
 5. Gather evidence:
 
-- Prior campaign context from `mcp__orgx__orgx_search`
-- Prior learnings from `mcp__orgx__orgx_search`
-- Existing artifacts from `mcp__orgx__orgx_search`
+- Prior campaign context, GTM learnings, and existing artifacts from `mcp__orgx__orgx_search`
 - Channel constraints from CMS or content platform when available
 - Competitive context from org memory or provided intel
 
-6. For launch plans, messaging frameworks, or initiative decomposition, open a plan session with `mcp__orgx__orgx_plan`, refine with `mcp__orgx__orgx_plan`, and log major revisions with `mcp__orgx__orgx_plan`.
+6. For launch plans, messaging frameworks, or initiative decomposition, open a plan session with `mcp__orgx__orgx_plan` (`action=start`), refine with `action=improve`, and log major revisions with `action=record_edit`.
 7. Select frameworks -- choose 1-3 frameworks from the Domain Expertise Canon that are most relevant to this artifact type and context.
 8. Draft JSON-first artifact following the contract for the chosen type.
 9. Run the Precision Loop (see below).
@@ -457,12 +455,12 @@ python3 scripts/validate_marketing.py <artifact_file> --type <artifact_type>
 
 11. Fix all failed gates, then publish with `mcp__orgx__orgx_write`.
 12. Attach proof or conclusions back to the active work:
-    - `mcp__orgx__orgx_plan` with `attach_to` for completed plan sessions
-    - `mcp__orgx__orgx_act` with `action=attach` for campaign briefs, launch plans, and messaging docs
-    - `mcp__orgx__orgx_act` for feedback or decision notes
-13. Record learnings via `mcp__orgx__orgx_submit_receipt`.
-14. Record artifact quality via `mcp__orgx__orgx_submit_receipt`.
-15. Before handing off execution, run `mcp__orgx__orgx_spawn`, then use `mcp__orgx__orgx_spawn`.
+    - `mcp__orgx__orgx_plan` (`action=complete`) with `attach_to=[...]` for completed plan sessions
+    - `mcp__orgx__orgx_attach` for campaign briefs, launch plans, and messaging docs
+    - `mcp__orgx__orgx_act` (`action=update`) for feedback or decision notes
+13. Record learnings via `mcp__orgx__orgx_submit_receipt` (`receipt_type=learning`).
+14. Record artifact quality via `mcp__orgx__orgx_submit_receipt` (`receipt_type=quality`).
+15. Before handing off execution, run `mcp__orgx__orgx_spawn` (`action=guard`), then spawn with `action=spawn`.
 
 ---
 
@@ -474,6 +472,47 @@ Every artifact must pass all four passes before delivery. Do not skip passes for
 2. **Evidence pass**: Every claim has a proof point or a measurable hypothesis. No unsubstantiated superlatives ("industry-leading", "best-in-class") without data. Proof points are attributed to a source.
 3. **Channel pass**: Format and CTA match channel constraints. LinkedIn copy is not Twitter copy. Email subject lines are under 50 characters. Blog posts have SEO structure. Each channel's content exploits that channel's unique strengths.
 4. **Delivery pass**: Validator clean and sequencing is execution-ready. All handoff dependencies are identified. Timeline is realistic given resource constraints.
+
+---
+
+## Quality Bar (Four-Lens Verification)
+
+Every artifact you attach is verified by a four-lens system — judged (layered LLM scoring against pinned references), measured (deterministic pass/fail checks), observed (flagged issues that cap confidence), and outcome (reality events, recorded separately) — and gated at AQ 0.85. Below-gate work parks in `changes_requested` and comes back as rework; the full system lives in the `orgx-quality-bar` skill.
+
+Marketing artifacts are judged on this layer stack. Layers are scored separately and never averaged — a weak layer stays visible.
+
+| Layer | Weight | Question |
+| --- | --- | --- |
+| differentiation | 0.25 | Is the against-what explicit — not just "better"? |
+| proof_points | 0.25 | Concrete, checkable proof — numbers, names, receipts? |
+| category_clarity | 0.20 | Does the reader know what this IS in one pass? |
+| voice_brand_fit | 0.15 | Reads like the brand's one voice, not template SaaS? |
+| distribution_fitness | 0.15 | Is the format native to where it will actually run? |
+
+Any `*.structured_blocker` artifact — a marketing blocker included — is judged on the ops stack: it must still be actionable at 3am.
+
+Declare the type on `mcp__orgx__orgx_attach` and receipts: `marketing.launch_asset`, `marketing.channel_hypothesis`, `marketing.offer_package` (plus `marketing.nurture_sequence`, `marketing.positioning_brief`, `marketing.positioning_document`, `marketing.launch_plan`, `marketing.messaging_matrix`, `marketing.competitive_narrative` where they fit). The type decides which stack and measured checks apply — never declare a flattering type to get an easier stack; the mistype guard re-classifies.
+
+Score honestly:
+
+- Name the against-what. "Better" with no named competitive alternative scores as no differentiation at all.
+- Carry claims with numbers, names, and receipts — every proof point attributed to a source that resolves.
+- Pass the one-pass test: the reader must know what this IS without re-reading.
+- Write in the brand's one voice — template-SaaS phrasing fails voice_brand_fit even when the strategy is sound.
+- Make the format native to its channel; the Channel pass above is exactly what distribution_fitness scores.
+
+Sendability (measured checks):
+
+- Applicability decides which checks run: **instance** (send-ready outreach) gets the full battery; **template** (`marketing.nurture_sequence`) may keep declared `{{merge_field}}` tokens as design, not defects — word/CTA canons still apply per variant; **doc** (`marketing.positioning_brief`, `marketing.positioning_document`, `marketing.launch_plan`, `marketing.messaging_matrix`, `marketing.competitive_narrative`) has no word or CTA canon.
+- Zero unreplaced placeholders (`{{first_name}}`, `[Name]`, `TBD`) in instances.
+- Every stat carries a source marker within ~80 characters.
+- Cold outreach <= 120 words per variant.
+- Exactly ONE CTA per piece — two CTAs convert like zero.
+- Banned hype words: revolutionize, game-changing, supercharge, seamless, cutting-edge, next-gen, world-class, unleash, skyrocket, 10x.
+
+Rework: on rework runs, read `metadata.rework_feedback` first and change what the feedback names — layer plus quoted evidence. Never resubmit near-identical work; version lineage records the chain (v1 -> changes_requested -> v2), so each version must be a real response.
+
+Honesty: no self-describing quality preambles ("This well-researched brief demonstrates...") — they prime the judge and are never evidence. No grade-shopping: re-running evaluation on unchanged content is visible in the audit trail.
 
 ---
 
@@ -496,25 +535,16 @@ Before marking any artifact as complete, verify these strategic questions are an
 
 Primary:
 
-- `mcp__orgx__orgx_bootstrap` -- initialize OrgX session scope and recommended workflow
-- `mcp__orgx__orgx_bootstrap` -- resolve or switch workspace scope
-- `mcp__orgx__orgx_inspect` -- hydrate task-bound context, attachments, and plan sessions
-- `mcp__orgx__orgx_search` -- retrieve prior campaigns, learnings, competitive intel
-- `mcp__orgx__orgx_search` -- pull prior GTM learnings before drafting
-- `mcp__orgx__orgx_search` -- find existing artifacts, initiatives, and context
-- `mcp__orgx__orgx_plan` -- open tracked planning sessions for launch and messaging work
-- `mcp__orgx__orgx_plan` -- refine campaign or launch plans
-- `mcp__orgx__orgx_plan` -- capture material revisions to the plan
-- `mcp__orgx__orgx_plan` -- finalize and attach the plan to OrgX entities
-- `mcp__orgx__orgx_write` -- publish completed artifacts
-- `mcp__orgx__orgx_act` -- attach evidence and update entity state
-- `mcp__orgx__orgx_act` -- leave review notes on active initiatives or tasks
-- `mcp__orgx__orgx_spawn` -- verify delegation is allowed before handoff
-- `mcp__orgx__orgx_spawn` -- hand off to other agents
-- `mcp__orgx__orgx_submit_receipt` -- record learnings for the flywheel
-- `mcp__orgx__orgx_submit_receipt` -- record artifact quality for calibration
-- `mcp__orgx__orgx_recommend` -- understand current org state and priorities
-- `mcp__orgx__orgx_recommend` -- identify highest-leverage marketing action
+- `mcp__orgx__orgx_bootstrap` -- initialize OrgX session scope and recommended workflow; auto-resolves the workspace
+- `mcp__orgx__orgx_inspect` -- hydrate task-bound context, attachments, and plan sessions (`type=initiative|workstream|milestone|task|decision|artifact|plan_session`; `hydrate_context=true` for full context)
+- `mcp__orgx__orgx_search` -- retrieve prior campaigns, GTM learnings, competitive intel, and existing artifacts
+- `mcp__orgx__orgx_plan` -- tracked planning sessions for launch and messaging work (`action=start|resume|improve|record_edit|complete`; `complete` takes `attach_to=[...]`)
+- `mcp__orgx__orgx_write` -- publish completed artifacts (`operation=create|update`, one entity; use `orgx_apply_changeset` with ref keys and an `idempotency_key` for multi-entity batches)
+- `mcp__orgx__orgx_attach` -- attach evidence and artifacts with `artifact_type`, `business_outcome`, `owner`, and `verification`
+- `mcp__orgx__orgx_act` -- update entity state and leave review notes (`action=update|complete_with_proof|flag_risk|approve|decline|...`; `action=validate` with `dry_run=true` for readiness checks)
+- `mcp__orgx__orgx_spawn` -- delegation (`action=guard` before `action=spawn`; `action=handoff` for cross-agent handoffs)
+- `mcp__orgx__orgx_submit_receipt` -- record learnings and artifact quality for the flywheel (`receipt_type=proof|outcome|quality|attribution|learning`)
+- `mcp__orgx__orgx_recommend` -- current org state and highest-leverage marketing action (`mode=next_action|morning_brief`)
 
 Optional (if configured):
 
