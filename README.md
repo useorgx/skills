@@ -25,6 +25,7 @@ npx add-skill useorgx/skills --list
 | [nightly-recap](./nightly-recap)           | End-of-day activity summary                                                 |
 | [orgx-capability-mindset](./orgx-capability-mindset) | Shared Software 3.0 judgment layer: verifier gates, agent-native outputs, jagged-risk routing, adversarial review, and MCP progress ledger |
 | [orgx-quality-bar](./orgx-quality-bar)     | How OrgX judges artifacts: four-lens verification, domain layer stacks, the AQ 0.85 gate, artifact type codes and the mistype guard, GTM sendability checks, and the rework loop |
+| [orgx-design](./orgx-design)               | Canonical OrgX product design system: full-surface audits, app and widget patterns, responsive/accessibility verification, cut protocol, and cross-tool drift control |
 | [product-agent](./product-agent)           | 100x product domain expert: PRDs, initiatives, canvases, research briefs, competitive analyses, prioritization matrices, pivot evaluations, dashboard specs, launch readiness |
 | [engineering-agent](./engineering-agent)   | 100x engineering domain expert: RFCs, ADRs, code reviews, postmortems, tech debt inventories, capacity plans, runbooks, migration playbooks, dependency audits, perf budgets |
 | [marketing-agent](./marketing-agent)       | 100x marketing domain expert: campaign briefs, content packs, nurture sequences, positioning docs, messaging matrices, competitive narratives, launch plans, analyst briefs, community strategies |

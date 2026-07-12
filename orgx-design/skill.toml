@@ -1,0 +1,7 @@
+name = "orgx-design"
+version = "3.0.0"
+description = "Canonical OrgX product design system, full-surface audit workflow, implementation map, and rendered verification bar."
+entry_instructions = "SKILL.md"
+required_tools = []
+required_scopes = []
+resources = ["references"]
