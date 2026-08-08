@@ -1,0 +1,7 @@
+name = "orgx-quality-bar"
+version = "1.0.0"
+description = "How OrgX judges artifacts and how to produce work that passes honestly: the four-lens verification system (judged, measured, observed, outcome), domain layer stacks, the 0.85 quality gate, artifact type codes and the mistype guard, deterministic GTM sendability checks, and the rework loop."
+entry_instructions = "SKILL.md"
+required_tools = []
+required_scopes = []
+resources = ["reference"]

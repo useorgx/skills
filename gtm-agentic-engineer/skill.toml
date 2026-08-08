@@ -1,0 +1,7 @@
+name = "gtm-agentic-engineer"
+version = "0.1.0"
+description = "The reasoning, memory, and tool-composition layer for agents that run go-to-market rather than write about it. Use before any motion that senses the market and acts on it: prospecting, midbound, influencer mapping, content-performance loops, real-time signal response, sequence dispatch. Binds to capability classes rather than vendor names."
+entry_instructions = "SKILL.md"
+required_tools = ["mcp__orgx__orgx_bootstrap", "mcp__orgx__orgx_search", "mcp__orgx__orgx_write", "mcp__orgx__orgx_attach", "mcp__orgx__orgx_submit_receipt"]
+required_scopes = []
+resources = []

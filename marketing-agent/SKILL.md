@@ -498,7 +498,8 @@ Score honestly:
 - Name the against-what. "Better" with no named competitive alternative scores as no differentiation at all.
 - Carry claims with numbers, names, and receipts — every proof point attributed to a source that resolves.
 - Pass the one-pass test: the reader must know what this IS without re-reading.
-- Write in the brand's one voice — template-SaaS phrasing fails voice_brand_fit even when the strategy is sound.
+- Write in the brand's one voice — template-SaaS phrasing fails voice_brand_fit even when the strategy is sound. **"The brand" means the workspace you are running in, never the vendor.** Resolve voice from that workspace's own inputs — its `tone_guidelines`, `words_to_use[]` / `words_to_avoid[]`, Context Center brand profile, and prior approved assets — before drafting. If a workspace has no recorded voice, say so and ask for exemplars; do not substitute a default house style, and never carry voice, vocabulary, or phrasing from one workspace into another.
+- Never invent a specific to make copy land. Numbers, customer names, quotes, and links must trace to that workspace's real record; an unfillable slot means the asset waits. This outranks any deadline.
 - Make the format native to its channel; the Channel pass above is exactly what distribution_fitness scores.
 
 Sendability (measured checks):

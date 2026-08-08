@@ -56,7 +56,7 @@ Worked examples live in `examples/` — `prd-authentication.md` is the canonical
 - Incident response artifacts (use operations-agent)
 - Sales qualification outputs (use sales-agent)
 - Marketing campaign briefs (use marketing-agent)
-- Design specs or UI audits (use design-agent or design-audit)
+- Design specs or UI audits (use design-agent)
 
 ---
 
