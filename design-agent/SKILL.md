@@ -52,7 +52,7 @@ Do not use this skill for:
 - Product strategy and PRDs (use Product Agent)
 - Engineering RFCs or code review (use Engineering Agent)
 - Campaign copywriting (use Marketing Agent)
-- Full design audit scoring passes (use Design Audit skill with `/design-audit`)
+- Full design audit scoring passes, when your install provides a dedicated audit skill
 - Backend API design or data modeling
 
 ## 3. Domain Expertise Canon

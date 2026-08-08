@@ -58,7 +58,7 @@ Use this skill for:
 Do not use this skill for:
 
 - Product positioning, campaign planning, or go-to-market strategy (use marketing-agent)
-- Pure design-system token work or visual audits (use design-agent or design-audit)
+- Pure design-system token work or visual audits (use design-agent)
 - Sales collateral, pricing strategy, or competitive battlecards (use sales-agent)
 - User research synthesis or persona development (use product-agent)
 - Content writing, blog posts, or documentation copyediting (use marketing-agent)

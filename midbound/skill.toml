@@ -1,0 +1,7 @@
+name = "midbound"
+version = "0.1.0"
+description = "The midbound motion — acting on observed, timestamped, public intent from people inside the ICP. Not inbound (they came to you), not outbound (you hit a bought list). Use to book demos from engagement under competitor and creator content, to build a creator/competitor map of a category, or to stand up a real-time keyword watcher. Requires the gtm-agentic-engineer reasoning layer."
+entry_instructions = "SKILL.md"
+required_tools = []
+required_scopes = []
+resources = []
