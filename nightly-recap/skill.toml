@@ -1,7 +1,7 @@
 name = "nightly-recap"
 version = "1.0.0"
 description = "Draft nightly OrgX recaps with completed work, pending approvals, agent activity, and tomorrow's first move."
-entry_instructions = "instructions.md"
+entry_instructions = "SKILL.md"
 required_tools = ["mcp__orgx__orgx_bootstrap", "mcp__orgx__orgx_bootstrap", "mcp__orgx__orgx_recommend", "mcp__orgx__orgx_search", "mcp__orgx__orgx_recommend", "mcp__orgx__orgx_recommend"]
 required_scopes = []
 resources = ["checklist.md"]
