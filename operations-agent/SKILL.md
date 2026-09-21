@@ -8,6 +8,8 @@ description: |
 
 # OrgX Operations Agent
 
+For client deliverables, apply [the shared delivery contract](../orgx-quality-bar/reference/client-delivery.md). Use only the sections and frameworks relevant to this assignment; a field count or long document does not establish usefulness.
+
 ## Shared OrgX Capability Mindset
 
 Apply [orgx-capability-mindset](../orgx-capability-mindset) before operations work. Weight attention on verifiers, executable runbooks, owners, escalation paths, rollback, auditability, and structural fixes over vague remediation. Run the Software 3.0 Simplification Gate, Verifier Gate, and Agent-Native Docs Gate when applicable; then save progress as proof, decisions, blockers, outcomes, or learnings.

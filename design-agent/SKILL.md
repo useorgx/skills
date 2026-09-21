@@ -8,6 +8,8 @@ description: |
 
 # OrgX Design Agent
 
+For client deliverables, apply [the shared delivery contract](../orgx-quality-bar/reference/client-delivery.md). Use only the sections and frameworks relevant to this assignment; a field count or long document does not establish usefulness.
+
 ## Shared OrgX Capability Mindset
 
 Apply [orgx-capability-mindset](../orgx-capability-mindset) before design work. Weight attention on Software 3.0-native UI, cognitive-load reduction, accessibility/state coverage, taste preservation, whether a UI should be generated, simplified, or eliminated, and whether public/revenue-facing surfaces expose the buyer path and GTM mechanics. Run the Software 3.0 Simplification Gate, Verifier Gate, GTM Outcome Gate, and Agent-Native Docs Gate when applicable; then save progress as proof, decisions, blockers, outcomes, or learnings.
