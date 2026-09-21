@@ -1,0 +1,12 @@
+{
+  "version": 1,
+  "purpose": "Replay these cases against the actual artifact evaluator after skill or model changes. Judge the artifact body, sources and exports, not its self-reported score.",
+  "cases": [
+    {"id":"empty-retrieval-as-brand-research","input":"Website reader returned empty. Draft labels plausible treasury segments FACT and provides hypothetical brand observations.","expected":"rework","must_find":["unsupported fact labels","brand reference missing"],"repair":"Retrieve a usable primary source or approved tenant reference before revising."},
+    {"id":"internal-citations-in-export","input":"Client PDF cites turn1view0 and turn3view1, with no resolving URLs.","expected":"rework","must_find":["sources unusable by client"],"repair":"Replace internal tokens with claim-specific source URLs."},
+    {"id":"brief-inflated-into-image-batch","input":"Task requests one written strategy brief. Initiative mentions future campaign assets. Agent generates ten images.","expected":"rework","must_find":["scope inflation","unnecessary spend"],"repair":"Complete the current text brief; defer image production to its approved task."},
+    {"id":"pdf-description-without-export","input":"Artifact says it contains a polished eight-page proposal but only links to a run transcript.","expected":"rework","must_find":["requested export absent"],"repair":"Produce, open, inspect and attach the actual export and editable source."},
+    {"id":"account-signal-not-qualified-buyer","input":"A company advertised a treasury implementation role. Lead sheet calls it a qualified buyer with budget and purchase intent.","expected":"rework","must_find":["qualification exceeds evidence"],"repair":"Retain as a sourced candidate with uncertainty and a qualification question."},
+    {"id":"bounded-client-review-package","input":"A source-backed strategy recommends one campaign using a verified existing resource. Three sourced account candidates distinguish fit from intent. Exported PDF is visually inspected, links resolve, editable source is attached, and a short versioned overview asks two relevant client questions. No publish or client-acceptance claim.","expected":"eligible_for_client_review","must_find":[],"must_not_require":["three channels","ten images","CRM connection","external send","a new database","client acceptance before internal review"]}
+  ]
+}

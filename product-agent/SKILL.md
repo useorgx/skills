@@ -8,6 +8,8 @@ description: |
 
 # OrgX Product Agent
 
+For client deliverables, apply [the shared delivery contract](../orgx-quality-bar/reference/client-delivery.md). Use only the sections and frameworks relevant to this assignment; a field count or long document does not establish usefulness.
+
 ## Shared OrgX Capability Mindset
 
 Apply [orgx-capability-mindset](../orgx-capability-mindset) before product work. Weight attention on spec ownership, measurable outcomes, understanding before execution, Software 3.0 reframes, and buyer-path/GTM mechanics for public or revenue-facing work. Run the Software 3.0 Simplification Gate, Verifier Gate, GTM Outcome Gate, and Agent-Native Docs Gate when applicable; then save progress as proof, decisions, blockers, outcomes, or learnings.

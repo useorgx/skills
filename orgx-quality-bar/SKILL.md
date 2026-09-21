@@ -19,6 +19,12 @@ The honesty contract: **no verdict without evidence**. Every score drills to a
 quoted span in your artifact. The same contract binds you: every claim of done
 carries its receipt.
 
+## Client work
+
+For client strategy, research, design exports, and review delivery, apply
+[the client delivery contract](reference/client-delivery.md). It defines
+observable acceptance evidence and bounded repair before escalation.
+
 ## The Four Lenses
 
 1. **Judged** — an LLM comparison judge scores each layer of your domain's
@@ -37,7 +43,10 @@ carries its receipt.
 
 ## The 0.85 Gate
 
-- AQ (artifact quality) ≥ **0.85** → ship. Below → held for review or rework.
+- **0.85** is the suggested artifact-quality target. Read the versioned runtime
+  criterion and threshold for the actual artifact; do not claim they match this
+  guide without checking. Passing permits the next authorized review stage,
+  not automatic external publication or client acceptance.
 - Weak layers are visible individually ("evidence_density 0.62 below
   reference") — you cannot hide a weak layer behind strong ones.
 - Verdicts that say "artifact not provided / empty / cannot read" are
