@@ -11,13 +11,14 @@ description: |
 
 # OrgX Quality Bar
 
-Every artifact you attach to OrgX is verified by a four-lens system. This skill
-tells you what the lenses check so you can pass them by doing the work well —
-not by writing around the judge.
+OrgX distinguishes four verification lenses. This skill describes the intended
+quality contract; it is not proof that every lens ran for an artifact. Read the
+actual evaluation receipt, criterion version and evidence before claiming a pass.
 
-The honesty contract: **no verdict without evidence**. Every score drills to a
-quoted span in your artifact. The same contract binds you: every claim of done
-carries its receipt.
+The honesty contract: **no verdict without evidence**. A useful finding names
+the defect and supporting artifact span or observation. A holistic score without
+per-layer findings must not be reported as proof that every layer passed. Every
+claim of done carries its receipt.
 
 ## Client work
 

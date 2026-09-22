@@ -17,6 +17,21 @@ must not silently turn a strategy brief into ten images or a complete website.
 - Preserve real links in exported work. Internal model citation tokens are not
   usable references outside that model conversation.
 
+## Apply only the relevant acceptance criteria
+
+Identify the active task, artifact type and requested review stage before
+judging. Apply only the matching row below. A research calibration does not
+owe a campaign strategy, distribution plan or PDF. A correctly labeled partial
+output can satisfy an explicitly partial task; it cannot complete a larger task.
+Do not require approved answers to questions the artifact was asked to surface.
+
+For account research, distinguish evidence quality from commercial fit. A
+well-evidenced rejection or low-priority candidate can be useful research. Judge
+whether the disposition follows the evidence, not whether every account is a
+qualified prospect. Require contrary evidence when found and otherwise state
+what remains unknown; never demand invented disqualifiers, current buying intent
+or an approved ICP when the task is to help the client calibrate that ICP.
+
 ## Produce the requested work
 
 | Output | Evidence required before ready for client review |
