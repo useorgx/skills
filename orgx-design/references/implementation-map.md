@@ -8,9 +8,9 @@ component APIs can change.
 | Need | Canonical primitive | Contract |
 | --- | --- | --- |
 | Page frame | `components/layout/AppPageShell.tsx` | Shared max widths, responsive page padding, atmosphere, and optional viewport-owned workbench mode. |
-| Page identity / H1 | `components/command-primitives/PageHero.tsx` | One visible page heading with restrained context and actions. |
+| Page identity / H1 | `components/command-primitives/PageHero.tsx` | Flat header (no card) closed by one hairline: one H1 matching the nav label, restrained context, and actions. |
 | Context / identity | `components/command-primitives/IdentityRow.tsx` | Workspace or entity identity, truthful connection state, and quiet metadata. |
-| Earned attention | `components/command-primitives/FocusBanner.tsx` | Calm collapses; warning/danger may claim first-paint. Never nest it in another card. |
+| Earned attention | `components/command-primitives/FocusBanner.tsx` | Calm collapses to an inline chip; warning/danger claim one tinted band with an unboxed glyph. Never nest it in another card. |
 | Navigable metrics | `components/command-primitives/MetricRail.tsx` | Metrics select meaningful detail; they are not decorative KPI tiles. |
 | Action hierarchy | `components/command-primitives/ActionBar.tsx` | One primary, few secondary, rare actions behind one disclosure. |
 | Repeated rows | `components/ui/list-row.tsx` | One row grammar for state, metadata, and inline consequence. |
@@ -18,6 +18,9 @@ component APIs can change.
 Compatibility wrappers such as `components/ox/OxMetricRail.tsx` and
 `components/ox/OxListRow.tsx` may exist. Reuse them only when their contract
 matches the canonical primitive; do not fork styling to make a near-duplicate.
+
+| Primary nav | `components/navigation/AppSideNav.tsx` | `NAV_GROUPS` is the only destination list; see the navigation budget in SKILL.md. |
+| Command home | `components/command-v3/CommandV3Layout.tsx` | Needs-you queue owns "Next unread" unless the goal bar renders; `ExecutionSliceQueue` omits empty and already-shown states. |
 
 ## Data and action ownership
 

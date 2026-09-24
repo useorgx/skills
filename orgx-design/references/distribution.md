@@ -1,8 +1,16 @@
 # Distribution and Drift Control
 
 The authoring source for this skill is the `orgx-design/` directory in
-[useorgx/skills](https://github.com/useorgx/skills). Installed copies are
-generated caches, not independent sources.
+[useorgx/skills](https://github.com/useorgx/skills). `orgx/skills/` in the app
+repo is a managed copy pinned by `skills/.source.lock.json` to a reviewed
+upstream commit; `pnpm check:invariants --only=skills-source` fails if it is
+edited in place. Regenerate it with `scripts/sync-useorgx-skills.mjs --write`
+from the merged upstream commit. Every other copy is a generated cache.
+
+v3.2 was authored directly in the repo-local `.codex` cache and never reached
+upstream, so a routine sync would have deleted it. If a cache is ahead of the
+source, land that content upstream first, then sync; never sync over newer
+work.
 
 ## Supported copies
 
@@ -26,7 +34,9 @@ prove a plugin bundle has updated; verify the installed content independently.
 3. Run `node orgx-design/scripts/validate.mjs`.
 4. Commit, review, and merge the hosted change.
 5. Sync generated local copies from the merged source with
-   `node orgx-design/scripts/sync-local.mjs --apply`.
+   `node orgx-design/scripts/sync-local.mjs --apply`. For the repo-local
+   caches pass them explicitly:
+   `--target .claude/skills/orgx-design --target .codex/skills/orgx-design --target .cursor/orgx/skills/orgx-design`.
 6. Run the same command with `--check` and require zero drift.
 7. Update companion plugin packages through their own release pipeline when
    they embed skill files.

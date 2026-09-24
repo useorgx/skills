@@ -9,6 +9,7 @@ Every widget starts by detecting its rendering context:
 ```js
 function _detectProtocol() {
   if (typeof window.openai !== 'undefined') return 'chatgpt';
+  if (window.McpApps?.App && window.parent && window.parent !== window) return 'mcp-apps-sdk';
   if (window.parent && window.parent !== window) return 'mcp-apps';
   return 'standalone';
 }
@@ -31,7 +32,8 @@ initWidget({
 
 The `initWidget` function handles:
 - **ChatGPT**: Reads `window.openai.toolOutput`, listens for `openai:set_globals`
-- **MCP-apps**: Sends `ui/initialize` via postMessage, listens for `ui/notifications/tool-result`
+- **MCP Apps SDK**: Connects an official `App`, receives `ontoolresult`, and applies `styles.variables` plus `styles.css.fonts` from host context
+- **Legacy MCP-apps**: Uses the compatibility postMessage bridge only for widgets not yet migrated
 - **Standalone**: Calls render immediately with demo or null data
 
 ### Boot Sequence
@@ -58,7 +60,8 @@ callTool('approve_decision', {
 
 `callTool` dispatches via:
 - **ChatGPT**: `window.openai.callTool(name, args)`
-- **MCP-apps**: `postMessage` with `tools/call` method, 30s timeout
+- **MCP Apps SDK**: `App.callServerTool({ name, arguments })`
+- **Legacy MCP-apps**: `postMessage` with `tools/call` method, 30s timeout
 - **Standalone**: Returns `null` (demo mode)
 
 ## Navigation via `openWidgetLink`
@@ -69,6 +72,11 @@ All deep links MUST use `openWidgetLink` instead of raw `<a>` navigation:
 function openWidgetLink(url, event) {
   if (!url) return false;
   var protocol = _detectProtocol();
+  if (protocol === 'mcp-apps-sdk') {
+    if (event) event.preventDefault();
+    void getBridge(true).openLink(url);
+    return false;
+  }
   if (protocol === 'mcp-apps') {
     if (event) event.preventDefault();
     window.parent.postMessage({
@@ -92,9 +100,10 @@ Usage in HTML:
 </a>
 ```
 
-## Size Reporting
+## Legacy Size Reporting
 
-MCP-apps need to know the widget's dimensions:
+The official SDK owns host communication. Only legacy widgets report size with
+the compatibility postMessage bridge:
 
 ```js
 function _sendSize() {
