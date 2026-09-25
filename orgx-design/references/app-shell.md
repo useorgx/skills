@@ -1,8 +1,9 @@
 # App-Shell Contract — the page layer above the widget
 
 > The widgets follow this design system. The **pages** are where it breaks.
-> Every full-page app surface (`/command`, `/initiatives`, `/decisions`,
-> `/people`, `/businesses`, `/goals`, `/learn`, `/settings`) tends to drift
+> Every full-page app surface (`/command`, `/decisions`, `/initiatives`,
+> `/work`, `/work-ledger`, `/command/agents`, `/goals`, `/learn`, `/people`,
+> `/businesses`, `/settings`) tends to drift
 > back into the one thing the philosophy puts on the refuse list: a **dashboard
 > grid of equal-volume cards**. This file is the enforcement layer. Read it
 > before touching any page-level surface, not just MCP widgets.
@@ -72,6 +73,27 @@ button on every row (that's equal-volume again). Copy is operational, not
 passive: "Decide" → "Approve & unblock"; "Plan outreach" → "Plan next touch";
 "Open guided builder" → "Scope initiative". Merge double pills (Status +
 Priority) into a single urgency token: `Urgent · 5d`.
+
+### 7. The hero is flat, and it matches the nav
+`PageHero` renders no card: identity, earned banner, metric rail, and actions
+sit on the page surface above one hairline. The H1 uses the sidebar's noun.
+Do not pass a card-like `className` back into it. Command's own header
+(`.cv3-operating-head`) uses the same 26px/600 H1 so the home page does not
+read as a separate product.
+
+## Navigation (runtime source: `components/navigation/AppSideNav.tsx`)
+
+```
+OPERATE   Command · Decisions · Initiatives · Requests (/work) · Work Ledger
+TEAM      Agents (owns the Council entry) · Chat
+CONTEXT   Goals · Playbooks (/learn) · People · Businesses
+FOOTER    Settings row + Docs and Feedback as named icon buttons
+```
+
+Eleven destinations, fitting a 1440×768 viewport with no nav scroll. `/today`
+and `/command/council` keep their routes and are reached from Command and
+Agents. Drift between the sidebar, `scripts/generate-core-app-surface-registry.mjs`,
+and this file is a release defect.
 
 ## Cut the decoration-as-information
 Radar/sonar glyphs that inform nothing, unlabeled segment strips, progress

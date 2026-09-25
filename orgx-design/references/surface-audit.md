@@ -68,6 +68,27 @@ Flag:
 Fix structure before styling. Prefer removal, grouping, inline consequence, and
 progressive disclosure over smaller type or tighter cards.
 
+## Duplication sweep
+
+Run this on every page before judging hierarchy. Each hit is a finding:
+
+- the same sentence under the H1 and under a section heading;
+- the same control (Next, Search, Create) twice in one view;
+- an item listed in an attention queue and again in the list below it;
+- a row whose subtitle restates its title;
+- a side rail that restates the main column (onboarding context rails);
+- a paragraph that paraphrases the banner above it;
+- two CTAs for one empty state, especially in different colors;
+- a nav label and H1 that name the same page differently.
+
+## Evidence capture
+
+Use the offline fixture server and capture viewport screenshots while
+scrolling, not only full-page captures: lazy imagery and fixed chrome do not
+render in a full-page capture, and a sidebar that clips only shows up at a real
+viewport height. Measure the nav at 1440×768 (`scrollHeight` must not exceed
+`clientHeight`).
+
 ## Onboarding
 
 Audit onboarding as a time-to-value pipeline, not a slideshow.
@@ -102,3 +123,10 @@ Before removing a feature or route:
 6. Report removal, merge, deployment, and observed traffic separately.
 
 Unknown use is a research gap, not proof of value or permission to break links.
+
+Before deleting, search template strings and generated sources as well as
+literals: `` `/plans/${id}` ``, MCP widget `openWidgetLink` targets, email
+templates, OAuth `returnTo` values, `scripts/generate-core-app-surface-registry.mjs`,
+and `.next/types` are all real entry points. A route whose view components
+are complete but whose links were never wired (e.g. `/work-ledger/strand`) is a
+wiring gap, not dead code.

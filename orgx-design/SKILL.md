@@ -1,7 +1,7 @@
 ---
 name: orgx-design
-version: "3.0.0"
-description: "The canonical OrgX product design system and full-surface audit workflow. Use before building, redesigning, reviewing, cutting, or verifying any OrgX UI: core app pages, onboarding, MCP widgets, overlays, public proof, artifact renderers, and responsive states. Triggers on OrgX design, UX, UI polish, design-system work, 'Ive-level', progressive disclosure, responsive audits, interaction quality, or requests to make a surface feel unmistakably OrgX."
+version: '3.3.0'
+description: "The canonical OrgX product design system and full-surface audit workflow. Use before building, redesigning, reviewing, cutting, or verifying any OrgX UI: core app pages, public marketing, onboarding, MCP widgets, overlays, public proof, artifact renderers, and responsive states. Triggers on OrgX design, UX, UI polish, design-system work, 'Ive-level', progressive disclosure, responsive audits, interaction quality, product theater, or requests to make a surface feel unmistakably OrgX."
 ---
 
 # OrgX Design System — v3
@@ -18,19 +18,20 @@ Every surface must shorten that loop or get out of its way.
 
 Read each selected file completely before acting.
 
-| File | Required when |
-| --- | --- |
-| [philosophy.md](references/philosophy.md) | Any new or redesigned visual surface. Read first. |
-| [surface-audit.md](references/surface-audit.md) | Any page, flow, onboarding, responsive, consolidation, or removal work. |
-| [app-shell.md](references/app-shell.md) | Any full-page authenticated app surface. |
-| [implementation-map.md](references/implementation-map.md) | Editing OrgX React/CSS or choosing existing primitives. |
-| [verification.md](references/verification.md) | Any work described as done, fixed, verified, responsive, or ready to ship. |
-| [scorecard.md](references/scorecard.md) | Before shipping any visual change. |
-| [modes-and-patterns.md](references/modes-and-patterns.md) | Choosing layout, mode, content hierarchy, or microcopy. |
-| [tokens.md](references/tokens.md) | Writing or reviewing visual styling. |
-| [components.md](references/components.md) | Building layouts or reusable components. |
-| [widget-sdk.md](references/widget-sdk.md) | MCP widgets, embedded HTML, protocol actions, or widget navigation. |
-| [distribution.md](references/distribution.md) | Editing or syncing this skill across tools. |
+| File                                                                    | Required when                                                                                             |
+| ----------------------------------------------------------------------- | --------------------------------------------------------------------------------------------------------- |
+| [philosophy.md](references/philosophy.md)                               | Any new or redesigned visual surface. Read first.                                                         |
+| [surface-audit.md](references/surface-audit.md)                         | Any page, flow, onboarding, responsive, consolidation, or removal work.                                   |
+| [app-shell.md](references/app-shell.md)                                 | Any full-page authenticated app surface.                                                                  |
+| [implementation-map.md](references/implementation-map.md)               | Editing OrgX React/CSS or choosing existing primitives.                                                   |
+| [verification.md](references/verification.md)                           | Any work described as done, fixed, verified, responsive, or ready to ship.                                |
+| [scorecard.md](references/scorecard.md)                                 | Before shipping any visual change.                                                                        |
+| [modes-and-patterns.md](references/modes-and-patterns.md)               | Choosing layout, mode, content hierarchy, or microcopy.                                                   |
+| [tokens.md](references/tokens.md)                                       | Writing or reviewing visual styling.                                                                      |
+| [components.md](references/components.md)                               | Building layouts or reusable components.                                                                  |
+| [marketing-product-theater.md](references/marketing-product-theater.md) | Public homepage, pricing, atmospheric imagery, embedded product demonstrations, or marketing UI fidelity. |
+| [widget-sdk.md](references/widget-sdk.md)                               | MCP widgets, embedded HTML, protocol actions, or widget navigation.                                       |
+| [distribution.md](references/distribution.md)                           | Editing or syncing this skill across tools.                                                               |
 
 ## Non-Negotiable Workflow
 
@@ -118,6 +119,11 @@ At minimum, inspect:
   applicable;
 - overflow, touch targets, reduced motion, and back/Escape behavior.
 
+Render locally with the offline fixture (`pnpm dev:ui`, profiles in
+`docs/LOCAL_FIXTURE.md`). Full-page screenshots miss lazy-loaded imagery and
+fixed/sticky chrome, so an "empty panel" in a full-page capture is not a
+defect until a scrolled viewport capture confirms it.
+
 ### 7. Judge and cut
 
 Run both gates:
@@ -138,6 +144,13 @@ Route removal additionally requires reference search, traffic or live-behavior
 evidence where available, a canonical replacement, redirect preservation, and
 tests. Full-license-to-cut is not license to break deep links.
 
+Search for template-string links (`` `/plans/${id}` ``), MCP widget links,
+email templates, and generated registries, not just quoted literals. When a
+deletion is refused by tooling or review, record the verified cut list, its
+replacements, and its redirects in the audit and leave the decision with the
+owner. Never make a route unreachable another way (redirecting it, gating it)
+to get the same result.
+
 ## Page Grammar
 
 Authenticated core pages follow this information order:
@@ -152,6 +165,58 @@ Authenticated core pages follow this information order:
 
 Do not turn the grammar into seven boxes. Most steps should be typographic,
 spatial, or interactive relationships on one continuous surface.
+
+## Coherence Rules
+
+These are the defects the September 2026 core-experience audit found on
+nearly every page. Check them on every change; each one is cheap to see and
+expensive to leave.
+
+1. **The header is not a card.** `PageHero` is a flat region closed by one
+   hairline. The only surface allowed to claim a tinted band is the
+   `FocusBanner`, and only when tone is warning/danger. A boxed hero holding a
+   boxed banner holding a boxed glyph is three levels of nesting.
+2. **One name per destination.** The sidebar label, the page H1, and the
+   browser title use the same noun (`Command` → H1 `Command`, `Playbooks` →
+   H1 `Playbooks`). Two names for one place reads as two places.
+3. **Say it once.** A subline under the H1 is not repeated under the first
+   section; a banner headline is not paraphrased in a paragraph below it; a
+   control ("Next unread", "Search") exists once per view; a row title is not
+   repeated as its own subtitle; an item shown in "Needs you" is not listed
+   again in the section beneath it.
+4. **Omit empty sections; do not announce them.** Five headers that say
+   "none" push the one section with work below the fold. When everything is
+   empty, one quiet line replaces the whole group. Filter tabs whose counts
+   are all zero are not rendered.
+5. **One CTA per empty state.** An empty state carries exactly one action, in
+   the page's action color, that completes the job in place (open the dialog)
+   rather than sending the user to another page to start over.
+6. **Guard computed numbers.** Never render a value whose units disagree with
+   its target (`214,500% of 100%`), a percent above what the model allows, or
+   a raw internal id as the primary label. Fix the derivation, add a test,
+   and only then the formatting.
+7. **No codenames or engineering status in product UI.** Internal program
+   names (`Red Dot`, `IWMT`) and pipeline state (`backfill`, `write path`,
+   `latest schema`) are replaced with what the user can do next.
+8. **Healthy status is a line, not a panel.** "Execution truth is current" is
+   ambient text beside the heading. Warning and danger earn the full strip.
+9. **Label/value rows let the label keep its width.** Use
+   `grid-template-columns: auto minmax(0, 1fr)` so the value wraps; a value on
+   `auto` takes max-content and collapses the label beneath it.
+10. **Every block sits on the page grid.** On marketing pages every section,
+    theater, and strip uses the shared measure (`--hv3-max`); a bare child of
+    `<main>` runs to the viewport edge. On app pages the hero and the working
+    area share one left edge.
+
+## Navigation Budget
+
+The primary sidebar lists at most eleven destinations and must fit a 768px-tall
+viewport without the nav scrolling; a destination below the fold is one nobody
+finds. Rows are 36px for fine pointers and 44px under `pointer: coarse`.
+Before adding a link, remove one or prove the new page is not a view of an
+existing one. A page that leaves the nav keeps its route and gains a visible
+entry point from the page that owns its job (Today → a "Daily brief" link on
+Command; Council → the Agents roster).
 
 ## Attention Model
 
@@ -182,7 +247,12 @@ Reject:
 12. hover-only disclosure or icon-only controls without names;
 13. raw anchors in MCP widgets;
 14. versioned duplicate routes without a consolidation plan;
-15. “award-winning” polish claims without rendered evidence.
+15. “award-winning” polish claims without rendered evidence;
+16. a boxed page hero, or a banner nested inside one;
+17. empty sections, zero-count filter tabs, or a second CTA in an empty state;
+18. internal codenames, raw ids, or pipeline status as user-facing copy;
+19. a nav label that differs from the H1 it opens;
+20. marketing blocks off the page measure.
 
 ## Final Gate
 
