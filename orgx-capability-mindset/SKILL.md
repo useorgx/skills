@@ -1,6 +1,6 @@
 ---
 name: orgx-capability-mindset
-version: "2.0.0"
+version: "2.1.0"
 description: |
   Shared Software 3.0 operating mindset for every OrgX agent. Use whenever an agent plans, implements, reviews, delegates, ships, or produces an artifact. Pushes capability by enforcing agent-native outputs, verifier-first execution, jagged-intelligence routing, adversarial review, durable progress artifacts, and human-governed decisions.
 ---
@@ -31,6 +31,40 @@ Always bind the mindset to the current OrgX MCP surface.
 
 Log the sensor-to-actuator transition in the work record. This is where stale state and hidden assumptions compound.
 
+## Record Work as an Agent Work Receipt
+
+Describe your own work in the vocabulary of `@useorgx/agent-work-receipt`
+(`agent-work-receipt/v0.1`): what you were asked to do, **what authority you
+had**, what you did, what changed, **how it was checked**, **where a human was
+needed**, and what it cost. It is account-free and schema-validated, so the same
+record works in any runtime. Full vocabulary and the mapping from
+`metadata.artifact_contract`: `reference/agent-work-receipt.md`.
+
+Three rules follow from it, and they bind before the work starts:
+
+- **Declare the checks before you build.** `verification.checks` is evidence a
+  skeptic can re-run — a command and its exit code, an HTTPS probe and its
+  status, or an independent judge. A check written after the fact, to match what
+  you already produced, verifies nothing. Where the OrgX hook shim is installed,
+  `orgx-agent criteria set` records them and the Stop hook runs the command
+  checks in your working copy before your session is allowed to end.
+- **Know your authority, and record where a human was needed.**
+  `authority.mode` is `manual`, `gated`, or `autopilot`. The autonomy floor stops
+  eight classes at the point of action — `merge`, `force_push`, `deploy`,
+  `publish`, `destructive`, `send`, `spend`, `prod_data` — and files an OrgX
+  decision (`decision_type: agent_action`) in the owner's inbox. Only a
+  signed-in human resolves it; no API key can, including yours. Approval covers
+  exactly that one command, once. Record the denial under
+  `human_interventions`, continue with other work, and never retry or route
+  around it.
+- **State the rung you actually reached.** `outcome.status` is what changed, not
+  what you meant to change. Files in a scratch directory are not a draft; a
+  branch with commits is. A PR is not merged, merged is not deployed, and
+  deployed is not proven in production. `outcome.acceptance` — a human accepting
+  the result — is a separate fact from your own verification passing. Claiming a
+  rung you did not reach is the most expensive error in this system, because
+  everything downstream trusts it.
+
 ## Founder/Team Artifact Contract
 
 Every OrgX agent should shape work around the next practical company artifact,
@@ -41,7 +75,10 @@ workspace is acting like an `early_founder`, `founder_led_company`, or
 When attaching proof with `mcp__orgx__orgx_act` (`action=attach`) or
 `mcp__orgx__orgx_attach`, include these MCP artifact-contract fields either as
 top-level fields when the client supports them or under
-`metadata.artifact_contract`:
+`metadata.artifact_contract`. They are the OrgX projection of the Agent Work
+Receipt records — see `reference/agent-work-receipt.md` for the fuller shape and
+for the three records this projection leaves out (`authority`,
+`human_interventions`, `cost`):
 
 - `agent_type`: `engineering`, `sales`, `marketing`, `product`, `design`,
   `operations`, or `orchestrator`
