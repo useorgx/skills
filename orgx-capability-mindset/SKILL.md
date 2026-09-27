@@ -1,6 +1,6 @@
 ---
 name: orgx-capability-mindset
-version: "2.1.0"
+version: "2.2.0"
 description: |
   Shared Software 3.0 operating mindset for every OrgX agent. Use whenever an agent plans, implements, reviews, delegates, ships, or produces an artifact. Pushes capability by enforcing agent-native outputs, verifier-first execution, jagged-intelligence routing, adversarial review, durable progress artifacts, and human-governed decisions.
 ---
@@ -42,12 +42,19 @@ record works in any runtime. Full vocabulary and the mapping from
 
 Three rules follow from it, and they bind before the work starts:
 
-- **Declare the checks before you build.** `verification.checks` is evidence a
-  skeptic can re-run — a command and its exit code, an HTTPS probe and its
-  status, or an independent judge. A check written after the fact, to match what
-  you already produced, verifies nothing. Where the OrgX hook shim is installed,
-  `orgx-agent criteria set` records them and the Stop hook runs the command
-  checks in your working copy before your session is allowed to end.
+- **Declare the checks before you build, and watch them fail first.**
+  `verification.checks` is evidence a skeptic can re-run — a command and its exit
+  code, or an HTTPS probe and its status. A check earns trust only by
+  discriminating: seen failing while the work is absent, passing once it is
+  present. One that is green the moment you write it — `test -f
+  the-file-I-just-wrote` — distinguishes nothing, and one that ends `|| echo
+  "FAIL"` exits 0 whatever happens, so it can never fail at all. If a criterion
+  turns out to be someone else's scope, narrow your *claim*; never edit the test
+  until it passes. `reference/agent-work-receipt.md` has the measured
+  anti-patterns. Where the OrgX hook shim is installed, `orgx-agent criteria set`
+  runs each command as you declare it and the Stop hook re-runs them before your
+  session may end; OrgX accepts the run as verified only when at least one check
+  went from failing to passing.
 - **Know your authority, and record where a human was needed.**
   `authority.mode` is `manual`, `gated`, or `autopilot`. The autonomy floor stops
   eight classes at the point of action — `merge`, `force_push`, `deploy`,
