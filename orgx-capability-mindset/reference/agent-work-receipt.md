@@ -1,6 +1,6 @@
 # Agent Work Receipt: the record shape for agent work
 
-`@useorgx/agent-work-receipt` (`agent-work-receipt/v0.1`, Apache-2.0) is the
+`@useorgx/agent-work-receipt` (`agent-work-receipt/v0.2`, Apache-2.0) is the
 published contract for recording what an agent was asked to do, what authority
 it had, what it did, what changed, how the result was checked, and what it cost.
 It is account-free: no OrgX workspace, UUID, or database row is required, and
@@ -16,7 +16,12 @@ a shape that only one system understands.
 
 Required: `intent`, `actor`, `authority`, `actions`, `artifacts`, `evidence`,
 `outcome`, `verification`, `cost`, `lineage`, `human_interventions`,
-`timestamps`. Hashes and signatures are optional under `integrity`.
+`timestamps`, plus `receipt_id` and `schema_version`. Hashes and signatures are
+optional under `integrity`.
+
+v0.2 requires exactly the same records as v0.1 and keeps their shapes, so a v0.1
+receipt stays readable; it adds two optional ones, `provenance` and
+`trajectory`. The package ships both schemas.
 
 Four of them carry the weight, and three of those four are what hand-rolled
 records usually miss.
@@ -56,6 +61,48 @@ records usually miss.
 - **`cost`** and **`lineage`** are what make a receipt comparable to other
   receipts: what it cost, and which run, initiative, or parent work it belongs
   to.
+
+## What makes a check a check
+
+Measured on 2026-09-27, across seven agents that were each forced to declare
+criteria before their session could end: every one of them wrote the criteria
+*after* finishing, and every machine check asserted the existence of a file the
+agent had just written. All seven passed. None had verified anything. These are
+the shapes to refuse, in your own work and in review.
+
+**A check that cannot fail.** One agent declared:
+
+```
+test $(tail -n +2 prospects.csv | wc -l) -ge 100 || echo "FAIL: <100 prospects"
+```
+
+It printed `FAIL: <100 prospects`, exited `0`, and was recorded as a pass,
+because `|| echo` swallows the exit status. Anything ending `|| echo`,
+`|| true`, `; true`, or piped into `head`/`tail`/`cat` reports the last
+command's status, not the check's. Write the check so a shell can only exit
+non-zero when the work is missing.
+
+**A check that was already green when you wrote it.** `test -f the-doc-I-just-wrote.md`
+passes the moment it is declared, so it cannot distinguish done from not-done.
+A criterion earns trust only by being seen to fail while the work is absent and
+pass once it is present. Declare it first, watch it fail, then make it pass.
+That is also the cheapest way to discover that your check tests the wrong
+thing.
+
+**Prose in place of a check.** One agent declared eight criteria and wrote seven
+of them as rubrics for a future judge, leaving one file-existence check to carry
+the whole claim. Prose records intent; it verifies nothing. Keep it if it helps a
+reader, but never let it stand in for `verification.checks`.
+
+**Weakening the check instead of the claim.** One agent replaced "the landing
+page responds at its URL" with "the spec file mentions Calendly" and reported
+success. If a criterion turns out to belong to someone else's scope, narrow the
+*claim* — say what you did and did not do — and leave the criterion honest. Never
+edit the test until it passes.
+
+**A shell error is not a pass.** `test: $count: integer expression expected` with
+exit `0` means the shell could not run what you wrote, so its exit status says
+nothing. Read the output, not just the code.
 
 ## Relationship to `metadata.artifact_contract`
 
