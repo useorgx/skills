@@ -1,6 +1,6 @@
 # Agent Work Receipt: the record shape for agent work
 
-`@useorgx/agent-work-receipt` (`agent-work-receipt/v0.1`, Apache-2.0) is the
+`@useorgx/agent-work-receipt` (`agent-work-receipt/v0.2`, Apache-2.0) is the
 published contract for recording what an agent was asked to do, what authority
 it had, what it did, what changed, how the result was checked, and what it cost.
 It is account-free: no OrgX workspace, UUID, or database row is required, and
@@ -16,7 +16,12 @@ a shape that only one system understands.
 
 Required: `intent`, `actor`, `authority`, `actions`, `artifacts`, `evidence`,
 `outcome`, `verification`, `cost`, `lineage`, `human_interventions`,
-`timestamps`. Hashes and signatures are optional under `integrity`.
+`timestamps`, plus `receipt_id` and `schema_version`. Hashes and signatures are
+optional under `integrity`.
+
+v0.2 requires exactly the same records as v0.1 and keeps their shapes, so a v0.1
+receipt stays readable; it adds two optional ones, `provenance` and
+`trajectory`. The package ships both schemas.
 
 Four of them carry the weight, and three of those four are what hand-rolled
 records usually miss.

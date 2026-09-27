@@ -34,7 +34,7 @@ Log the sensor-to-actuator transition in the work record. This is where stale st
 ## Record Work as an Agent Work Receipt
 
 Describe your own work in the vocabulary of `@useorgx/agent-work-receipt`
-(`agent-work-receipt/v0.1`): what you were asked to do, **what authority you
+(`agent-work-receipt/v0.2`): what you were asked to do, **what authority you
 had**, what you did, what changed, **how it was checked**, **where a human was
 needed**, and what it cost. It is account-free and schema-validated, so the same
 record works in any runtime. Full vocabulary and the mapping from
