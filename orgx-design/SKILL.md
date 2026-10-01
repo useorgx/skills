@@ -1,6 +1,6 @@
 ---
 name: orgx-design
-version: '3.3.0'
+version: '3.4.0'
 description: "The canonical OrgX product design system and full-surface audit workflow. Use before building, redesigning, reviewing, cutting, or verifying any OrgX UI: core app pages, public marketing, onboarding, MCP widgets, overlays, public proof, artifact renderers, and responsive states. Triggers on OrgX design, UX, UI polish, design-system work, 'Ive-level', progressive disclosure, responsive audits, interaction quality, product theater, or requests to make a surface feel unmistakably OrgX."
 ---
 
@@ -29,7 +29,7 @@ Read each selected file completely before acting.
 | [modes-and-patterns.md](references/modes-and-patterns.md)               | Choosing layout, mode, content hierarchy, or microcopy.                                                   |
 | [tokens.md](references/tokens.md)                                       | Writing or reviewing visual styling.                                                                      |
 | [components.md](references/components.md)                               | Building layouts or reusable components.                                                                  |
-| [marketing-product-theater.md](references/marketing-product-theater.md) | Public homepage, pricing, atmospheric imagery, embedded product demonstrations, or marketing UI fidelity. |
+| [marketing-product-theater.md](references/marketing-product-theater.md) | Any public page: sign-up CTAs and their label, door, and color; homepage, pricing, atmospheric imagery, embedded product demonstrations, or marketing UI fidelity. |
 | [widget-sdk.md](references/widget-sdk.md)                               | MCP widgets, embedded HTML, protocol actions, or widget navigation.                                       |
 | [distribution.md](references/distribution.md)                           | Editing or syncing this skill across tools.                                                               |
 

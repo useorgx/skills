@@ -8,6 +8,16 @@ let a buyer **feel the product while preserving product truth**. Borrow the
 principle from the best product-led pages, not their visual skin: the interface
 must remain recognizably OrgX and the evidence must stay honest.
 
+## Scope
+
+This contract covers every public route, not only pages that embed product UI:
+the homepage, product pages, pricing, compare, for / use-cases / skip-the-hire,
+tools, guides, about, proof and booking pages, and the legal pages. A page that
+predates the theater (a persona landing page, a comparison) is not out of scope
+because it embeds no product scene; the color, sign-up, and measure rules apply
+to it too. Auth surfaces and the live room have their own contracts, and the
+docs site (docs.useorgx.com) is a separate platform audited separately.
+
 ## Product-truth gate
 
 Before drawing a product scene, name its canonical route, component, state
@@ -98,6 +108,48 @@ Tier identity, status, and primary action are different jobs. A selected tier
 may carry its identity color on an edge or rail; the action still uses lime.
 Never recolor the shell-wide primary token merely to fix one CTA.
 
+## Sign-up contract
+
+Every public page offers the same commitment in the same words. A September 2026
+crawl found 47 different labels for one action, 14 pages whose "Start Free" went
+to `/onboarding`, and a "Start 14-day trial" button on 14 pages that opened a
+form that never mentions a trial.
+
+- **One verb.** The sign-up action reads "Start free" (`SIGNUP_CTA_LABEL` in
+  `lib/marketing/signupCta.ts`). A page does not invent its own ("Start 14-day
+  trial", "Get Started Free", "Publish your quality bar"). A promise-bearing
+  verb has to be kept by the next screen, and the next screen is the same
+  account form for everyone. A deep link whose redirect lands on the surface the
+  label names ("Run this benchmark in OrgX" to the benchmark runs page) may keep
+  its own label.
+- **One door.** A visitor with no account goes to `/sign-up`. `/sign-in` and
+  `/onboarding` are returning-user doors: `/onboarding` redirects a signed-out
+  visitor to `/sign-in`, whose only route to account creation is a small text
+  link. A plan chosen on pricing returns to that plan through `redirect_url`,
+  still through `/sign-up`.
+- **One look.** The primary sign-up button is the `action` variant, resolved
+  through the `--ox-action*` theme tokens: the same lime in the nav, hero,
+  pricing, and final CTA. Teal is verification and proof. Do not recolor a
+  persona page's, a tier's, or a campaign's button.
+- **Say what is free.** The Free plan is one active initiative (`lib/plans.ts`).
+  A trial belongs to paid checkout, not to the free account form. Do not
+  promise a trial on a button that opens the free form, and do not quote a
+  free-tier size that is not the plan's.
+- **Carry the intent.** Links pass `?intent=<page>` from a registered set, so
+  the sign-up screen can name the page the visitor left. Attribution records
+  the referrer; the intent is for the visitor.
+- **Two doors on the homepage.** `/` leads with the booked call and keeps
+  self-serve as the quiet secondary; the nav action mirrors the page's primary.
+  Every other page leads with self-serve and may add a booked call as its
+  secondary, never a second primary.
+
+Enforcement lives in the app repo. `pnpm check:invariants --only=public-cta`
+reads source (the path, the label, returning-user doors, doubled title
+suffixes). `pnpm audit:public-site` renders the site signed out and checks
+label, destination, the nav action's color against every filled sign-up button,
+overflow at 1440, 768, and 375, canonical and `og:url`, internal 404s, and
+first-party request failures. A rule no gate covers is a preference.
+
 ## Pricing completeness
 
 Pricing is a product boundary, not a decorative end card.
@@ -145,7 +197,7 @@ A public product-theater change is not verified until the receipt includes:
 - the canonical route or component represented by every embedded surface;
 - interaction checks for tabs, selection, focus, and disclosure;
 - exact action-color comparison across navigation, hero, pricing, and final
-  CTA;
+  CTA, and the output of `pnpm audit:public-site` against the deployed URL;
 - touch-target and horizontal-overflow measurements;
 - a two-sided height comparison for every composition-changing breakpoint;
 - an explicit label for every illustrative or fixture-backed state;

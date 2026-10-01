@@ -10,7 +10,7 @@ const text = await readFile(skillPath, 'utf8');
 const errors = [];
 
 for (const phrase of [
-  "version: '3.3.0'",
+  "version: '3.4.0'",
   '## Coherence Rules',
   '## Navigation Budget',
   'The header is not a card',
@@ -59,5 +59,5 @@ if (errors.length) {
 }
 
 console.log(
-  `orgx-design v3.3 valid: ${new Set(references).size} references resolved`
+  `orgx-design v3.4 valid: ${new Set(references).size} references resolved`
 );
