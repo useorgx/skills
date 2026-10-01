@@ -2,6 +2,19 @@
 
 Single source of truth for every visual value. If it's not here, it shouldn't be in the CSS.
 
+## Where these tokens apply
+
+This file is the **widget** contract (MCP Apps and HQ widgets). The React app
+and the public site run a second set, in `app/globals.css` and
+`components/ui/button.tsx`. Check which surface you are building before copying
+a value.
+
+| | Widgets (`ox-*` CSS) | App and public site |
+| --- | --- | --- |
+| Font | `--ox-font`: system stack, Inter | Geist (`--font-sans`; `--ox-font` resolves to it) |
+| Button | `ox-btn`, 12px radius, 44px minimum | `Button`: 14px radius, `size="lg"` 28px, 48 / 56px tall; product pages keep `ox-btn` at 12px |
+| Primary action | `--ox-primary-rgb`, one per widget | `--ox-action*` theme tokens: one lime, never a per-page literal |
+
 All shared classes use the `ox-` prefix: `ox-card`, `ox-well`, `ox-eyebrow`, `ox-title`, `ox-btn`, `ox-badge`. Widget-specific classes are unprefixed and scoped to that widget's `<style>` block.
 
 ## Colors
