@@ -42,21 +42,73 @@ The `initWidget` function handles:
 3. Data arrives → `applyBootPayload` → minimum 220ms loading time → render
 4. Skeleton fades out (opacity 0.3s) → content fades in
 
+## Design Kit
+
+Widgets are built on the shared OrgX design kit (`@useorgx/orgx-ui-kit`),
+vendored into the widget server as `public/widgets/shared/kit/ox-tokens.css`
+(the `--ox-*` and `--agent-<key>` variables) and
+`public/widgets/shared/kit/ox-elements.js` (framework-free custom elements,
+exposed as `window.OrgXElements`). Load both before widget code:
+
+```html
+<link rel="stylesheet" href="shared/kit/ox-tokens.css" />
+<script src="shared/kit/ox-elements.js"></script>
+```
+
+Reach for an element before writing bespoke markup:
+
+| Element | Use |
+| --- | --- |
+| `<ox-state-chip state>` | One pill for every action state (`needs_you`, `sending`, `held`, `queued`, `running`, `succeeded`, `failed`, `handed_off`, `confirmed`, ...). It shows the person-facing wording, never the stored name. |
+| `<ox-attention-line tone count oldest>` | The one line that opens a surface: "2 need your decision · oldest 2d", or "Nothing needs your decision." |
+| `<ox-receipt-row status label value detail href>` | One line of proof (`met`, `fail`, `yours`, `unverified`, `pending`). With `href` it fires a cancelable `ox-open` event; route it through `openWidgetLink`. |
+| `<ox-footer variant state>` | The action footer: `finishes-here`, `confirms-in-orgx`, `queues-work`, or `reads`, with hold-to-confirm and undo windows. |
+| `<ox-glyph kind>` | Entity glyphs: `goal`, `initiative`, `workstream`, `milestone`, `task`, `run`, `decision`, `question`, `artifact`, `receipt`. |
+| `<ox-avatar agent form size>` | Real agent avatars from `https://mcp.useorgx.com/widgets/shared/avatars/`, with an initial fallback. |
+
+The kit files are generated from the kit package; never edit them in place.
+Show the state the server reports: a chip or footer moves to `succeeded`/done
+only after the tool call (or `orgx_command_status`) says so.
+
 ## Inline Actions via `callTool`
 
-Widgets can call OrgX MCP tools directly from the UI:
+Widgets can call OrgX MCP tools directly from the UI. A person's click is the
+only thing that settles a decision, so the decisions widget settles one with
+`orgx_widget_decide` and the single-use approval token that arrives in
+widget-only result metadata (`orgx/widgetApproval`). The model never sees that
+token and never calls `orgx_widget_decide`; `approve_decision` /
+`reject_decision` only point the person to where they decide.
 
 ```js
-// Approve a decision
-callTool('approve_decision', {
-  decision_id: 'dec-123',
-  note: 'Approved via widget'
-}).then(function(result) {
-  // Update UI to show resolution
-}).catch(function(err) {
-  // Show error state
-});
+// The person clicked Approve on an ordinary decision
+var meta = window.OrgXWidgetRuntime.getToolResponseMetadata('orgx/widgetApproval');
+var token = meta && meta.approval_tokens ? meta.approval_tokens[decisionId] : null;
+if (!token) {
+  // No token: this decision is made in OrgX. Show "Open in OrgX" (review_url);
+  // never pretend the widget settled it.
+} else {
+  callTool('orgx_widget_decide', {
+    decision_id: decisionId,
+    action: 'approve', // or 'reject' with a reason
+    approval_token: token
+  }).then(function(result) {
+    // Show the settled state only after the call succeeds
+  }).catch(function(err) {
+    // Show the error; the decision is still waiting on the person
+  });
+}
 ```
+
+Critical decisions, decisions with options to choose between, agent-run
+approvals, and protected or artifact-review decisions carry no token: they are
+always decided on the decision page in OrgX.
+
+To show what happened after something was started, read
+`orgx_command_status({ kind: 'decision' | 'run' | 'command', id })`. Its
+`state` is `queued`, `held`, `running`, `succeeded`, `failed`, `cancelled`, or
+`not_found`; `waiting_on` names a `person` or `agent`; check again after
+`next_poll_after_ms`, and stop when it is `null` (final). Never render
+"Done" for a state that is not `succeeded`.
 
 `callTool` dispatches via:
 - **ChatGPT**: `window.openai.callTool(name, args)`
@@ -193,18 +245,26 @@ var AGENT_DIRECTORY = {
 Resolution tries: direct name → agent type → role. Falls back to generic "OrgX Agent".
 
 ### Avatar Rendering
+
+Use `<ox-avatar>` from the design kit (below) rather than hand-built `<img>`
+markup. It renders the real agent avatar at
+`https://mcp.useorgx.com/widgets/shared/avatars/<agent>-<form>-<size>.webp`
+(agents `pace`, `eli`, `mark`, `sage`, `orion`, `dana`, `xandy`; forms `base`,
+`strategic`, `proactive`, `working`, `asking`, `verifying`; sizes 48/96/192
+with a 2x `srcset`), and falls back to the agent's initial in the same
+footprint when the image fails:
+
 ```js
-function renderAvatar(agent) {
-  var profile = resolveAgentProfile(agent);
-  if (profile.avatarPath) {
-    var src = 'https://mcp.useorgx.com/widgets/shared/' + profile.avatarPath;
-    return '<img src="' + src + '" onerror="this.style.display=\'none\'; this.previousElementSibling.style.display=\'flex\';" />';
+function renderAvatar(agentKey, name, sizePx) {
+  if (agentKey && window.customElements && window.customElements.get('ox-avatar')) {
+    return '<ox-avatar agent="' + agentKey + '" form="asking" size="' + sizePx + '" name="' + escapeHtml(name) + '"></ox-avatar>';
   }
-  return '<span class="avatar-fallback">' + profile.name[0] + '</span>';
+  return '<span class="avatar-fallback">' + escapeHtml(name.charAt(0)) + '</span>';
 }
 ```
 
-Always include a letter-fallback `<span>` before the `<img>` with `display:none` — the `onerror` handler reveals it on image load failure.
+Pick the form from state: `working` for a run in progress, `asking` when it
+needs the person, `verifying` while proof is checked, `base` otherwise.
 
 ## Icon System
 
@@ -222,10 +282,12 @@ Standard icon set: `agent`, `task`, `blocked`, `stream`, `check`, `warning`, `er
 
 ## Remote Assets
 
-Widget shared assets (avatars, CSS, JS) served from:
+Widget shared assets (design kit, avatars, CSS, JS) served from:
 ```
 https://mcp.useorgx.com/widgets/shared/
 ```
+
+Design kit files live under `kit/` and agent avatar renders under `avatars/`.
 
 Resolve via:
 ```js

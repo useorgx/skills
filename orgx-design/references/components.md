@@ -6,6 +6,8 @@ Reusable patterns from the live widget system. Each pattern includes the semanti
 
 All widgets load `shared/widget-foundation.css` for base tokens and `shared/interaction-kit.css` + `shared/interaction-kit.js` for interactive components (buttons, links, tooltips). Widget-specific styles go in inline `<style>` blocks.
 
+Widgets also load the shared design kit (`shared/kit/ox-tokens.css` + `shared/kit/ox-elements.js`) for state chips, attention lines, receipt rows, footers, glyphs, and real agent avatars; prefer those elements over bespoke markup (see `widget-sdk.md` → Design Kit).
+
 ## Pattern: Widget Shell
 
 The hero card that introduces every widget. Standard across all widget types.
@@ -346,7 +348,7 @@ Shimmer placeholders shown before data arrives.
 - `deep-link`: 48px min-height, 14px radius, primary-tinted border + background
 - Hover: translateY(-1px), stronger border
 - **Must use `openWidgetLink()`** for MCP protocol compatibility — not raw `<a href>` navigation
-- `callTool()` for inline actions (approve, reject) — see widget-sdk reference
+- `callTool()` for inline actions (approve, reject) — a person's click settles an ordinary decision through `orgx_widget_decide` with its widget-only token; everything else opens OrgX. See widget-sdk reference
 
 ## Composition: Multi-Agent Grid
 
