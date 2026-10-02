@@ -33,6 +33,7 @@ Transform a goal into a structured OrgX initiative with milestones, workstreams,
 4. If the user requests specific agent delegation:
    - call `mcp__orgx__orgx_spawn action=guard` (and `action=estimate` when cost matters)
    - then `mcp__orgx__orgx_spawn action=spawn` once the guard passes; omit `model_tier`/`provider`/`model` for normal work — OrgX auto-routes by task complexity and workspace policy
+   - report each spawn as started, not done; where the connection exposes `mcp__orgx__orgx_command_status`, check `kind=run` with the returned `run_id` before saying anything about the result
 5. Launch with `mcp__orgx__orgx_act type=initiative action=launch` when the initiative should go live immediately.
 6. Finish with `mcp__orgx__orgx_recommend mode=next_action entity_type=initiative` so the user knows the first move after kickoff.
 
@@ -61,7 +62,7 @@ Workstreams:
 - [domain] — [task count] starter tasks
 
 Delegation:
-- [agent assignment summary or "none"]
+- [agent assignment + run state as OrgX reports it (started / running / waiting on <person>), or "none"]
 
 Next action:
 - [single highest-leverage next step]

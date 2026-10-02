@@ -43,7 +43,7 @@ canonical recap body. Add only context that is missing from that body.
 
 ## Pending Decisions
 
-- [decision]
+- [decision — waiting on <person>, with its review link]
 
 ## Proof Gaps
 

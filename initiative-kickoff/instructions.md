@@ -27,5 +27,5 @@ Report:
 - initiative title and ID
 - milestones created
 - workstreams created
-- any delegated agents
+- any delegated agents, each as started (with its run ID) rather than done
 - the single best next action

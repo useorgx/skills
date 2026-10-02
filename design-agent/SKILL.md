@@ -152,7 +152,7 @@ python3 scripts/validate_design.py <artifact_file> --type <artifact_type>
 10. **Attach proof**:
     - `mcp__orgx__orgx_plan` (`action=complete`, `attach_to=[...]`) for planning sessions
     - `mcp__orgx__orgx_attach` (with `artifact_type`, `description`, `verification`) for audits, token packages, and component docs
-    - `mcp__orgx__orgx_act` (`action=approve` or `action=decline`) for design review verdicts on other agents' work
+    - `mcp__orgx__orgx_act` (`action=update` with a `note`) for design review verdicts on other agents' work; settling a decision is the person's call, so hand them its `review_url` instead of approving or declining it
 11. **Record learnings and quality**: Submit learnings with `mcp__orgx__orgx_submit_receipt` (`receipt_type=learning`) and record quality with `receipt_type=quality`.
 12. **Handoff**: Before delegating downstream work, run `mcp__orgx__orgx_spawn` (`action=guard`), then notify or spawn downstream agents (`action=spawn` or `action=handoff`) per the Cross-Agent Handoff Contracts.
 
@@ -800,7 +800,7 @@ Apply relevant prior learnings. Reference them explicitly (e.g., "Per learning L
 - `mcp__orgx__orgx_plan` — tracked design planning: `action=start` to open, `action=improve` to refine, `action=record_edit` to capture revisions, `action=complete` (`attach_to=[...]`) to persist and attach
 - `mcp__orgx__orgx_write` — publish completed artifacts (`operation=create` | `operation=update`; use `orgx_apply_changeset` for multi-entity batches)
 - `mcp__orgx__orgx_attach` — attach artifacts with `artifact_type`, `description`, `verification` metadata
-- `mcp__orgx__orgx_act` — entity state changes and review verdicts (`action=approve` | `decline` | `update`; `action=validate dry_run=true` for readiness checks)
+- `mcp__orgx__orgx_act` — entity state changes and review notes (`action=update`; `action=validate dry_run=true` for readiness checks). Only a person settles a decision; give them its `review_url`
 - `mcp__orgx__orgx_submit_receipt` — record learnings (`receipt_type=learning`) and score quality (`receipt_type=quality`) for calibration
 - `mcp__orgx__orgx_spawn` — `action=guard` to verify delegation is allowed, then `action=spawn` for follow-on work
 
