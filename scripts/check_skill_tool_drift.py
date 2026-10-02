@@ -31,6 +31,7 @@ KNOWN_ORGX_TOOLS = {
     "orgx_apply_changeset",
     "orgx_attach",
     "orgx_bootstrap",
+    "orgx_command_status",
     "orgx_decide",
     "orgx_emit_activity",
     "get_agent_status",
@@ -103,6 +104,24 @@ DEPRECATED_ORGX_TOOLS = {
     "update_stream_progress",
     "validate_studio_content",
     "verify_entity_completion",
+}
+
+# Tools only a host widget may call. A model never holds the single-use token
+# they need, so a skill that tells an agent to call one teaches a dead end.
+WIDGET_ONLY_ORGX_TOOLS = {
+    "orgx_widget_decide",
+}
+
+# The truthful-state contract every agent inherits from the capability mindset:
+# a model never settles a decision, a started run is not a finished one, and a
+# retried write reuses its idempotency key.
+TRUTHFUL_STATE_PHRASES = {
+    "## Truthful State",
+    "review_url",
+    "orgx_command_status",
+    "next_poll_after_ms",
+    "waiting_on",
+    "idempotency_key",
 }
 
 PLAN_TOOLS = {"orgx_plan"}
@@ -192,7 +211,12 @@ def main() -> int:
             combined_refs |= refs
 
             for ref in sorted(refs):
-                if ref in DEPRECATED_ORGX_TOOLS:
+                if ref in WIDGET_ONLY_ORGX_TOOLS:
+                    errors.append(
+                        f"{file_path.relative_to(ROOT)} references widget-only OrgX tool "
+                        f"`mcp__orgx__{ref}`; agents must never call it"
+                    )
+                elif ref in DEPRECATED_ORGX_TOOLS:
                     errors.append(
                         f"{file_path.relative_to(ROOT)} references deprecated OrgX tool "
                         f"`mcp__orgx__{ref}`"
@@ -244,6 +268,12 @@ def main() -> int:
                             f"{CAPABILITY_MINDSET_SKILL} is missing canonical "
                             f"artifact_type `{artifact_type}` for {agent_dir}"
                         )
+            for phrase in sorted(TRUTHFUL_STATE_PHRASES):
+                if phrase not in combined_text:
+                    errors.append(
+                        f"{CAPABILITY_MINDSET_SKILL} is missing truthful-state "
+                        f"contract text `{phrase}`"
+                    )
             for field in sorted(LOOP_VALIDATION_FIELDS):
                 if field not in combined_text:
                     errors.append(

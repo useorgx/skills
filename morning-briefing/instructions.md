@@ -18,3 +18,4 @@ You are generating the morning briefing for the user's OrgX workspace.
 - Surface the single most important next move.
 - If any section is empty, say so explicitly instead of omitting it.
 - Prefer workspace-level priorities over generic summaries.
+- Pending decisions wait on the person: link each one to its `review_url`. Never say a decision was approved or rejected unless OrgX shows it settled.

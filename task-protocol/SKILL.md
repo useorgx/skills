@@ -38,9 +38,19 @@ description: |
 - Emit blocker telemetry with `mcp__orgx__orgx_emit_activity phase=blocked`.
 - When the blocker needs an explicit approval, tradeoff, or de-stall decision,
   create it through `mcp__orgx__orgx_write` with a `decision.create`
-  operation and an idempotency key tied to the task/run.
+  operation and an idempotency key tied to the task/run. Only a person settles
+  it: report the task as waiting on them, hand them the decision's `review_url`,
+  and never approve or reject it yourself (`orgx_decide action=approve|reject`
+  only returns where the person decides).
+- If a write's outcome is unclear (timeout, dropped connection), retry it with
+  the same idempotency key; OrgX replays the stored result instead of
+  duplicating it. A 409 means the first attempt is still running.
 - Before cross-domain delegation, call `mcp__orgx__orgx_spawn action=guard` (add `action=estimate` when cost matters).
 - Dispatch with `mcp__orgx__orgx_spawn action=spawn` (or `action=handoff` to reassign) only after the guard passes.
+- A spawn starts a run; it does not finish one. Report it as started, keep the
+  returned `run_id`, and check it with `mcp__orgx__orgx_command_status kind=run`
+  where the connection exposes it (otherwise `mcp__orgx__get_agent_status`)
+  before relying on its output. See `orgx-capability-mindset` → Truthful State.
 
 ## Completing
 

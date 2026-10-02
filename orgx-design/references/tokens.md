@@ -109,7 +109,7 @@ Per-agent accent colors set via `--agent-accent-rgb` on each card:
 | Dana | Design | `236, 72, 153` | Pink |
 | Xandy | Orchestrator | `20, 184, 166` | Teal |
 
-Agent avatars are served from `https://mcp.useorgx.com/widgets/shared/{filename}.png` with letter-fallback on error.
+Agent avatars are served from `https://mcp.useorgx.com/widgets/shared/avatars/<agent>-<form>-<size>.webp`; render them with the design kit's `<ox-avatar>`, which falls back to the agent's initial on error (see `widget-sdk.md`).
 
 ### Tone Classes
 The `.tone-*` system provides semantic coloring across all components:

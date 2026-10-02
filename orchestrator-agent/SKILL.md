@@ -32,6 +32,7 @@ Apply [orgx-capability-mindset](../orgx-capability-mindset) before orchestration
    - Omit `model_tier`, `provider`, and exact `model` for normal work so OrgX auto-routes by task complexity and workspace policy.
    - Use `model_tier=standard` and `budget_mode=cheapest_valid` only for controlled reliability validation runs, test initiatives, or explicit budget-constrained verification.
    - Each delegation must name the target agent, acceptance criteria, expected receipt, and whether routing is auto or intentionally constrained.
+   - A spawn starts a run; it does not complete one. Report delegated work as started, keep each `run_id`, and check it with `mcp__orgx__orgx_command_status` (`kind=run`) where the connection exposes it (otherwise `mcp__orgx__get_agent_status`) before synthesizing its output. Decisions you raise wait on a person: report them as waiting, with their `review_url`.
 10. Submit learnings with `mcp__orgx__orgx_submit_receipt` (`receipt_type=learning`) and score the artifact with `mcp__orgx__orgx_submit_receipt` (`receipt_type=quality`).
 
 Drive multi-agent execution with clear dependencies, quality gates, and accountable handoffs. The orchestrator never does the domain work itself — it coordinates, sequences, unblocks, and synthesizes.
@@ -211,7 +212,7 @@ python3 scripts/validate_orchestration.py <artifact_file> --type <artifact_type>
 14. Attach coordination proof back to OrgX:
     - `mcp__orgx__orgx_plan` (`action=complete`, `attach_to=[...]`) for planning sessions
     - `mcp__orgx__orgx_attach` for initiative plans, synthesis, and risk registers (declare `artifact_type`)
-    - `mcp__orgx__orgx_act` (`action=unblock`, `action=flag_risk`, `action=approve`/`decline`) for unblock requests, reviews, and decision notes
+    - `mcp__orgx__orgx_act` (`action=unblock`, `action=flag_risk`, `action=update` with a `note`) for unblock requests, reviews, and decision notes; decisions themselves are settled only by a person, so route them to the decision's `review_url`
 15. Submit learnings: `mcp__orgx__orgx_submit_receipt` (`receipt_type=learning`) with coordination-specific insight.
 16. Score the artifact: `mcp__orgx__orgx_submit_receipt` (`receipt_type=quality`) with evidence including at least one verifiable URL.
 
@@ -568,9 +569,10 @@ Any `*.structured_blocker` artifact — from any domain — is judged on the ops
 - `mcp__orgx__orgx_plan` — tracked plan sessions for initiative design and retrospectives (`action=start|resume|improve|record_edit|complete`; `complete` takes `attach_to=[...]`)
 - `mcp__orgx__orgx_write` — create or update one entity (`operation=create|update`): initiatives, workstreams, milestones, tasks
 - `mcp__orgx__orgx_apply_changeset` — multi-entity batches with ref keys + `idempotency_key` (idempotent, transactional)
-- `mcp__orgx__orgx_act` — lifecycle and state changes (`action=launch|pause|resume|complete|complete_with_proof|block|unblock|flag_risk|reopen|approve|decline|update`; `action=validate` with `dry_run=true` for readiness checks)
+- `mcp__orgx__orgx_act` — lifecycle and state changes (`action=launch|pause|resume|complete|complete_with_proof|block|unblock|flag_risk|reopen|update`; `action=validate` with `dry_run=true` for readiness checks). It never settles a decision: only a person does, from the decision's `review_url`
 - `mcp__orgx__orgx_attach` — attach artifacts and evidence (declare `artifact_type`, `business_outcome`, `owner`, `verification`)
 - `mcp__orgx__orgx_spawn` — delegation (`action=guard|estimate|spawn|handoff|classify`; guard before spawn)
+- `mcp__orgx__orgx_command_status` — real state of a started run, decision, or work command (`kind=run|decision|command`, `id`); recheck after `next_poll_after_ms`, `null` means final. Only on connections whose profile exposes it
 - `mcp__orgx__orgx_emit_activity` — emit progress checkpoints and status updates
 - `mcp__orgx__orgx_recommend` — initiative momentum, blockers, and queue pressure (`mode=next_action|morning_brief`)
 - `mcp__orgx__orgx_submit_receipt` — flywheel receipts (`receipt_type=proof|outcome|quality|attribution|learning`; evidence includes at least one verifiable URL)

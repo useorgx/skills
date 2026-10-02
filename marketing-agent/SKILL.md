@@ -544,7 +544,7 @@ Primary:
 - `mcp__orgx__orgx_plan` -- tracked planning sessions for launch and messaging work (`action=start|resume|improve|record_edit|complete`; `complete` takes `attach_to=[...]`)
 - `mcp__orgx__orgx_write` -- publish completed artifacts (`operation=create|update`, one entity; use `orgx_apply_changeset` with ref keys and an `idempotency_key` for multi-entity batches)
 - `mcp__orgx__orgx_attach` -- attach evidence and artifacts with `artifact_type`, `business_outcome`, `owner`, and `verification`
-- `mcp__orgx__orgx_act` -- update entity state and leave review notes (`action=update|complete_with_proof|flag_risk|approve|decline|...`; `action=validate` with `dry_run=true` for readiness checks)
+- `mcp__orgx__orgx_act` -- update entity state and leave review notes (`action=update|complete_with_proof|flag_risk|...`; `action=validate` with `dry_run=true` for readiness checks). Only a person settles a decision; give them its `review_url`
 - `mcp__orgx__orgx_spawn` -- delegation (`action=guard` before `action=spawn`; `action=handoff` for cross-agent handoffs)
 - `mcp__orgx__orgx_submit_receipt` -- record learnings and artifact quality for the flywheel (`receipt_type=proof|outcome|quality|attribution|learning`)
 - `mcp__orgx__orgx_recommend` -- current org state and highest-leverage marketing action (`mode=next_action|morning_brief`)

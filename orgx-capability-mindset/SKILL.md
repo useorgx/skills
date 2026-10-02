@@ -31,6 +31,14 @@ Always bind the mindset to the current OrgX MCP surface.
 
 Log the sensor-to-actuator transition in the work record. This is where stale state and hidden assumptions compound.
 
+## Truthful State
+
+Report the state OrgX actually holds, never the state you asked for.
+
+- **Only a person settles a decision.** `mcp__orgx__orgx_decide action=approve|reject` (and the `approve_decision` / `reject_decision` aliases) never approve or reject anything: they return where the person decides — the Approve button in the decisions widget for ordinary decisions in hosts that render it, otherwise the decision page in OrgX (`review_url`). Give the person the `review_url` and say the decision is waiting on them. Never say a decision was approved or rejected unless OrgX shows it settled. `orgx_widget_decide` is widget-only, driven by a single-use token the model never sees; never call it.
+- **Started is not done.** Spawning, delegating, launching, or raising a decision starts something. Report it as "started" or "waiting on <person>", keep the returned `run_id` / decision ID, and check before you claim an outcome. Where the connection exposes `mcp__orgx__orgx_command_status`, call it with `kind=decision|run|command` and that `id`: `state` is `queued`, `held`, `running`, `succeeded`, `failed`, `cancelled`, or `not_found`; `waiting_on` says whether a `person` or an `agent` holds it; check again after `next_poll_after_ms`, and treat `null` as final. Without it, read the entity with `mcp__orgx__orgx_inspect` or `mcp__orgx__get_agent_status`. Only `succeeded` plus proof counts as done.
+- **Retry writes with the same key.** OrgX stores the response for each `idempotency_key`: retrying the same write with the same key replays that response instead of duplicating work, so retry a write whose outcome you did not see rather than guessing or deduplicating by hand. Reusing a key with a different body is refused (422) — a different change needs a new key. A 409 means the first attempt is still in flight; wait, then retry with the same key.
+
 ## Record Work as an Agent Work Receipt
 
 Describe your own work in the vocabulary of `@useorgx/agent-work-receipt`
@@ -271,7 +279,7 @@ End substantial work with:
 - `Capability delta`: what the user or org can now do that they could not do before.
 - `Verifier / proof`: checks run, evidence links, durable artifacts, or why proof is blocked.
 - `GTM outcome`: buyer path, capture mechanic, attribution, follow-up owner, and conversion metric when the work is public or revenue-facing.
-- `Progress ledger`: activity emitted, artifacts attached, blockers or decisions created, outcomes or learnings recorded.
+- `Progress ledger`: activity emitted, artifacts attached, blockers or decisions created, outcomes or learnings recorded. Name each started run or raised decision by its real state (`running`, waiting on a person with its `review_url`, `succeeded`), never the hoped-for one.
 - `Risks or open decisions`: named, with severity and owner.
 - `Suggested next agent`: who should pick this up and why.
 

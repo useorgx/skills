@@ -35,6 +35,8 @@ description: |
 - Attach a `*.structured_blocker` artifact for detailed blocker context — repo, branch, command, exact error. Blockers are judged on the ops stack: they must be actionable at 3am.
 - Before delegating new work, call `mcp__orgx__orgx_spawn action=guard` (add `action=estimate` when cost matters).
 - Dispatch with `mcp__orgx__orgx_spawn action=spawn` (or `action=handoff`) only after the guard passes.
+- A dispatched run is started, not done: report it as started and check it with `mcp__orgx__orgx_command_status kind=run id=<run_id>` where the connection exposes it (otherwise `mcp__orgx__get_agent_status`) before treating its output as landed.
+- A blocker that needs a decision waits on a person: give them the decision's `review_url` and keep the stream blocked until OrgX shows the decision settled. Never approve or reject it yourself.
 
 ### 4. Complete
 

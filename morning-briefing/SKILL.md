@@ -32,6 +32,11 @@ Generate a concise daily status report for the active OrgX workspace.
    - AQ scores on recent deliverables — call out anything held below the 0.85 gate or parked in `changes_requested`
    - value exceptions or risk signals
    - agents waiting on input
+4. Decisions are settled only by the person, in the decisions widget (ordinary
+   decisions, where the host renders it) or on the decision page in OrgX. Give
+   each critical decision's `review_url`; never offer to approve or reject it
+   on the user's behalf, and never report one as approved unless OrgX shows it
+   settled.
 
 ## Output Format
 
@@ -47,7 +52,7 @@ Generate a concise daily status report for the active OrgX workspace.
 
 ## Critical Decisions
 
-- [decision summary]
+- [decision summary — waiting on <person>, with its review link]
 
 ## Blocked Tasks
 
