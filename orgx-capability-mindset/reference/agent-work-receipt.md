@@ -104,13 +104,13 @@ edit the test until it passes.
 exit `0` means the shell could not run what you wrote, so its exit status says
 nothing. Read the output, not just the code.
 
-## Relationship to `metadata.artifact_contract`
+## Relationship to the artifact contract
 
 The OrgX MCP artifact contract is the projection of these records onto an
-attached artifact. Keep sending it — it is what `orgx_attach` and the four-lens
+attached artifact. Keep sending it — it is what `orgx_attach_artifact` and the four-lens
 verification read — and treat AWR as the fuller shape it maps onto:
 
-| `metadata.artifact_contract` | Agent Work Receipt |
+| Artifact contract field | Agent Work Receipt |
 | --- | --- |
 | `agent_type` | `actor` |
 | `company_stage` | context on `intent` |

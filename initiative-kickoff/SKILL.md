@@ -1,6 +1,6 @@
 ---
 name: Initiative Kickoff
-version: "2.1.0"
+version: "2.2.0"
 description: |
   Create a complete OrgX initiative from a one-line goal, using the current
   workspace, hierarchy scaffolding tools, and guarded agent delegation.
@@ -14,9 +14,9 @@ Transform a goal into a structured OrgX initiative with milestones, workstreams,
 
 ## Quick Start
 
-1. Bootstrap the session with `mcp__orgx__orgx_bootstrap` (pass `workspace_id` only when overriding the auto-resolved workspace).
+1. Read context with `mcp__orgx__orgx_get_workspace_context` (pass `workspace_id` only when overriding the auto-resolved workspace; it reads, it does not select a workspace or create a session).
 2. Check for duplicate or overlapping initiatives.
-3. Prefer `mcp__orgx__scaffold_initiative` for the full hierarchy — it auto-resolves the workspace and creates initiative, milestones, workstreams, and starter tasks in one call.
+3. Prefer `mcp__orgx__orgx_validate_initiative_plan` then `mcp__orgx__orgx_create_initiative_hierarchy` for the full hierarchy — validate the `plan`, then one call creates initiative, milestones, workstreams, and starter tasks.
 4. Launch only if the user wants execution to start now.
 
 ## Workflow
@@ -29,13 +29,13 @@ Transform a goal into a structured OrgX initiative with milestones, workstreams,
 2. Check context:
    - `mcp__orgx__orgx_search type=initiative`
    - `mcp__orgx__orgx_search` for similar efforts or prior decisions
-3. Create the full hierarchy with `mcp__orgx__scaffold_initiative` (pass explicit `workstreams` to preserve the user's structure; omit them to enable auto-planning).
+3. Validate the plan with `mcp__orgx__orgx_validate_initiative_plan`, then create the full hierarchy with `mcp__orgx__orgx_create_initiative_hierarchy` (`plan`, `idempotency_key`; put explicit workstreams in the `plan` to preserve the user's structure). Retry with the same `idempotency_key` if the outcome is unclear.
 4. If the user requests specific agent delegation:
-   - call `mcp__orgx__orgx_spawn action=guard` (and `action=estimate` when cost matters)
-   - then `mcp__orgx__orgx_spawn action=spawn` once the guard passes; omit `model_tier`/`provider`/`model` for normal work — OrgX auto-routes by task complexity and workspace policy
-   - report each spawn as started, not done; where the connection exposes `mcp__orgx__orgx_command_status`, check `kind=run` with the returned `run_id` before saying anything about the result
-5. Launch with `mcp__orgx__orgx_act type=initiative action=launch` when the initiative should go live immediately.
-6. Finish with `mcp__orgx__orgx_recommend mode=next_action entity_type=initiative` so the user knows the first move after kickoff.
+   - call `mcp__orgx__orgx_estimate_agent_task` with the `task` first (v2 has no separate guard call; the estimate is the pre-dispatch check)
+   - then `mcp__orgx__orgx_start_agent_task` with the `task_id` of an existing task once the estimate is acceptable; omit `model_tier`/`provider`/`model` for normal work — OrgX auto-routes by task complexity and workspace policy
+   - report each start as started, not done; poll `mcp__orgx__orgx_get_operation_status` (honor `next_poll_after_ms`, read `waiting_on`) with the returned id before saying anything about the result
+5. Launch with `mcp__orgx__orgx_launch_initiative` when the initiative should go live immediately.
+6. Finish with `mcp__orgx__orgx_get_next_actions entity_type=initiative` so the user knows the first move after kickoff.
 
 ## Default Structure
 
@@ -72,4 +72,4 @@ Next action:
 
 - If a similar initiative exists, stop and ask whether to extend it or create a new one.
 - If the workspace is unset, resolve it before scaffolding anything.
-- If spawn guard blocks delegation, create the initiative anyway and report the block explicitly.
+- If the estimate blocks delegation, create the initiative anyway and report the block explicitly.

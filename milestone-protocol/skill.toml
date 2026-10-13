@@ -1,7 +1,7 @@
 name = "milestone-protocol"
-version = "2.0.0"
+version = "2.1.0"
 description = "Milestone checkpoint management for OrgX initiatives with launch, pause, evidence attachment, and completion verification."
 entry_instructions = "SKILL.md"
-required_tools = ["mcp__orgx__orgx_bootstrap", "mcp__orgx__orgx_bootstrap", "mcp__orgx__orgx_write", "mcp__orgx__orgx_write", "mcp__orgx__orgx_search", "mcp__orgx__orgx_act", "mcp__orgx__orgx_act", "mcp__orgx__orgx_act"]
+required_tools = ["mcp__orgx__orgx_get_workspace_context", "mcp__orgx__orgx_search", "mcp__orgx__orgx_create_milestone", "mcp__orgx__orgx_update_work", "mcp__orgx__orgx_get_initiative_progress", "mcp__orgx__orgx_pause_work", "mcp__orgx__orgx_capture_decision", "mcp__orgx__orgx_attach_artifact", "mcp__orgx__orgx_complete_work_with_proof"]
 required_scopes = []
 resources = []

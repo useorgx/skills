@@ -1,7 +1,7 @@
 name = "nightly-recap"
-version = "1.0.0"
+version = "1.1.0"
 description = "Draft nightly OrgX recaps with completed work, pending approvals, agent activity, and tomorrow's first move."
 entry_instructions = "SKILL.md"
-required_tools = ["mcp__orgx__orgx_bootstrap", "mcp__orgx__orgx_bootstrap", "mcp__orgx__orgx_recommend", "mcp__orgx__orgx_search", "mcp__orgx__orgx_recommend", "mcp__orgx__orgx_recommend"]
+required_tools = ["mcp__orgx__orgx_get_workspace_context", "mcp__orgx__orgx_get_operator_brief", "mcp__orgx__orgx_search", "mcp__orgx__orgx_list_pending_decisions", "mcp__orgx__orgx_get_agent_status", "mcp__orgx__orgx_get_next_actions"]
 required_scopes = []
 resources = ["checklist.md"]

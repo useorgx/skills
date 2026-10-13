@@ -1,10 +1,10 @@
 ---
 name: Bulk Create
-version: "2.1.0"
+version: "2.2.0"
 description: |
   Create multiple OrgX tasks or milestones from a markdown checklist or bullet
-  list. Uses batch creation, ref-based dependency wiring, and current workspace
-  context instead of one-off entity creation loops.
+  list. Uses typed create operations with one idempotency key per item, ordered
+  dependency notes, and current workspace context.
 ---
 
 # Bulk Create
@@ -21,14 +21,16 @@ Completed checkbox items are skipped by default.
 
 ## Workflow
 
-1. Bootstrap with `mcp__orgx__orgx_bootstrap` (pass `workspace_id` only when overriding the auto-resolved workspace).
+1. Read workspace context with `mcp__orgx__orgx_get_workspace_context` (pass `workspace_id` only when overriding the auto-resolved workspace). It reads; it does not select a workspace.
 2. Parse the list into ordered items with priority, nesting, and completion state.
 3. Check the parent initiative, milestone, or workstream with `mcp__orgx__orgx_search`.
-4. Build a single `mcp__orgx__orgx_apply_changeset` payload with an `idempotency_key`:
-   - use `ref` keys for each created item
-   - use `depends_on` for nested or sequential dependencies
-   - prefer `type=task` unless the user explicitly wants milestones
-5. If only one or two standalone items are being added to an existing hierarchy, individual `mcp__orgx__orgx_write operation=create` calls are acceptable, but the batch changeset is preferred.
+4. Create each item with a typed call, in list order, each with its own stable `idempotency_key`:
+   - `mcp__orgx__orgx_create_task` (needs `workstream_id`; `milestone_id` optional) is the default
+   - `mcp__orgx__orgx_create_milestone` (needs `workstream_id`) only when the user explicitly wants milestones
+   - a retried create reuses the same `idempotency_key`, so a repeat never makes a duplicate
+5. If the list describes a whole new initiative (initiative, workstreams, milestones, tasks), validate the plan with `mcp__orgx__orgx_validate_initiative_plan`, then create it in one call with `mcp__orgx__orgx_create_initiative_hierarchy` (`plan`, `idempotency_key`).
+
+v2 has no generic batch changeset. Do not look for one; use the typed create calls above.
 
 ## Priority Detection
 
@@ -45,7 +47,7 @@ Default priority is `medium`.
 
 - Nested items depend on their nearest parent item.
 - Sequential mode is optional; only apply it when the user asks for ordered execution.
-- Prefer `depends_on` in the batch payload over patching dependencies after creation.
+- The typed create calls take no dependency argument. Record the dependency in the item description ("Depends on: <title or id>"). For a new initiative, express dependencies inside the `plan` given to `mcp__orgx__orgx_create_initiative_hierarchy`.
 
 ## Output Format
 

@@ -1,6 +1,6 @@
 ---
 name: orgx-design-agent
-version: "2.1.0"
+version: "2.2.0"
 description: |
   Produce high-confidence design artifacts for OrgX: WCAG accessibility audits, design token packages, component documentation, interaction specs, UX research plans, design critiques, motion specs, dark mode audits, and responsive breakpoint maps.
   Use when work requires design-system decisions, accessibility validation, interaction design, or design-to-engineering handoff quality gates.
@@ -16,19 +16,19 @@ Apply [orgx-capability-mindset](../orgx-capability-mindset) before design work. 
 
 ## 1. Quick Start
 
-1. Run `mcp__orgx__orgx_bootstrap` (it auto-resolves the workspace).
+1. Run `mcp__orgx__orgx_get_workspace_context` (it reads the workspace; `workspace_id` is optional).
 2. Confirm the artifact or decision type and the target audience. If the request is task-bound, hydrate it with `mcp__orgx__orgx_inspect` (`hydrate_context=true`); otherwise map neighboring work with `mcp__orgx__orgx_search`.
-3. Pull prior design precedent, standards, and learnings with `mcp__orgx__orgx_search`.
+3. Pull prior design precedent, standards, and decisions with `mcp__orgx__orgx_search`.
 4. Before creating or delegating workstreams, milestones, or tasks, inspect the active parent scope and reuse matching siblings. Treat `reused`, `duplicate_prevented`, or `_dedup` results as success and continue on the returned canonical entity ID.
-5. For interaction specs, breakpoint plans, or design-system migrations, use the planning loop: `mcp__orgx__orgx_plan` (`action=start`), refine with `action=improve`, capture revisions with `action=record_edit`, then close with `action=complete` (`attach_to=[...]`).
+5. For interaction specs, breakpoint plans, or design-system migrations, use the planning loop: `mcp__orgx__orgx_start_plan` (`title`), resume with `mcp__orgx__orgx_read_plan`, refine with `mcp__orgx__orgx_save_plan` (`session_id`, `plan_content`, `expected_version`), capture revisions with `mcp__orgx__orgx_record_plan_edit`, then close with `mcp__orgx__orgx_complete_plan` (`attach_to`).
 6. Identify the **context signal** (see Context Adaptation Protocol) and adjust depth accordingly.
 7. Produce the artifact using the contract below and return:
    - A concise summary (3-6 bullets)
    - The artifact body (JSON or structured Markdown)
    - 3 actionable next steps with owners and effort estimates
 8. Run the precision loop before delivery. Every artifact ships validator-clean.
-9. Attach the result back to the active entity with `mcp__orgx__orgx_attach`, then record quality with `mcp__orgx__orgx_submit_receipt` (`receipt_type=quality`). When attaching, declare the `artifact_type` that matches the work (`design.audit`, `design.component_spec`, or `design.token_package`) and include `metadata.artifact_contract` with `agent_type`, `company_stage`, `business_outcome`, `owner`, `review_date`, and `verification`.
-10. Before delegating downstream design or implementation work, run `mcp__orgx__orgx_spawn` (`action=guard`), then `mcp__orgx__orgx_spawn` (`action=spawn`).
+9. Attach the result back to the active entity with `mcp__orgx__orgx_attach_artifact`, then record quality with `quality_score` and `verification` on `mcp__orgx__orgx_complete_work_with_proof` (or request an independent judgment with `mcp__orgx__orgx_request_independent_artifact_review`). When attaching, declare the `artifact_type` that matches the work (`design.audit`, `design.component_spec`, or `design.token_package`) and pass `agent_type`, `company_stage`, `business_outcome`, `owner`, `review_date`, and `verification` as arguments.
+10. Before delegating downstream design or implementation work, run `mcp__orgx__orgx_estimate_agent_task` (`task`) — v2 has no separate guard call, so the estimate is the pre-dispatch check — then dispatch an existing task with `mcp__orgx__orgx_start_agent_task` (`task_id`). A started run is not a finished one: poll `mcp__orgx__orgx_get_operation_status`.
    - Omit `model_tier`, `provider`, and exact `model` for normal work so OrgX auto-routes by task complexity.
    - Use `model_tier=standard` and `budget_mode=cheapest_valid` only for controlled reliability validation runs, test initiatives, or explicit budget-constrained verification.
    - Design delegation must name the target surface, expected spec/audit/token artifact, and validation method before spawn.
@@ -132,13 +132,13 @@ If inputs are incomplete, declare assumptions explicitly at the top of the artif
 
 ## 6. Operating Workflow
 
-1. **Bootstrap**: Run `mcp__orgx__orgx_bootstrap` (workspace scope resolves automatically).
-2. **Scope**: Confirm the artifact type and audience. If task-bound, load `mcp__orgx__orgx_inspect` (`type=task`, `hydrate_context=true`). Identify the context signal from the table above.
+1. **Workspace context**: Run `mcp__orgx__orgx_get_workspace_context` (reads workspace scope).
+2. **Scope**: Confirm the artifact type and audience. If task-bound, load `mcp__orgx__orgx_inspect` (`type=task`, `id`, `hydrate_context=true`). Identify the context signal from the table above.
 3. **Gather evidence**:
-   - Query existing OrgX artifacts, prior standards, decisions, and learnings with `mcp__orgx__orgx_search`
+   - Query existing OrgX artifacts, prior standards and decisions with `mcp__orgx__orgx_search`
    - Pull Figma context with `mcp__figma__*` when available
    - Review related artifacts from Engineering and Product agents for constraints
-4. **Plan when needed**: For interaction flows, token migrations, or breakpoint programs, open a plan session with `mcp__orgx__orgx_plan` (`action=start`), refine with `action=improve`, and record major revisions with `action=record_edit`.
+4. **Plan when needed**: For interaction flows, token migrations, or breakpoint programs, open a plan session with `mcp__orgx__orgx_start_plan`, refine with `mcp__orgx__orgx_save_plan`, and record major revisions with `mcp__orgx__orgx_record_plan_edit`.
 5. **Draft**: Produce the artifact directly in JSON (preferred) or Markdown with a fenced JSON block.
 6. **Self-review**: Run the Precision Loop (Section 12) against the draft.
 7. **Validate**:
@@ -148,13 +148,13 @@ python3 scripts/validate_design.py <artifact_file> --type <artifact_type>
 ```
 
 8. **Fix and re-validate**: Resolve every failed gate. Re-run validator until all gates pass.
-9. **Publish**: Save with `mcp__orgx__orgx_write` (`operation=create` or `operation=update`) and link related entities.
+9. **Publish**: Save with `mcp__orgx__orgx_attach_artifact` and link related entities with `mcp__orgx__orgx_update_work` (`type`, `id`, `fields`).
 10. **Attach proof**:
-    - `mcp__orgx__orgx_plan` (`action=complete`, `attach_to=[...]`) for planning sessions
-    - `mcp__orgx__orgx_attach` (with `artifact_type`, `description`, `verification`) for audits, token packages, and component docs
-    - `mcp__orgx__orgx_act` (`action=update` with a `note`) for design review verdicts on other agents' work; settling a decision is the person's call, so hand them its `review_url` instead of approving or declining it
-11. **Record learnings and quality**: Submit learnings with `mcp__orgx__orgx_submit_receipt` (`receipt_type=learning`) and record quality with `receipt_type=quality`.
-12. **Handoff**: Before delegating downstream work, run `mcp__orgx__orgx_spawn` (`action=guard`), then notify or spawn downstream agents (`action=spawn` or `action=handoff`) per the Cross-Agent Handoff Contracts.
+    - `mcp__orgx__orgx_complete_plan` (`attach_to`) for planning sessions
+    - `mcp__orgx__orgx_attach_artifact` (with `artifact_type`, `description`, `verification`) for audits, token packages, and component docs
+    - `mcp__orgx__orgx_update_work` (`fields` carrying a note) for design review verdicts on other agents' work; settling a decision is the person's call, so hand them its `review_url` instead of approving or declining it
+11. **Record learnings and quality**: State learnings in the `note` and record quality with `quality_score` and `verification` on `mcp__orgx__orgx_complete_work_with_proof`. v2 has no separate learning-capture call; do not invent one.
+12. **Handoff**: Before delegating downstream work, run `mcp__orgx__orgx_estimate_agent_task`, then start or hand off downstream agents (`mcp__orgx__orgx_start_agent_task` or `mcp__orgx__orgx_handoff_task`) per the Cross-Agent Handoff Contracts.
 
 ## 7. Artifact Contracts
 
@@ -763,7 +763,7 @@ The design agent improves over time by recording learnings and consuming them on
 
 ### Recording learnings:
 
-After every artifact delivery, submit a learning via `mcp__orgx__orgx_submit_receipt` (`receipt_type=learning`) with:
+After every artifact delivery, state a learning in the `note` of `mcp__orgx__orgx_complete_work_with_proof` (v2 has no separate learning-capture call) with:
 
 - `category`: `design_pattern` | `accessibility_fix` | `token_decision` | `research_finding` | `motion_pattern`
 - `observation`: What was decided and why
@@ -773,7 +773,7 @@ After every artifact delivery, submit a learning via `mcp__orgx__orgx_submit_rec
 
 ### Consuming learnings:
 
-At the start of every artifact, query `mcp__orgx__orgx_search` with:
+At the start of every artifact, query `mcp__orgx__orgx_search` for prior work and decisions with:
 
 - The component or flow name
 - The artifact type
@@ -794,15 +794,17 @@ Apply relevant prior learnings. Reference them explicitly (e.g., "Per learning L
 
 ### Primary:
 
-- `mcp__orgx__orgx_bootstrap` — initialize OrgX session scope and recommended workflow (workspace auto-resolves)
-- `mcp__orgx__orgx_inspect` — hydrate task-bound context, attachments, and plan sessions (`hydrate_context=true`)
-- `mcp__orgx__orgx_search` — query existing design artifacts, prior decisions, and design-specific learnings before drafting
-- `mcp__orgx__orgx_plan` — tracked design planning: `action=start` to open, `action=improve` to refine, `action=record_edit` to capture revisions, `action=complete` (`attach_to=[...]`) to persist and attach
-- `mcp__orgx__orgx_write` — publish completed artifacts (`operation=create` | `operation=update`; use `orgx_apply_changeset` for multi-entity batches)
-- `mcp__orgx__orgx_attach` — attach artifacts with `artifact_type`, `description`, `verification` metadata
-- `mcp__orgx__orgx_act` — entity state changes and review notes (`action=update`; `action=validate dry_run=true` for readiness checks). Only a person settles a decision; give them its `review_url`
-- `mcp__orgx__orgx_submit_receipt` — record learnings (`receipt_type=learning`) and score quality (`receipt_type=quality`) for calibration
-- `mcp__orgx__orgx_spawn` — `action=guard` to verify delegation is allowed, then `action=spawn` for follow-on work
+- `mcp__orgx__orgx_get_workspace_context` — read workspace scope (`workspace_id` optional; reads only)
+- `mcp__orgx__orgx_inspect` — hydrate task-bound context, attachments, and plan sessions (`type`, `id`, `hydrate_context=true`)
+- `mcp__orgx__orgx_search` — query existing design artifacts and prior decisions before drafting
+- `mcp__orgx__orgx_start_plan`, `mcp__orgx__orgx_read_plan`, `mcp__orgx__orgx_save_plan`, `mcp__orgx__orgx_record_plan_edit`, `mcp__orgx__orgx_complete_plan` — tracked design planning (`save_plan` takes `session_id`, `plan_content`, `expected_version`; `complete_plan` takes `attach_to`)
+- `mcp__orgx__orgx_update_work` — update one entity or record a review note (`type`, `id`, `fields`); a retried write reuses its `idempotency_key`
+- `mcp__orgx__orgx_attach_artifact` — attach artifacts with `artifact_type`, `description`, `verification` metadata
+- `mcp__orgx__orgx_complete_work_with_proof` — complete work with `artifact`, `verification`, `quality_score`, `note`
+- `mcp__orgx__orgx_capture_decision`, `mcp__orgx__orgx_open_decision_review` — raise a decision; only a person settles it, so give them its `review_url`
+- `mcp__orgx__orgx_estimate_agent_task`, `mcp__orgx__orgx_start_agent_task`, `mcp__orgx__orgx_handoff_task` — estimate before dispatch, then start or hand off follow-on work
+- `mcp__orgx__orgx_get_operation_status` — real state of a started run (`kind`, `id`); recheck after `next_poll_after_ms`
+- `mcp__orgx__orgx_request_independent_artifact_review` — independent judgment of an artifact
 
 ### Optional (when configured):
 
@@ -823,7 +825,7 @@ python3 scripts/validate_design.py <artifact_file> --type <audit|tokens|componen
 | Missing design source (no Figma, no screenshots) | Request the source. If unavailable, proceed with stated assumptions and mark confidence as `low`. |
 | Figma tools unavailable | Continue with supplied evidence. Note confidence reduction in the artifact header. |
 | Validator fails | Do not publish. Fix every failed gate and re-run. Never override. |
-| Conflicting prior learnings | Present the conflict, state the resolution rationale, and update the learning with `mcp__orgx__orgx_submit_receipt` (`receipt_type=learning`). |
+| Conflicting prior learnings | Present the conflict, state the resolution rationale, and state the revised learning in the completion note of `mcp__orgx__orgx_complete_work_with_proof`. |
 | Ambiguous artifact type | Ask the requester to clarify. If no response within context, choose the most conservative type and note the assumption. |
 | Engineering says "not feasible" | Adapt the design to constraints. Document what was compromised and why. Record as a learning. |
 | Insufficient evidence for critique score | Mark the score as provisional, list what evidence is missing, and specify what would change the score. |
@@ -906,7 +908,7 @@ Any `*.structured_blocker` artifact — from any domain, including design — is
 
 ### Type codes
 
-Declare `artifact_type` on `mcp__orgx__orgx_attach` and receipts so the right stack judges you: `design.audit`, `design.critique`, `design.accessibility_audit`, `design.dark_mode_audit`, `design.component_spec`, `design.token_package`. A mistyped artifact is judged on the wrong bar, and the mistype guard re-classifies flattering types.
+Declare `artifact_type` on `mcp__orgx__orgx_attach_artifact` and receipts so the right stack judges you: `design.audit`, `design.critique`, `design.accessibility_audit`, `design.dark_mode_audit`, `design.component_spec`, `design.token_package`. A mistyped artifact is judged on the wrong bar, and the mistype guard re-classifies flattering types.
 
 ### Score honestly
 
@@ -933,6 +935,6 @@ An artifact is done when all of the following are true:
 - Findings and recommendations are specific, actionable, and evidence-backed
 - Public or revenue-facing work passes the GTM Outcome Gate or explicitly documents why it is not applicable
 - Downstream agent handoff requirements are met
-- Final artifact is saved via `mcp__orgx__orgx_write` and linked to related entities
-- At least one learning has been recorded via `mcp__orgx__orgx_submit_receipt`
+- Final artifact is attached via `mcp__orgx__orgx_attach_artifact` and linked to related entities
+- At least one learning has been stated in the completion note of `mcp__orgx__orgx_complete_work_with_proof`
 - Requester has received the summary with 3 next steps

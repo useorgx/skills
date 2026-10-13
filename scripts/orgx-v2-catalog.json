@@ -1,0 +1,632 @@
+{
+ "_comment": "Generated from the hosted OrgX MCP default v2 catalog (tools/list, profile v2). Regenerate when orgx-mcp changes its catalog.",
+ "source": {
+  "repo": "useorgx/orgx-mcp",
+  "commit": "e8a3ef9",
+  "profile": "v2"
+ },
+ "widget_only": [
+  "orgx_panel_snapshot",
+  "orgx_widget_approve_artifact",
+  "orgx_widget_decide",
+  "orgx_widget_receipt_call",
+  "orgx_widget_request_artifact_changes",
+  "orgx_widget_select_workspace",
+  "resume_agent_run"
+ ],
+ "tools": [
+  {
+   "name": "orgx_get_workspace_context",
+   "read_only": true,
+   "required": [],
+   "properties": [
+    "initiative_id",
+    "workspace_id"
+   ]
+  },
+  {
+   "name": "orgx_search",
+   "read_only": false,
+   "required": [],
+   "properties": [
+    "created_from",
+    "created_to",
+    "cursor",
+    "fields",
+    "initiative_id",
+    "limit",
+    "offset",
+    "query",
+    "session_id",
+    "status",
+    "type",
+    "workspace_id"
+   ]
+  },
+  {
+   "name": "orgx_inspect",
+   "read_only": true,
+   "required": [
+    "type",
+    "id"
+   ],
+   "properties": [
+    "hydrate_context",
+    "id",
+    "max_chars",
+    "session_id",
+    "type"
+   ]
+  },
+  {
+   "name": "orgx_get_operator_brief",
+   "read_only": true,
+   "required": [],
+   "properties": [
+    "period",
+    "workspace_id"
+   ]
+  },
+  {
+   "name": "orgx_get_next_actions",
+   "read_only": false,
+   "required": [],
+   "properties": [
+    "entity_id",
+    "entity_type",
+    "initiative_id",
+    "limit",
+    "session_id",
+    "workspace_id"
+   ]
+  },
+  {
+   "name": "orgx_get_agent_status",
+   "read_only": false,
+   "required": [],
+   "properties": [
+    "agent_id",
+    "include_idle",
+    "initiative_id",
+    "workspace_id"
+   ]
+  },
+  {
+   "name": "orgx_get_initiative_progress",
+   "read_only": false,
+   "required": [
+    "initiative_id"
+   ],
+   "properties": [
+    "initiative_id"
+   ]
+  },
+  {
+   "name": "orgx_get_operation_status",
+   "read_only": true,
+   "required": [],
+   "properties": [
+    "id",
+    "kind",
+    "operation_id"
+   ]
+  },
+  {
+   "name": "orgx_check_execution_readiness",
+   "read_only": true,
+   "required": [],
+   "properties": [
+    "workspace_id"
+   ]
+  },
+  {
+   "name": "orgx_start_plan",
+   "read_only": false,
+   "required": [
+    "title"
+   ],
+   "properties": [
+    "idempotency_key",
+    "initial_plan",
+    "title",
+    "workspace_id"
+   ]
+  },
+  {
+   "name": "orgx_read_plan",
+   "read_only": true,
+   "required": [],
+   "properties": [
+    "session_id",
+    "workspace_id"
+   ]
+  },
+  {
+   "name": "orgx_save_plan",
+   "read_only": false,
+   "required": [
+    "session_id",
+    "plan_content",
+    "expected_version"
+   ],
+   "properties": [
+    "edit_summary",
+    "expected_version",
+    "plan_content",
+    "session_id",
+    "title",
+    "workspace_id"
+   ]
+  },
+  {
+   "name": "orgx_complete_plan",
+   "read_only": false,
+   "required": [
+    "session_id",
+    "plan_content",
+    "expected_version"
+   ],
+   "properties": [
+    "attach_to",
+    "expected_version",
+    "plan_content",
+    "session_id",
+    "workspace_id"
+   ]
+  },
+  {
+   "name": "orgx_validate_initiative_plan",
+   "read_only": true,
+   "required": [
+    "plan"
+   ],
+   "properties": [
+    "plan",
+    "source_evidence",
+    "workspace_id"
+   ]
+  },
+  {
+   "name": "orgx_create_initiative_hierarchy",
+   "read_only": false,
+   "required": [
+    "plan",
+    "idempotency_key"
+   ],
+   "properties": [
+    "idempotency_key",
+    "plan",
+    "plan_digest",
+    "source_evidence",
+    "workspace_id"
+   ]
+  },
+  {
+   "name": "orgx_create_initiative",
+   "read_only": false,
+   "required": [
+    "title"
+   ],
+   "properties": [
+    "description",
+    "goal_ids",
+    "idempotency_key",
+    "metadata",
+    "priority",
+    "session_id",
+    "summary",
+    "title",
+    "workspace_id"
+   ]
+  },
+  {
+   "name": "orgx_create_workstream",
+   "read_only": false,
+   "required": [
+    "title",
+    "initiative_id"
+   ],
+   "properties": [
+    "description",
+    "goal_ids",
+    "idempotency_key",
+    "initiative_id",
+    "metadata",
+    "priority",
+    "session_id",
+    "summary",
+    "title",
+    "workspace_id"
+   ]
+  },
+  {
+   "name": "orgx_create_milestone",
+   "read_only": false,
+   "required": [
+    "title",
+    "workstream_id"
+   ],
+   "properties": [
+    "description",
+    "due_date",
+    "goal_ids",
+    "idempotency_key",
+    "initiative_id",
+    "metadata",
+    "priority",
+    "session_id",
+    "summary",
+    "title",
+    "workspace_id",
+    "workstream_id"
+   ]
+  },
+  {
+   "name": "orgx_create_task",
+   "read_only": false,
+   "required": [
+    "title",
+    "workstream_id"
+   ],
+   "properties": [
+    "description",
+    "due_date",
+    "goal_ids",
+    "idempotency_key",
+    "initiative_id",
+    "metadata",
+    "milestone_id",
+    "priority",
+    "session_id",
+    "summary",
+    "title",
+    "workspace_id",
+    "workstream_id"
+   ]
+  },
+  {
+   "name": "orgx_update_work",
+   "read_only": false,
+   "required": [
+    "type",
+    "id",
+    "fields"
+   ],
+   "properties": [
+    "fields",
+    "id",
+    "idempotency_key",
+    "session_id",
+    "type"
+   ]
+  },
+  {
+   "name": "orgx_estimate_agent_task",
+   "read_only": true,
+   "required": [
+    "task"
+   ],
+   "properties": [
+    "agent_type",
+    "budget_mode",
+    "initiative_id",
+    "max_cost_usd",
+    "model",
+    "model_tier",
+    "provider",
+    "runtime",
+    "task",
+    "workspace_id"
+   ]
+  },
+  {
+   "name": "orgx_start_agent_task",
+   "read_only": false,
+   "required": [
+    "task_id"
+   ],
+   "properties": [
+    "acceptance",
+    "agent_type",
+    "budget_mode",
+    "deadline",
+    "effects",
+    "expected_artifacts",
+    "idempotency_key",
+    "initiative_id",
+    "instructions",
+    "max_cost_usd",
+    "max_parallel",
+    "model",
+    "model_tier",
+    "provider",
+    "runtime",
+    "session_id",
+    "task_id",
+    "workspace_id"
+   ]
+  },
+  {
+   "name": "orgx_handoff_task",
+   "read_only": false,
+   "required": [
+    "task_id",
+    "agent_type"
+   ],
+   "properties": [
+    "acceptance",
+    "agent_type",
+    "budget_mode",
+    "deadline",
+    "effects",
+    "expected_artifacts",
+    "idempotency_key",
+    "initiative_id",
+    "instructions",
+    "max_cost_usd",
+    "max_parallel",
+    "model",
+    "model_tier",
+    "provider",
+    "runtime",
+    "session_id",
+    "task_id",
+    "workspace_id"
+   ]
+  },
+  {
+   "name": "orgx_launch_initiative",
+   "read_only": false,
+   "required": [
+    "initiative_id"
+   ],
+   "properties": [
+    "idempotency_key",
+    "initiative_id",
+    "note",
+    "session_id"
+   ]
+  },
+  {
+   "name": "orgx_pause_work",
+   "read_only": false,
+   "required": [
+    "level",
+    "id"
+   ],
+   "properties": [
+    "id",
+    "level"
+   ]
+  },
+  {
+   "name": "orgx_resume_work",
+   "read_only": false,
+   "required": [
+    "level",
+    "id"
+   ],
+   "properties": [
+    "id",
+    "level"
+   ]
+  },
+  {
+   "name": "orgx_retry_work",
+   "read_only": false,
+   "required": [
+    "level",
+    "id"
+   ],
+   "properties": [
+    "id",
+    "level"
+   ]
+  },
+  {
+   "name": "orgx_cancel_work",
+   "read_only": false,
+   "required": [
+    "level",
+    "id"
+   ],
+   "properties": [
+    "id",
+    "level"
+   ]
+  },
+  {
+   "name": "orgx_capture_decision",
+   "read_only": false,
+   "required": [
+    "decision"
+   ],
+   "properties": [
+    "context",
+    "decision",
+    "idempotency_key",
+    "initiative_id",
+    "session_id",
+    "summary",
+    "title",
+    "workspace_id"
+   ]
+  },
+  {
+   "name": "orgx_list_pending_decisions",
+   "read_only": true,
+   "required": [],
+   "properties": [
+    "initiative_id",
+    "session_id",
+    "workspace_id"
+   ]
+  },
+  {
+   "name": "orgx_open_decision_review",
+   "read_only": true,
+   "required": [
+    "decision_id"
+   ],
+   "properties": [
+    "decision_id",
+    "workspace_id"
+   ]
+  },
+  {
+   "name": "orgx_attach_artifact",
+   "read_only": false,
+   "required": [
+    "type",
+    "id",
+    "name",
+    "artifact_type",
+    "location"
+   ],
+   "properties": [
+    "agent_type",
+    "artifact_type",
+    "business_outcome",
+    "company_stage",
+    "description",
+    "id",
+    "idempotency_key",
+    "location",
+    "name",
+    "owner",
+    "preview_markdown",
+    "review_date",
+    "session_id",
+    "type",
+    "verification"
+   ]
+  },
+  {
+   "name": "orgx_open_artifact_review",
+   "read_only": true,
+   "required": [],
+   "properties": [
+    "artifact_id",
+    "entity_id",
+    "workspace_id"
+   ]
+  },
+  {
+   "name": "orgx_request_independent_artifact_review",
+   "read_only": false,
+   "required": [
+    "artifact_id"
+   ],
+   "properties": [
+    "artifact_id"
+   ]
+  },
+  {
+   "name": "orgx_complete_work_with_proof",
+   "read_only": false,
+   "required": [
+    "type",
+    "id",
+    "artifact"
+   ],
+   "properties": [
+    "artifact",
+    "id",
+    "idempotency_key",
+    "note",
+    "quality_score",
+    "session_id",
+    "type",
+    "verification",
+    "workspace_id"
+   ]
+  },
+  {
+   "name": "orgx_record_plan_edit",
+   "read_only": false,
+   "required": [
+    "session_id",
+    "edit_summary"
+   ],
+   "properties": [
+    "edit_summary",
+    "idempotency_key",
+    "session_id"
+   ]
+  },
+  {
+   "name": "orgx_submit_work_receipt",
+   "read_only": false,
+   "required": [
+    "receipt"
+   ],
+   "properties": [
+    "idempotency_key",
+    "receipt",
+    "workspace_id"
+   ]
+  },
+  {
+   "name": "orgx_validate_work_receipt",
+   "read_only": true,
+   "required": [
+    "receipt"
+   ],
+   "properties": [
+    "receipt"
+   ]
+  },
+  {
+   "name": "orgx_get_work_receipt",
+   "read_only": true,
+   "required": [
+    "receipt_id"
+   ],
+   "properties": [
+    "receipt_id",
+    "workspace_id"
+   ]
+  },
+  {
+   "name": "orgx_list_work_receipts",
+   "read_only": true,
+   "required": [],
+   "properties": [
+    "kind",
+    "limit",
+    "query",
+    "view",
+    "workspace_id"
+   ]
+  },
+  {
+   "name": "orgx_get_receipt_review_queue",
+   "read_only": true,
+   "required": [],
+   "properties": [
+    "kind",
+    "limit",
+    "workspace_id"
+   ]
+  }
+ ],
+ "retired": {
+  "orgx_bootstrap": "orgx_get_workspace_context",
+  "orgx_write": "orgx_create_initiative | orgx_create_workstream | orgx_create_milestone | orgx_create_task | orgx_update_work",
+  "orgx_spawn": "orgx_estimate_agent_task (estimate) | orgx_start_agent_task (spawn) | orgx_handoff_task (handoff)",
+  "orgx_act": "orgx_launch_initiative | orgx_pause_work | orgx_resume_work | orgx_retry_work | orgx_cancel_work | orgx_complete_work_with_proof",
+  "orgx_plan": "orgx_start_plan | orgx_read_plan | orgx_save_plan | orgx_complete_plan | orgx_record_plan_edit",
+  "orgx_decide": "orgx_capture_decision (remember/create) | orgx_list_pending_decisions | orgx_open_decision_review",
+  "orgx_attach": "orgx_attach_artifact",
+  "orgx_recommend": "orgx_get_next_actions",
+  "orgx_command_status": "orgx_get_operation_status",
+  "get_agent_status": "orgx_get_agent_status",
+  "get_initiative_pulse": "orgx_get_initiative_progress",
+  "get_operator_chronicle": "orgx_get_operator_brief",
+  "scaffold_initiative": "orgx_validate_initiative_plan then orgx_create_initiative_hierarchy",
+  "check_execution_readiness": "orgx_check_execution_readiness",
+  "orgx_submit_receipt": "no v2 operation: put quality in orgx_complete_work_with_proof (quality_score, verification) and learnings in its note; import portable receipts with orgx_submit_work_receipt",
+  "orgx_emit_activity": "no v2 operation: progress is captured by client hooks; record outcomes with orgx_complete_work_with_proof",
+  "orgx_apply_changeset": "no v2 operation: use the typed create/update operations"
+ }
+}

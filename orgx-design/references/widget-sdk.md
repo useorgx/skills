@@ -68,7 +68,7 @@ Reach for an element before writing bespoke markup:
 
 The kit files are generated from the kit package; never edit them in place.
 Show the state the server reports: a chip or footer moves to `succeeded`/done
-only after the tool call (or `orgx_command_status`) says so.
+only after the tool call (or `orgx_get_operation_status`) says so.
 
 ## Inline Actions via `callTool`
 
@@ -76,8 +76,8 @@ Widgets can call OrgX MCP tools directly from the UI. A person's click is the
 only thing that settles a decision, so the decisions widget settles one with
 `orgx_widget_decide` and the single-use approval token that arrives in
 widget-only result metadata (`orgx/widgetApproval`). The model never sees that
-token and never calls `orgx_widget_decide`; `approve_decision` /
-`reject_decision` only point the person to where they decide.
+token and never calls `orgx_widget_decide`; `orgx_open_decision_review`
+only points the person to where they decide.
 
 ```js
 // The person clicked Approve on an ordinary decision
@@ -104,7 +104,7 @@ approvals, and protected or artifact-review decisions carry no token: they are
 always decided on the decision page in OrgX.
 
 To show what happened after something was started, read
-`orgx_command_status({ kind: 'decision' | 'run' | 'command', id })`. Its
+`orgx_get_operation_status({ kind: 'decision' | 'run' | 'command', id })`. Its
 `state` is `queued`, `held`, `running`, `succeeded`, `failed`, `cancelled`, or
 `not_found`; `waiting_on` names a `person` or `agent`; check again after
 `next_poll_after_ms`, and stop when it is `null` (final). Never render

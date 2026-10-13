@@ -1,7 +1,7 @@
 name = "workstream-protocol"
-version = "2.0.0"
+version = "2.1.0"
 description = "Stream execution lifecycle for OrgX workstreams with DAG-aware monitoring, evidence attachment, guarded delegation, and completion verification."
 entry_instructions = "SKILL.md"
-required_tools = ["mcp__orgx__orgx_bootstrap", "mcp__orgx__orgx_bootstrap", "mcp__orgx__orgx_act", "mcp__orgx__orgx_inspect", "mcp__orgx__orgx_search", "mcp__orgx__orgx_spawn", "mcp__orgx__orgx_spawn", "mcp__orgx__orgx_spawn", "mcp__orgx__orgx_emit_activity", "mcp__orgx__orgx_act", "mcp__orgx__orgx_act"]
+required_tools = ["mcp__orgx__orgx_get_workspace_context", "mcp__orgx__orgx_update_work", "mcp__orgx__orgx_inspect", "mcp__orgx__orgx_search", "mcp__orgx__orgx_pause_work", "mcp__orgx__orgx_attach_artifact", "mcp__orgx__orgx_estimate_agent_task", "mcp__orgx__orgx_start_agent_task", "mcp__orgx__orgx_handoff_task", "mcp__orgx__orgx_get_operation_status", "mcp__orgx__orgx_get_agent_status", "mcp__orgx__orgx_capture_decision", "mcp__orgx__orgx_complete_work_with_proof"]
 required_scopes = []
 resources = []

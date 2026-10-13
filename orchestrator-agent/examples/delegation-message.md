@@ -115,7 +115,7 @@ This is a worked example of a delegation message from the orchestrator to the en
   },
   "escalation": {
     "path": "If blocked for more than 24 hours on any critical-path item, escalate to orchestrator-agent with: (1) what is blocked, (2) what has been tried, (3) what is needed to unblock, (4) impact on timeline if not resolved within 48 hours.",
-    "contact": "orchestrator-agent via mcp__orgx__orgx_emit_activity with urgency: high",
+    "contact": "orchestrator-agent via mcp__orgx__orgx_capture_decision with urgency: high",
     "response_time": "Orchestrator will respond within 4 hours during business hours, 12 hours outside business hours",
     "common_escalation_scenarios": [
       "Design specs are delayed past April 15 — orchestrator will negotiate timeline adjustment or scope reduction",
@@ -124,8 +124,8 @@ This is a worked example of a delegation message from the orchestrator to the en
     ]
   },
   "handoff": {
-    "output_format": "RFC (for API design review at checkpoint 1) + deployed staging environment (at checkpoint 2) + production deployment with monitoring (at deadline). All artifacts published via mcp__orgx__orgx_write linked to init-analytics-dash-001.",
-    "completion_signal": "Call mcp__orgx__orgx_act to mark workstream ws-engineering as complete. Include artifact references for RFC, staging URL, production deployment confirmation, and monitoring dashboard URL."
+    "output_format": "RFC (for API design review at checkpoint 1) + deployed staging environment (at checkpoint 2) + production deployment with monitoring (at deadline). All artifacts published via mcp__orgx__orgx_attach_artifact linked to init-analytics-dash-001.",
+    "completion_signal": "Call mcp__orgx__orgx_complete_work_with_proof (type=workstream, id=ws-engineering) to mark the workstream complete. Include artifact references for RFC, staging URL, production deployment confirmation, and monitoring dashboard URL."
   }
 }
 ```
