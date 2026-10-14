@@ -1,6 +1,6 @@
 ---
 name: orgx-product-agent
-version: "2.1.0"
+version: "2.2.0"
 description: |
   Produce high-confidence product artifacts for OrgX: PRDs, initiative plans, product canvases, user research briefs, competitive analyses, feature prioritization matrices, pivot evaluations, metric dashboard specs, and launch readiness checklists.
   Use when problem framing, user/value articulation, prioritization, and measurable product outcomes are required.
@@ -16,18 +16,18 @@ Apply [orgx-capability-mindset](../orgx-capability-mindset) before product work.
 
 ## Quick Start
 
-1. Run `mcp__orgx__orgx_bootstrap` — it auto-resolves the active workspace (no second confirmation call needed).
+1. Run `mcp__orgx__orgx_get_workspace_context` — it reads the active workspace; it does not select one or open a session.
 2. Confirm the artifact type (`--type`) and the target audience. If the request is task-bound, hydrate it with `mcp__orgx__orgx_inspect`; otherwise pull surrounding context with `mcp__orgx__orgx_search`.
 3. Pull precedent with `mcp__orgx__orgx_search` — prior artifacts, related decisions, and flywheel learnings.
 4. Before creating or delegating workstreams, milestones, or tasks, inspect the active parent scope and reuse matching siblings. Treat `reused`, `duplicate_prevented`, or `_dedup` results as success and continue on the returned canonical entity ID.
-5. If the output is a plan, start a planning loop with `mcp__orgx__orgx_plan` (`action=start`), refine with `action=improve`, record material revisions with `action=record_edit`, and close it with `action=complete` using `attach_to=[...]`.
+5. If the output is a plan, start a planning loop with `mcp__orgx__orgx_start_plan` (`title`), resume with `mcp__orgx__orgx_read_plan`, refine with `mcp__orgx__orgx_save_plan` (`session_id`, `plan_content`, `expected_version`), record material revisions with `mcp__orgx__orgx_record_plan_edit`, and close it with `mcp__orgx__orgx_complete_plan` using `attach_to=[...]`.
 6. Produce the artifact using the contract below and return:
    - A concise summary (3-6 bullets)
    - The artifact body (JSON or structured Markdown)
    - 3 actionable next steps with owners
 7. Validate with `python3 scripts/validate_artifact.py <file> --type <type>`.
-8. Publish via `mcp__orgx__orgx_write` (`operation=create`), attach evidence back to the task or initiative with `mcp__orgx__orgx_attach`, and record quality via `mcp__orgx__orgx_submit_receipt` (`receipt_type=quality`). When attaching, use the MCP artifact type that matches the work (`product.customer_discovery`, `product.prd`, `product.pricing_hypothesis`, or `product.decision_record`) and include `metadata.artifact_contract` with `agent_type`, `company_stage`, `business_outcome`, `owner`, `review_date`, and `verification`.
-9. Before delegating follow-on execution, run `mcp__orgx__orgx_spawn` (`action=guard`), then spawn with `action=spawn`.
+8. Publish by attaching the artifact to the task or initiative with `mcp__orgx__orgx_attach_artifact` (`type`, `id`, `name`, `artifact_type`, `location`), and record quality with `quality_score` and `verification` on `mcp__orgx__orgx_complete_work_with_proof`. When attaching, use the MCP artifact type that matches the work (`product.customer_discovery`, `product.prd`, `product.pricing_hypothesis`, or `product.decision_record`) and include `agent_type`, `company_stage`, `business_outcome`, `owner`, `review_date`, and `verification`.
+9. Before delegating follow-on execution, run `mcp__orgx__orgx_estimate_agent_task` (`task`); v2 has no separate guard call. Then start it with `mcp__orgx__orgx_start_agent_task` (`task_id` of an existing task; create it with `mcp__orgx__orgx_create_task` first); a started run is not a finished one, so poll `mcp__orgx__orgx_get_operation_status`, and a retried start reuses its `idempotency_key`.
    - Omit `model_tier`, `provider`, and exact `model` for normal work so OrgX auto-routes by task complexity.
    - Use `model_tier=standard` and `budget_mode=cheapest_valid` only for controlled reliability validation runs, test initiatives, or explicit budget-constrained verification.
    - Product delegation must name the measurable outcome, expected artifact, and validation signal before spawn.
@@ -352,33 +352,33 @@ A handoff without all five elements is incomplete. The agent must flag missing e
 Before producing any artifact, the agent must:
 
 1. Call `mcp__orgx__orgx_search` with the product domain and artifact type as context. Apply returned learnings as constraints, confidence adjustments, or explicit references in the artifact.
-2. Call `mcp__orgx__orgx_search` with `scope: "decisions"` for related product decisions. Check for prior decisions that constrain or inform the current artifact. Reference them explicitly.
-3. If the artifact relates to an existing initiative, call `mcp__orgx__orgx_recommend` (`mode=next_action`, `entity_type=initiative`) to understand current momentum and blockers.
+2. Call `mcp__orgx__orgx_search` with `type=decision` for related product decisions. Check for prior decisions that constrain or inform the current artifact. Reference them explicitly.
+3. If the artifact relates to an existing initiative, call `mcp__orgx__orgx_get_next_actions` (`entity_type=initiative`, `entity_id`) and `mcp__orgx__orgx_get_initiative_progress` to understand current momentum and blockers.
 
 ### After Completion
 
 After every artifact is finalized and published:
 
-1. Call `mcp__orgx__orgx_submit_receipt` (`receipt_type=learning`) with an outcome-linked insight. Format: "When building [artifact type] for [context], we learned [insight] because [evidence]. This should inform future [artifact types] by [specific guidance]."
-2. Call `mcp__orgx__orgx_submit_receipt` (`receipt_type=quality`) on the artifact with a self-assessed quality score, justification, and at least one verifiable evidence URL.
-3. If the artifact reveals a gap in organizational knowledge, call `mcp__orgx__orgx_spawn` (`action=guard`, then `action=spawn`) to assign follow-up research.
+1. Put an outcome-linked insight in the `note` of `mcp__orgx__orgx_complete_work_with_proof` (v2 has no separate learning-capture call). Format: "When building [artifact type] for [context], we learned [insight] because [evidence]. This should inform future [artifact types] by [specific guidance]."
+2. On the same call, pass a self-assessed `quality_score` with its justification, and `verification` carrying at least one verifiable evidence URL. For an independent judgment use `mcp__orgx__orgx_request_independent_artifact_review`.
+3. If the artifact reveals a gap in organizational knowledge, call `mcp__orgx__orgx_estimate_agent_task`, then `mcp__orgx__orgx_start_agent_task` on a task created with `mcp__orgx__orgx_create_task`, to assign follow-up research.
 
 ---
 
 ## Operating Workflow
 
-1. Run `mcp__orgx__orgx_bootstrap` — the workspace resolves automatically.
+1. Run `mcp__orgx__orgx_get_workspace_context` — it reads the workspace.
 2. Select `artifact_type` and confirm decision scope with the requester.
 3. Hydrate the active task or parent entity:
-   - Use `mcp__orgx__orgx_inspect` (`type=task`, `hydrate_context=true`) for task-bound work
+   - Use `mcp__orgx__orgx_inspect` (`type`=`task`, `id`, `hydrate_context=true`) for task-bound work
    - Use `mcp__orgx__orgx_search` for nearby initiatives, milestones, workstreams, or prior artifacts
 4. Run Context Adaptation Protocol and detect the product stage.
 5. Gather evidence:
    - OrgX context: `mcp__orgx__orgx_search`
-   - Flywheel learnings: `mcp__orgx__orgx_search` with `scope: "decisions"`
+   - Flywheel learnings: `mcp__orgx__orgx_search` with `type=decision`
    - Work planning context: `mcp__linear__*` when available
    - User signal context: `mcp__intercom__search` when available
-6. For planning-heavy outputs, open a plan session with `mcp__orgx__orgx_plan` (`action=start`), iterate with `action=improve`, and record substantive edits with `action=record_edit`.
+6. For planning-heavy outputs, open a plan session with `mcp__orgx__orgx_start_plan`, iterate with `mcp__orgx__orgx_save_plan` (`expected_version` required), and record substantive edits with `mcp__orgx__orgx_record_plan_edit`.
 7. Draft JSON-first artifact applying the Domain Expertise Canon.
 8. Run the Precision Loop (see below).
 9. Validate:
@@ -388,14 +388,14 @@ python3 scripts/validate_artifact.py <artifact_file> --type <type>
 ```
 
 10. Resolve all validator errors.
-11. Publish via `mcp__orgx__orgx_write`.
+11. Publish by attaching with `mcp__orgx__orgx_attach_artifact`.
 12. Attach proof or summaries back to the triggering entity:
-    - `mcp__orgx__orgx_plan` (`action=complete`) with `attach_to=[...]` for plan-session outputs
-    - `mcp__orgx__orgx_attach` for artifacts, research notes, and handoff docs
-    - `mcp__orgx__orgx_act` (`action=update`) for review notes or decision annotations
-13. Record quality via `mcp__orgx__orgx_submit_receipt` (`receipt_type=quality`).
-14. Submit learnings via `mcp__orgx__orgx_submit_receipt` (`receipt_type=learning`).
-15. Before delegating implementation or research, run `mcp__orgx__orgx_spawn` (`action=guard`), then spawn with `action=spawn`.
+    - `mcp__orgx__orgx_complete_plan` with `attach_to=[...]` for plan-session outputs
+    - `mcp__orgx__orgx_attach_artifact` for artifacts, research notes, and handoff docs
+    - `mcp__orgx__orgx_update_work` (`type`, `id`, `fields`) for review notes, or `mcp__orgx__orgx_capture_decision` for a decision a person must settle (hand them its `review_url`)
+13. Record quality with `quality_score` and `verification` on `mcp__orgx__orgx_complete_work_with_proof`.
+14. State learnings in that call's `note`; v2 has no separate learning-capture call.
+15. Before delegating implementation or research, run `mcp__orgx__orgx_estimate_agent_task`, then `mcp__orgx__orgx_start_agent_task` on an existing task; poll `mcp__orgx__orgx_get_operation_status` until it finishes.
 
 ---
 
@@ -428,7 +428,7 @@ Any `*.structured_blocker` artifact — from any domain, including product — i
 
 ### Type codes
 
-Declare the artifact type on `mcp__orgx__orgx_attach` and `mcp__orgx__orgx_submit_receipt` so the right stack judges you: `product.customer_discovery`, `product.prd`, `product.pricing_hypothesis`, `product.decision_record`. Undeclared artifacts get classified — possibly onto the general fallback stack — and the mistype guard re-classifies flattering types, so never declare a type to get an easier bar.
+Declare the artifact type on `mcp__orgx__orgx_attach_artifact` so the right stack judges you: `product.customer_discovery`, `product.prd`, `product.pricing_hypothesis`, `product.decision_record`. Undeclared artifacts get classified — possibly onto the general fallback stack — and the mistype guard re-classifies flattering types, so never declare a type to get an easier bar.
 
 ### Score honestly
 
@@ -451,16 +451,15 @@ One honesty caution: no self-describing quality preambles ("This well-researched
 
 ### Primary
 
-- `mcp__orgx__orgx_bootstrap` — initialize the current OrgX session; the workspace auto-resolves (one call is enough)
-- `mcp__orgx__orgx_inspect` — hydrate context (`type=initiative|workstream|milestone|task|decision|artifact|plan_session`; `hydrate_context=true` for full context)
+- `mcp__orgx__orgx_get_workspace_context` — read the workspace context (does not select a workspace or open a session)
+- `mcp__orgx__orgx_inspect` — hydrate context (`type`, `id`; `hydrate_context=true` for full context)
 - `mcp__orgx__orgx_search` — retrieve organizational context, prior decisions, existing entities, and flywheel learnings
-- `mcp__orgx__orgx_plan` — planning loop: `action=start` to open, `action=improve` to refine, `action=record_edit` to log revisions, `action=complete` with `attach_to=[...]` to persist
-- `mcp__orgx__orgx_write` — publish completed artifacts (`operation=create|update`, one entity; use `orgx_apply_changeset` with ref keys + `idempotency_key` for multi-entity batches)
-- `mcp__orgx__orgx_act` — entity lifecycle and status (`action=launch|complete|complete_with_proof|block|unblock|update|...`); use `action=validate` with `dry_run=true` for readiness checks
-- `mcp__orgx__orgx_attach` — attach artifacts with `artifact_type`, `business_outcome`, `owner`, `review_date`, `verification`
-- `mcp__orgx__orgx_spawn` — delegation: `action=guard` to verify before spawning, `action=spawn` to assign follow-on work
-- `mcp__orgx__orgx_submit_receipt` — record receipts (`receipt_type=proof|outcome|quality|attribution|learning`) with at least one verifiable evidence URL
-- `mcp__orgx__orgx_recommend` — understand initiative momentum (`mode=next_action`)
+- `mcp__orgx__orgx_start_plan`, `mcp__orgx__orgx_read_plan`, `mcp__orgx__orgx_save_plan`, `mcp__orgx__orgx_record_plan_edit`, `mcp__orgx__orgx_complete_plan` — planning loop: start to open, read to resume, save (`session_id`, `plan_content`, `expected_version`) to refine, record_plan_edit to log revisions, complete with `attach_to=[...]` to persist
+- `mcp__orgx__orgx_create_initiative`, `mcp__orgx__orgx_create_workstream`, `mcp__orgx__orgx_create_milestone`, `mcp__orgx__orgx_create_task` — typed entity creation; for multi-entity batches use `mcp__orgx__orgx_validate_initiative_plan` then `mcp__orgx__orgx_create_initiative_hierarchy` with an `idempotency_key`
+- `mcp__orgx__orgx_update_work` (`type`, `id`, `fields`), `mcp__orgx__orgx_launch_initiative`, `mcp__orgx__orgx_complete_work_with_proof` — content edits, launch, and proof-backed completion (status changes only through launch, lifecycle, and completion operations); `mcp__orgx__orgx_capture_decision` records a decision only a person can settle
+- `mcp__orgx__orgx_attach_artifact` — attach artifacts with `artifact_type`, `business_outcome`, `owner`, `review_date`, `verification`
+- `mcp__orgx__orgx_estimate_agent_task` — verify cost and fit before delegating; `mcp__orgx__orgx_start_agent_task` (existing `task_id`) to assign follow-on work; `mcp__orgx__orgx_handoff_task` (`task_id`, `agent_type`) for handoffs
+- `mcp__orgx__orgx_get_next_actions` and `mcp__orgx__orgx_get_initiative_progress` — understand initiative momentum
 
 ### Optional (if configured)
 

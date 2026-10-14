@@ -1,6 +1,6 @@
 ---
 name: orgx-sales-agent
-version: "2.1.0"
+version: "2.2.0"
 description: |
   Produce high-confidence sales artifacts for OrgX: competitive battlecards, MEDDIC deal scorecards, outreach sequences, territory plans, QBR decks, deal review preps, win/loss analyses, pricing proposals, and partner pitches.
   Use when deal qualification, competitive positioning, stakeholder persuasion, or revenue-risk reduction is needed.
@@ -16,20 +16,20 @@ Apply [orgx-capability-mindset](../orgx-capability-mindset) before sales work. W
 
 ## Quick Start
 
-1. Run `mcp__orgx__orgx_bootstrap`; it auto-resolves the workspace scope.
+1. Run `mcp__orgx__orgx_get_workspace_context`; it reads the workspace and does not select one or open a session.
 2. Confirm the artifact or decision type and the target audience. If the request is task-bound, hydrate it with `mcp__orgx__orgx_inspect`; otherwise map related deal work with `mcp__orgx__orgx_search`.
 3. Pull precedent — deal history, past artifacts, prior learnings — with `mcp__orgx__orgx_search`.
 4. Before creating or delegating workstreams, milestones, or tasks, inspect the active parent scope and reuse matching siblings. Treat `reused`, `duplicate_prevented`, or `_dedup` results as success and continue on the returned canonical entity ID.
-5. For deal plans, QBRs, or territory programs, use the planning loop: `mcp__orgx__orgx_plan` (`action=start`), refine with `action=improve`, capture substantive revisions with `action=record_edit`, then finalize with `action=complete` (`attach_to=[...]`).
+5. For deal plans, QBRs, or territory programs, use the planning loop: `mcp__orgx__orgx_start_plan` (`title`), resume with `mcp__orgx__orgx_read_plan`, refine with `mcp__orgx__orgx_save_plan` (`session_id`, `plan_content`, `expected_version`), capture substantive revisions with `mcp__orgx__orgx_record_plan_edit`, then finalize with `mcp__orgx__orgx_complete_plan` (`attach_to=[...]`).
 6. Adapt behavior to deal segment and motion using the Context Adaptation Protocol below.
 7. Produce the artifact using the contract below and return:
    - A concise summary (3-6 bullets)
    - The artifact body (JSON or structured Markdown)
    - 3 actionable next steps with owners and dates
 8. Run the Precision Loop before finalizing.
-9. Attach the result back to the active work with `mcp__orgx__orgx_attach`, then record quality with `mcp__orgx__orgx_submit_receipt` (`receipt_type=quality`). When attaching, use the MCP artifact type that matches the work (`sales.strategy`, `sales.icp_offer_sequence`, `sales.follow_up_sequence`, or `sales.send_plan`) and include `metadata.artifact_contract` with `agent_type`, `company_stage`, `business_outcome`, `owner`, `review_date`, and `verification`.
+9. Attach the result back to the active work with `mcp__orgx__orgx_attach_artifact` (`type`, `id`, `name`, `artifact_type`, `location`), then record quality with `quality_score` and `verification` on `mcp__orgx__orgx_complete_work_with_proof`. When attaching, use the MCP artifact type that matches the work (`sales.strategy`, `sales.icp_offer_sequence`, `sales.follow_up_sequence`, or `sales.send_plan`) and include `agent_type`, `company_stage`, `business_outcome`, `owner`, `review_date`, and `verification`.
    - If the work follows up on captured public-live intent, proof-room access, checkout intent, or a buyer-path interaction, emit `sales.follow_up_sequence` explicitly. The artifact must include captured signal, ICP/account context, proof referenced, sequence steps, objections, owner, next-send plan, and stop condition.
-10. Before delegating sales follow-up, research, or execution, run `mcp__orgx__orgx_spawn` (`action=guard`), then delegate with `action=spawn`.
+10. Before delegating sales follow-up, research, or execution, run `mcp__orgx__orgx_estimate_agent_task` (`task`); v2 has no separate guard call. Then delegate with `mcp__orgx__orgx_start_agent_task` (`task_id` of an existing task; create it with `mcp__orgx__orgx_create_task` first); a started run is not a finished one, so poll `mcp__orgx__orgx_get_operation_status`, and a retried start reuses its `idempotency_key`.
    - Omit `model_tier`, `provider`, and exact `model` for normal work so OrgX auto-routes by task complexity.
    - Use `model_tier=standard` and `budget_mode=cheapest_valid` only for controlled reliability validation runs, test initiatives, or explicit budget-constrained verification.
    - Sales delegation must require a concrete sales receipt: ICP, offer, target segment/list, sequence, objections, send plan, or structured blocker.
@@ -431,7 +431,7 @@ The sales agent improves over time by recording and consuming organizational lea
 
 ### Record After Every Artifact
 
-After producing any artifact, record learnings via `mcp__orgx__orgx_submit_receipt` (`receipt_type=learning`):
+After producing any artifact, state learnings in the `note` of `mcp__orgx__orgx_complete_work_with_proof` (v2 has no separate learning-capture call):
 
 - **Win/Loss patterns**: Winning talk tracks, objections that killed deals, competitor tactics observed.
 - **Pricing feedback**: What price points got pushback, what discounting worked, where we left money on the table.
@@ -457,7 +457,7 @@ Before producing any artifact, query learnings via `mcp__orgx__orgx_search`:
 
 ## Operating Workflow
 
-1. Run `mcp__orgx__orgx_bootstrap` (the workspace resolves automatically).
+1. Run `mcp__orgx__orgx_get_workspace_context` (it reads the workspace).
 2. Select `artifact_type`.
 3. Hydrate the active task or deal context:
    - `mcp__orgx__orgx_inspect` for task-bound sales work
@@ -466,7 +466,7 @@ Before producing any artifact, query learnings via `mcp__orgx__orgx_search`:
 5. Gather evidence:
    - OrgX historical context and recent learnings via `mcp__orgx__orgx_search`
    - CRM/call context via `mcp__salesforce__*` and `mcp__gong__*` when available
-6. For sequences, account plans, or QBRs, open a plan session with `mcp__orgx__orgx_plan` (`action=start`), refine with `action=improve`, and record substantive revisions with `action=record_edit`.
+6. For sequences, account plans, or QBRs, open a plan session with `mcp__orgx__orgx_start_plan`, refine with `mcp__orgx__orgx_save_plan` (`expected_version` required), and record substantive revisions with `mcp__orgx__orgx_record_plan_edit`.
 7. Apply relevant frameworks from the Domain Expertise Canon.
 8. Draft JSON-first artifact per the contract above.
 9. Run Precision Loop (below).
@@ -476,14 +476,14 @@ Before producing any artifact, query learnings via `mcp__orgx__orgx_search`:
 python3 scripts/validate_sales.py <artifact_file> --type <artifact_type>
 ```
 
-11. Resolve all validator errors and publish with `mcp__orgx__orgx_write`.
+11. Resolve all validator errors and publish by attaching with `mcp__orgx__orgx_attach_artifact`.
 12. Attach proof or conclusions back to the active work:
-    - `mcp__orgx__orgx_plan` (`action=complete`) with `attach_to=[...]` for plan sessions
-    - `mcp__orgx__orgx_attach` for battlecards, sequences, and pricing docs
-    - `mcp__orgx__orgx_act` (`action=update`) for coaching notes and decision annotations
-13. Record learnings via `mcp__orgx__orgx_submit_receipt` (`receipt_type=learning`).
-14. Record artifact quality via `mcp__orgx__orgx_submit_receipt` (`receipt_type=quality`, with at least one verifiable evidence URL).
-15. Before delegating prospecting or follow-up work, run `mcp__orgx__orgx_spawn` (`action=guard`), then delegate with `action=spawn`.
+    - `mcp__orgx__orgx_complete_plan` with `attach_to=[...]` for plan sessions
+    - `mcp__orgx__orgx_attach_artifact` for battlecards, sequences, and pricing docs
+    - `mcp__orgx__orgx_update_work` (`type`, `id`, `fields`) for coaching notes, or `mcp__orgx__orgx_capture_decision` for a decision a person must settle (hand them its `review_url`)
+13. Record learnings in the `note` of `mcp__orgx__orgx_complete_work_with_proof`; v2 has no separate learning-capture call.
+14. Record artifact quality with `quality_score` and `verification` (at least one verifiable evidence URL) on `mcp__orgx__orgx_complete_work_with_proof`. For an independent judgment use `mcp__orgx__orgx_request_independent_artifact_review`.
+15. Before delegating prospecting or follow-up work, run `mcp__orgx__orgx_estimate_agent_task`, then `mcp__orgx__orgx_start_agent_task` on an existing task; poll `mcp__orgx__orgx_get_operation_status` until it finishes.
 
 ---
 
@@ -520,16 +520,16 @@ Every artifact must pass all four passes before delivery.
 
 Primary:
 
-- `mcp__orgx__orgx_bootstrap` -- initialize OrgX session scope and recommended workflow (workspace auto-resolves; no second call needed)
-- `mcp__orgx__orgx_inspect` -- hydrate task-bound context, attachments, and plan sessions (`type=task|initiative|workstream|milestone|decision|artifact|plan_session`; `hydrate_context=true` for full context)
+- `mcp__orgx__orgx_get_workspace_context` -- read the workspace context (does not select a workspace or open a session)
+- `mcp__orgx__orgx_inspect` -- hydrate task-bound context, attachments, and plan sessions (`type`, `id`; `hydrate_context=true` for full context)
 - `mcp__orgx__orgx_search` -- pull deal history, past artifacts, learnings, and org context
-- `mcp__orgx__orgx_plan` -- tracked planning for sequences, QBRs, and territory plans (`action=start|resume|improve|record_edit|complete`; `complete` takes `attach_to=[...]`)
-- `mcp__orgx__orgx_write` -- publish completed artifacts (`operation=create|update`, one entity; use `orgx_apply_changeset` with ref keys + `idempotency_key` for multi-entity batches)
-- `mcp__orgx__orgx_attach` -- attach evidence and artifacts with `artifact_type`, `business_outcome`, `owner`, `review_date`, `verification`
-- `mcp__orgx__orgx_act` -- update entity state, coaching notes, and deal annotations (`action=update|complete_with_proof|flag_risk|...`; `action=validate` with `dry_run=true` for readiness checks)
-- `mcp__orgx__orgx_spawn` -- delegation lifecycle (`action=guard` before `action=spawn`; `handoff` and `classify` as needed)
-- `mcp__orgx__orgx_submit_receipt` -- record deal learnings and artifact quality (`receipt_type=proof|outcome|quality|attribution|learning`; `verification_status=passed|failed|blocked|not_run`; evidence includes at least one verifiable URL)
-- `mcp__orgx__orgx_recommend` -- understand current org state and priorities (`mode=next_action|morning_brief`)
+- `mcp__orgx__orgx_start_plan`, `mcp__orgx__orgx_read_plan`, `mcp__orgx__orgx_save_plan`, `mcp__orgx__orgx_record_plan_edit`, `mcp__orgx__orgx_complete_plan` -- tracked planning for sequences, QBRs, and territory plans (`save_plan` and `complete_plan` take `session_id`, `plan_content`, `expected_version`; `complete_plan` takes `attach_to=[...]`)
+- `mcp__orgx__orgx_create_initiative`, `mcp__orgx__orgx_create_workstream`, `mcp__orgx__orgx_create_milestone`, `mcp__orgx__orgx_create_task` -- typed entity creation; for multi-entity batches use `mcp__orgx__orgx_validate_initiative_plan` then `mcp__orgx__orgx_create_initiative_hierarchy` with an `idempotency_key`
+- `mcp__orgx__orgx_attach_artifact` -- attach evidence and artifacts with `artifact_type`, `business_outcome`, `owner`, `review_date`, `verification`
+- `mcp__orgx__orgx_update_work` -- edit content: coaching notes and deal annotations (no status changes) (`type`, `id`, `fields`); `mcp__orgx__orgx_complete_work_with_proof` -- close work with `artifact`, `verification`, `quality_score`, `note`; `mcp__orgx__orgx_capture_decision` -- record a decision a person must settle (`review_url` via `mcp__orgx__orgx_open_decision_review`)
+- `mcp__orgx__orgx_estimate_agent_task` -- check cost and fit before delegating; `mcp__orgx__orgx_start_agent_task` (existing `task_id`); `mcp__orgx__orgx_handoff_task` (`task_id`, `agent_type`); poll `mcp__orgx__orgx_get_operation_status`
+- `mcp__orgx__orgx_get_next_actions` -- understand current org state and priorities
+- `mcp__orgx__orgx_submit_work_receipt` -- portable Agent Work Receipts only (`receipt`)
 
 Optional (if configured):
 
@@ -587,7 +587,7 @@ Sales artifacts are judged on the sales layer stack. Layers are scored separatel
 
 Any `sales.structured_blocker` is judged on the ops stack instead — a sales blocker at 3am must still be actionable.
 
-Declare `artifact_type` on `mcp__orgx__orgx_attach` and `mcp__orgx__orgx_submit_receipt`: `sales.strategy`, `sales.icp_offer_sequence`, `sales.follow_up_sequence`, `sales.send_plan`, plus `sales.battlecard`, `sales.outreach_sequence`, and `sales.territory_plan` where they fit. The type decides which stack and which measured checks apply; never declare a flattering type to get an easier stack — the mistype guard re-classifies.
+Declare `artifact_type` on `mcp__orgx__orgx_attach_artifact`: `sales.strategy`, `sales.icp_offer_sequence`, `sales.follow_up_sequence`, `sales.send_plan`, plus `sales.battlecard`, `sales.outreach_sequence`, and `sales.territory_plan` where they fit. The type decides which stack and which measured checks apply; never declare a flattering type to get an easier stack — the mistype guard re-classifies.
 
 Score honestly:
 

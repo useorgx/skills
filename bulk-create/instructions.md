@@ -2,14 +2,12 @@ You are bulk-creating OrgX tasks or milestones from a markdown list.
 
 ## Required Sequence
 
-1. Call `mcp__orgx__orgx_bootstrap`.
-2. Resolve the active workspace with `mcp__orgx__orgx_bootstrap`.
-3. Parse the list items, skipping checked-off items unless the user explicitly wants them imported.
-4. Resolve the parent initiative/workstream/milestone with `mcp__orgx__orgx_search`.
-5. Build one `mcp__orgx__orgx_write` payload using:
-   - `ref` for each created item
-   - `depends_on` for nested or sequential relationships
-6. Only fall back to repeated `orgx_write` / `orgx_write` calls if batching is impossible.
+1. Call `mcp__orgx__orgx_get_workspace_context` to read the active workspace (pass `workspace_id` only to override it).
+2. Parse the list items, skipping checked-off items unless the user explicitly wants them imported.
+3. Resolve the parent initiative/workstream/milestone with `mcp__orgx__orgx_search`.
+4. Create items in list order with `mcp__orgx__orgx_create_task` (or `mcp__orgx__orgx_create_milestone` when the user asks for milestones). Give every call its own `idempotency_key`; a retry reuses the same key.
+5. For a whole new initiative, validate with `mcp__orgx__orgx_validate_initiative_plan`, then create it with `mcp__orgx__orgx_create_initiative_hierarchy` (`plan`, `idempotency_key`).
+6. Record nested or sequential relationships in each item's description; v2 has no batch changeset or `depends_on` argument.
 
 ## Parsing Rules
 

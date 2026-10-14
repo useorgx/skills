@@ -3,6 +3,7 @@
 
 from __future__ import annotations
 
+import json
 import re
 import sys
 from pathlib import Path
@@ -26,26 +27,13 @@ ROLE_AGENT_DIRS = {
     "sales-agent",
 }
 
-KNOWN_ORGX_TOOLS = {
-    "orgx_act",
-    "orgx_apply_changeset",
-    "orgx_attach",
-    "orgx_bootstrap",
-    "orgx_command_status",
-    "orgx_decide",
-    "orgx_emit_activity",
-    "get_agent_status",
-    "get_initiative_pulse",
-    "get_operator_chronicle",
-    "orgx_inspect",
-    "orgx_plan",
-    "orgx_recommend",
-    "orgx_search",
-    "orgx_spawn",
-    "orgx_submit_receipt",
-    "orgx_write",
-    "scaffold_initiative",
-}
+# The hosted server's default v2 catalog is the source of truth. A hand-kept
+# list once let ~600 references to retired tools pass this check while every
+# one of them returned "Tool not found" on v2.
+CATALOG = json.loads((ROOT / "scripts" / "orgx-v2-catalog.json").read_text(encoding="utf-8"))
+KNOWN_ORGX_TOOLS = {tool["name"] for tool in CATALOG["tools"]}
+RETIRED_ORGX_TOOLS: dict[str, str] = CATALOG["retired"]
+BASELINE_ORGX_TOOL = "orgx_get_workspace_context"
 
 DEPRECATED_ORGX_TOOLS = {
     "account_status",
@@ -108,9 +96,7 @@ DEPRECATED_ORGX_TOOLS = {
 
 # Tools only a host widget may call. A model never holds the single-use token
 # they need, so a skill that tells an agent to call one teaches a dead end.
-WIDGET_ONLY_ORGX_TOOLS = {
-    "orgx_widget_decide",
-}
+WIDGET_ONLY_ORGX_TOOLS = set(CATALOG["widget_only"])
 
 # The truthful-state contract every agent inherits from the capability mindset:
 # a model never settles a decision, a started run is not a finished one, and a
@@ -118,15 +104,14 @@ WIDGET_ONLY_ORGX_TOOLS = {
 TRUTHFUL_STATE_PHRASES = {
     "## Truthful State",
     "review_url",
-    "orgx_command_status",
+    "orgx_get_operation_status",
     "next_poll_after_ms",
     "waiting_on",
     "idempotency_key",
 }
 
-PLAN_TOOLS = {"orgx_plan"}
 ARTIFACT_CONTRACT_FIELDS = {
-    "metadata.artifact_contract",
+    "artifact_type",
     "agent_type",
     "company_stage",
     "business_outcome",
@@ -135,7 +120,7 @@ ARTIFACT_CONTRACT_FIELDS = {
     "verification",
 }
 LOOP_VALIDATION_FIELDS = {
-    "action=\"estimate\"",
+    "orgx_estimate_agent_task",
     "loop_validation",
     "validation_rung",
     "verification_status",
@@ -216,6 +201,11 @@ def main() -> int:
                         f"{file_path.relative_to(ROOT)} references widget-only OrgX tool "
                         f"`mcp__orgx__{ref}`; agents must never call it"
                     )
+                elif ref in RETIRED_ORGX_TOOLS:
+                    errors.append(
+                        f"{file_path.relative_to(ROOT)} references `mcp__orgx__{ref}`, "
+                        f"which the v2 catalog does not register; use {RETIRED_ORGX_TOOLS[ref]}"
+                    )
                 elif ref in DEPRECATED_ORGX_TOOLS:
                     errors.append(
                         f"{file_path.relative_to(ROOT)} references deprecated OrgX tool "
@@ -284,7 +274,7 @@ def main() -> int:
         if not combined_refs:
             continue
 
-        missing_baseline = {"orgx_bootstrap"} - combined_refs
+        missing_baseline = {BASELINE_ORGX_TOOL} - combined_refs
         for tool in sorted(missing_baseline):
             errors.append(
                 f"{skill_dir.name} is missing baseline OrgX workflow tool "
@@ -300,14 +290,19 @@ def main() -> int:
                 if tool.startswith("mcp__orgx__")
             }
 
-            for tool in sorted({"orgx_bootstrap"} - orgx_required):
+            for tool in sorted({BASELINE_ORGX_TOOL} - orgx_required):
                 errors.append(
                     f"{skill_toml.relative_to(ROOT)} is missing required tool "
                     f"`mcp__orgx__{tool}`"
                 )
 
             for tool in sorted(orgx_required):
-                if tool in DEPRECATED_ORGX_TOOLS:
+                if tool in RETIRED_ORGX_TOOLS:
+                    errors.append(
+                        f"{skill_toml.relative_to(ROOT)} declares `mcp__orgx__{tool}`, "
+                        f"which the v2 catalog does not register; use {RETIRED_ORGX_TOOLS[tool]}"
+                    )
+                elif tool in DEPRECATED_ORGX_TOOLS:
                     errors.append(
                         f"{skill_toml.relative_to(ROOT)} declares deprecated OrgX tool "
                         f"`mcp__orgx__{tool}`"
@@ -324,7 +319,10 @@ def main() -> int:
             print(f"- {error}")
         return 1
 
-    print(f"OrgX skill drift check passed for {len(SKILL_DIRS)} skills.")
+    print(
+        f"OrgX skill drift check passed for {len(SKILL_DIRS)} skills against the v2 catalog "
+        f"({CATALOG['source']['repo']}@{CATALOG['source']['commit']})."
+    )
     return 0
 
 

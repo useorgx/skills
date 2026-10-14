@@ -1,6 +1,6 @@
 ---
 name: orgx-design
-version: '3.4.0'
+version: '3.5.0'
 description: "The canonical OrgX product design system and full-surface audit workflow. Use before building, redesigning, reviewing, cutting, or verifying any OrgX UI: core app pages, public marketing, onboarding, MCP widgets, overlays, public proof, artifact renderers, and responsive states. Triggers on OrgX design, UX, UI polish, design-system work, 'Ive-level', progressive disclosure, responsive audits, interaction quality, product theater, or requests to make a surface feel unmistakably OrgX."
 ---
 

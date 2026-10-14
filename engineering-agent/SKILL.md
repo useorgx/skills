@@ -18,18 +18,18 @@ Apply [orgx-capability-mindset](../orgx-capability-mindset) before engineering w
 
 ## Quick Start
 
-1. Run `mcp__orgx__orgx_bootstrap` once — it auto-resolves the workspace.
+1. Run `mcp__orgx__orgx_get_workspace_context` once — it reads the auto-resolved workspace context (it does not select a workspace or create a session).
 2. Confirm the artifact or decision type and the target audience. If the request comes from a task, load it with `mcp__orgx__orgx_inspect`; otherwise map related work with `mcp__orgx__orgx_search`.
 3. Retrieve relevant learnings with `mcp__orgx__orgx_search` and prior decisions with `mcp__orgx__orgx_search` scoped to decisions.
 4. Before creating or delegating workstreams, milestones, or tasks, inspect the active parent scope and reuse matching siblings. Treat `reused`, `duplicate_prevented`, or `_dedup` results as success and continue on the returned canonical entity ID.
-5. For RFCs, migration playbooks, or other plan-shaped outputs, run a planning loop with `mcp__orgx__orgx_plan`: `action=start` to open, `action=improve` to refine, `action=record_edit` to capture material revisions, and `action=complete` (with `attach_to=[...]`) to persist.
+5. For RFCs, migration playbooks, or other plan-shaped outputs, run a planning loop: `mcp__orgx__orgx_start_plan` to open, `mcp__orgx__orgx_save_plan` (`session_id`, `plan_content`, `expected_version`) to save each refinement, `mcp__orgx__orgx_record_plan_edit` to capture material revisions, and `mcp__orgx__orgx_complete_plan` (with `attach_to=[...]`) to persist.
 6. Assess the org context (stage, team topology, reliability maturity) and adapt formality accordingly.
 7. Produce the artifact using the contract below and return:
    - A concise summary (3-6 bullets)
    - The artifact body (JSON or structured Markdown)
    - 3 actionable next steps
-8. Attach the output back to the active work item with `mcp__orgx__orgx_attach`, then submit learnings with `mcp__orgx__orgx_submit_receipt` (`receipt_type=learning`) and score the artifact with a `receipt_type=quality` receipt. When attaching, use the MCP artifact type that matches the work (`eng.pull_request`, `eng.deploy_proof`, or `eng.structured_blocker`) and include `metadata.artifact_contract` with `agent_type`, `company_stage`, `business_outcome`, `owner`, `review_date`, and `verification`.
-9. Before delegating implementation or investigation, run `mcp__orgx__orgx_spawn` with `action=guard` and only then spawn with `action=spawn`.
+8. Attach the output back to the active work item with `mcp__orgx__orgx_attach_artifact`, then record learnings in the completion `note` and the quality score on `mcp__orgx__orgx_complete_work_with_proof` (`quality_score`, `verification`); v2 has no separate learning-capture call. When attaching, use the MCP `artifact_type` that matches the work (`eng.pull_request`, `eng.deploy_proof`, or `eng.structured_blocker`) and pass `agent_type`, `company_stage`, `business_outcome`, `owner`, `review_date`, and `verification`.
+9. Before delegating implementation or investigation, run `mcp__orgx__orgx_estimate_agent_task` (the pre-dispatch check) and only then dispatch with `mcp__orgx__orgx_start_agent_task`. A started run is not done: poll `mcp__orgx__orgx_get_operation_status` (`next_poll_after_ms`, `waiting_on`). See `orgx-capability-mindset` → Truthful State.
    - Omit `model_tier`, `provider`, and exact `model` for normal work so OrgX auto-routes by task complexity.
    - Use `model_tier=standard` and `budget_mode=cheapest_valid` only for controlled reliability validation runs, test initiatives, or explicit budget-constrained verification.
    - Engineering delegation must require a PR URL with verification evidence, or a structured blocker with repo, branch, command, and exact error.
@@ -186,7 +186,7 @@ Declare assumptions explicitly if data is missing. Never fabricate metrics or in
 
 ## Operating Workflow
 
-1. Run `mcp__orgx__orgx_bootstrap` — it auto-resolves the workspace.
+1. Run `mcp__orgx__orgx_get_workspace_context` — it reads the auto-resolved workspace context.
 2. Select `artifact_type` and identify the target decision or deliverable.
 3. Hydrate the active task or parent entity:
    - `mcp__orgx__orgx_inspect` for task-bound work
@@ -194,13 +194,13 @@ Declare assumptions explicitly if data is missing. Never fabricate metrics or in
 4. Assess org context using the Context Adaptation Protocol.
 5. Retrieve learnings and precedent:
    - `mcp__orgx__orgx_search` for engineering domain insights
-   - `mcp__orgx__orgx_search` with `scope: "decisions"` for related architecture decisions
+   - `mcp__orgx__orgx_search` with `type=decision` for related architecture decisions
    - `mcp__orgx__orgx_search` for organizational precedent
 6. Gather evidence:
    - `mcp__github__*` for code, PR, and repository evidence
    - `mcp__grafana__*` and `mcp__loki__*` for runtime telemetry
    - `mcp__orgx__orgx_search` for related work items and initiatives
-7. For architecture or migration planning, open a plan session with `mcp__orgx__orgx_plan` (`action=start`), refine with `action=improve`, and record any material revision with `action=record_edit`.
+7. For architecture or migration planning, open a plan session with `mcp__orgx__orgx_start_plan`, save refinements with `mcp__orgx__orgx_save_plan`, and record any material revision with `mcp__orgx__orgx_record_plan_edit`.
 8. Apply learnings as constraints or confidence adjustments on the draft.
 9. Draft artifact in JSON (or Markdown with fenced JSON) following the artifact contract.
 10. Run the Precision Loop (all 5 passes).
@@ -211,14 +211,14 @@ python3 scripts/validate_engineering.py <artifact_file> --type <artifact_type>
 ```
 
 12. Fix all failed gates.
-13. Publish with `mcp__orgx__orgx_write` (`operation=create` or `operation=update`, one entity; use `orgx_apply_changeset` with ref keys and an `idempotency_key` for multi-entity batches).
+13. Publish with the typed calls (`mcp__orgx__orgx_create_task`, `mcp__orgx__orgx_create_milestone`, or `mcp__orgx__orgx_update_work`; one entity per call, each with its own `idempotency_key`, reused on retry).
 14. Attach proof or conclusions back to the active entity:
-    - `mcp__orgx__orgx_plan` (`action=complete`) with `attach_to` for plan sessions
-    - `mcp__orgx__orgx_attach` for RFCs, reviews, and runbooks (declare `artifact_type`)
-    - `mcp__orgx__orgx_act` (`action=update`) for review findings or architectural guidance on the entity itself
-15. Submit learnings: `mcp__orgx__orgx_submit_receipt` (`receipt_type=learning`) with outcome-linked insight.
-16. Score the artifact: `mcp__orgx__orgx_submit_receipt` (`receipt_type=quality`) with at least one verifiable URL in evidence.
-17. Before spawning follow-on work, run `mcp__orgx__orgx_spawn` (`action=guard`), then delegate with `action=spawn`.
+    - `mcp__orgx__orgx_complete_plan` with `attach_to` for plan sessions
+    - `mcp__orgx__orgx_attach_artifact` for RFCs, reviews, and runbooks (declare `artifact_type`)
+    - `mcp__orgx__orgx_update_work` for review findings or architectural guidance on the entity itself
+15. Record learnings: put the outcome-linked insight in the `note` of `mcp__orgx__orgx_complete_work_with_proof` (v2 has no separate learning-capture call).
+16. Score the artifact: pass `quality_score` and `verification` (with at least one verifiable URL in evidence) to `mcp__orgx__orgx_complete_work_with_proof`; for an independent judgment call `mcp__orgx__orgx_request_independent_artifact_review`.
+17. Before dispatching follow-on work, run `mcp__orgx__orgx_estimate_agent_task`, then delegate with `mcp__orgx__orgx_start_agent_task`.
 
 ## Artifact Contracts
 
@@ -454,13 +454,13 @@ If any of these five elements is missing from an incoming handoff, request clari
 ### Before Drafting
 
 1. Call `mcp__orgx__orgx_search` scoped to the engineering domain and the specific artifact type. Look for patterns like "previous RFCs for this service underestimated migration effort by 2x" or "this team prefers ADRs over RFCs for decisions under 1 week of work."
-2. Call `mcp__orgx__orgx_search` with `scope: "decisions"` and a query covering the related architecture area. Check for superseded ADRs, rejected RFC alternatives that are relevant again, and postmortem action items that should constrain new designs.
+2. Call `mcp__orgx__orgx_search` with `type=decision` and a query covering the related architecture area. Check for superseded ADRs, rejected RFC alternatives that are relevant again, and postmortem action items that should constrain new designs.
 3. Apply learnings as explicit constraints or confidence adjustments. If a learning says "database migrations for this service historically take 3x the estimate," note that in the risk section and adjust effort estimates accordingly.
 
 ### After Completion
 
-1. Call `mcp__orgx__orgx_submit_receipt` (`receipt_type=learning`) with an outcome-linked insight. The learning should be specific enough to help future artifact creation. Good: "RFC for service X required 3 revision cycles because the team had no observability — future RFCs for unobserved services should include an observability prerequisite phase." Bad: "RFCs are hard."
-2. Call `mcp__orgx__orgx_submit_receipt` (`receipt_type=quality`) on the artifact with a score and rationale. The score should reflect how well the artifact met its contract, how much revision was needed, and how actionable the output is.
+1. State an outcome-linked insight in the completion `note` of `mcp__orgx__orgx_complete_work_with_proof`. The learning should be specific enough to help future artifact creation. Good: "RFC for service X required 3 revision cycles because the team had no observability — future RFCs for unobserved services should include an observability prerequisite phase." Bad: "RFCs are hard."
+2. Pass a `quality_score` and rationale (in `verification` and the `note`) to `mcp__orgx__orgx_complete_work_with_proof`. The score should reflect how well the artifact met its contract, how much revision was needed, and how actionable the output is.
 
 ## Precision Loop (Run Every Time)
 
@@ -502,7 +502,7 @@ Engineering artifacts are judged on this layer stack. Layers are scored separate
 
 Any `*.structured_blocker` artifact — including `eng.structured_blocker` — is judged on the ops stack instead: actionable under stress, failure paths covered, named owners, explicit time bounds.
 
-Declare the type on `orgx_attach` and receipts so the right stack judges you: `eng.pull_request`, `eng.deploy_proof`, or `eng.structured_blocker`. Undeclared artifacts get a classifier-inferred type and may be judged on the general fallback stack until promoted. Never declare a flattering type — the mistype guard re-classifies, and a wrong stack produces feedback you cannot act on.
+Declare the `artifact_type` on `mcp__orgx__orgx_attach_artifact` and completion calls so the right stack judges you: `eng.pull_request`, `eng.deploy_proof`, or `eng.structured_blocker`. Undeclared artifacts get a classifier-inferred type and may be judged on the general fallback stack until promoted. Never declare a flattering type — the mistype guard re-classifies, and a wrong stack produces feedback you cannot act on.
 
 Score honestly:
 
@@ -521,15 +521,16 @@ Honesty caution: no self-describing quality preambles ("This rigorous RFC demons
 
 Primary:
 
-- `mcp__orgx__orgx_bootstrap` — initialize the OrgX session and recommended workflow; auto-resolves the active workspace
+- `mcp__orgx__orgx_get_workspace_context` — read the auto-resolved workspace context (reads only; does not select a workspace or create a session)
 - `mcp__orgx__orgx_inspect` — hydrate context (`type=initiative|workstream|milestone|task|decision|artifact|plan_session`; `hydrate_context=true` for full context)
-- `mcp__orgx__orgx_search` — organizational precedent, related work items, prior decisions (`scope: "decisions"`), and domain insights from previous work
-- `mcp__orgx__orgx_plan` — tracked planning for RFCs and migrations: `action=start`, `improve`, `record_edit`, then `complete` (with `attach_to`) to persist
-- `mcp__orgx__orgx_write` — publish completed artifacts (`operation=create|update`, one entity; multi-entity batches go through `orgx_apply_changeset`)
-- `mcp__orgx__orgx_attach` — attach artifacts with `artifact_type`, `description`, `verification`, and contract metadata
-- `mcp__orgx__orgx_act` — update entity state and record notes (`action=update`, `complete_with_proof`, `flag_risk`, `block`/`unblock`, …); `action=validate` with `dry_run=true` for readiness checks
-- `mcp__orgx__orgx_spawn` — `action=guard` to verify delegation is allowed, then `action=spawn` to hand off implementation or investigation work
-- `mcp__orgx__orgx_submit_receipt` — learnings and quality scores (`receipt_type=proof|outcome|quality|attribution|learning`; `verification_status=passed|failed|blocked|not_run`)
+- `mcp__orgx__orgx_search` — organizational precedent, related work items, prior decisions (`type=decision`), and domain insights from previous work
+- `mcp__orgx__orgx_start_plan`, `mcp__orgx__orgx_save_plan`, `mcp__orgx__orgx_record_plan_edit`, `mcp__orgx__orgx_complete_plan` — tracked planning for RFCs and migrations; complete with `attach_to` to persist
+- `mcp__orgx__orgx_create_task`, `mcp__orgx__orgx_create_milestone`, `mcp__orgx__orgx_update_work` — publish completed artifacts (one entity per call)
+- `mcp__orgx__orgx_attach_artifact` — attach artifacts with `artifact_type`, `description`, `verification`, and contract fields
+- `mcp__orgx__orgx_complete_work_with_proof` — complete work with the artifact, `verification`, `quality_score`, and a `note` carrying learnings
+- `mcp__orgx__orgx_capture_decision` — file a decision for a person to settle (hand them its `review_url`; never approve it yourself)
+- `mcp__orgx__orgx_estimate_agent_task` — pre-dispatch check, then `mcp__orgx__orgx_start_agent_task` or `mcp__orgx__orgx_handoff_task` to hand off implementation or investigation work
+- `mcp__orgx__orgx_get_operation_status` — poll a started run (`next_poll_after_ms`, `waiting_on`)
 
 Optional (if configured):
 

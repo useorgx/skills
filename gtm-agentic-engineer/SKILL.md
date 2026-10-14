@@ -1,6 +1,6 @@
 ---
 name: gtm-agentic-engineer
-version: "0.1.0"
+version: "0.2.0"
 description: |
   The reasoning, memory, and tool-composition layer for agents that RUN go-to-market
   rather than write about it. Use before any motion that senses the market and acts on
@@ -24,7 +24,7 @@ the booked meeting is.
 
 The gap is architectural, not a matter of better prompts. The OrgX capability mindset
 teaches "sensors before actuators" — but every sensor and actuator it names
-(`orgx_search`, `orgx_write`, `orgx_attach`) is **internal**. An agent bound only to
+(`orgx_search`, `orgx_update_work`, `orgx_attach_artifact`) is **internal**. An agent bound only to
 those can sense its own work record and act on its own work record. It is a closed
 loop. The practitioners worth copying run an open one.
 
@@ -33,7 +33,7 @@ memory required to survive running them repeatedly.**
 
 ## Before anything: bind to the workspace
 
-Call `orgx_bootstrap` first. Every model below — ICP predicate, segment priors, voice,
+Call `orgx_get_workspace_context` first (it reads the workspace; pass `workspace_id` to pin it). Every model below — ICP predicate, segment priors, voice,
 deliverability budget — is **per workspace**, and this skill acts on the outside world
 on that workspace's behalf. Running it without resolving which workspace you are in is
 how one tenant's ICP, vocabulary, or sending reputation leaks into another's campaign.
@@ -119,9 +119,10 @@ What actually worked: angle × ICP segment × channel × signal-type → observe
 meeting rates. This is what makes the fifth run better than the first, and it is the
 only memory that compounds.
 
-OrgX already has the substrate for this (`orgx_submit_receipt` with
-`receipt_type=learning`/`outcome`, and `orgx_search` to query it). The failure today is
-that receipts measure **artifact quality**, not market response. A learning receipt that
+OrgX has part of the substrate for this: write the learning into the
+`note` of `orgx_complete_work_with_proof` (v2 has no separate learning-capture
+call), and query it back with `orgx_search`. The failure today is
+that receipts measure **artifact quality**, not market response. A completion note that
 says "the brief scored 0.91" teaches nothing about GTM. One that says "pain-quote
 openers on the agency segment replied at 11% vs 4% for capability openers, n=180" is the
 asset.
