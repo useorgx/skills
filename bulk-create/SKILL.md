@@ -25,8 +25,8 @@ Completed checkbox items are skipped by default.
 2. Parse the list into ordered items with priority, nesting, and completion state.
 3. Check the parent initiative, milestone, or workstream with `mcp__orgx__orgx_search`.
 4. Create each item with a typed call, in list order, each with its own stable `idempotency_key`:
-   - `mcp__orgx__orgx_create_task` (needs `workstream_id`; `milestone_id` optional) is the default
-   - `mcp__orgx__orgx_create_milestone` (needs `workstream_id`) only when the user explicitly wants milestones
+   - `mcp__orgx__orgx_create_task` (needs `workstream_id`, `idempotency_key`; `milestone_id` optional) is the default
+   - `mcp__orgx__orgx_create_milestone` (needs `workstream_id`, `idempotency_key`) only when the user explicitly wants milestones
    - a retried create reuses the same `idempotency_key`, so a repeat never makes a duplicate
 5. If the list describes a whole new initiative (initiative, workstreams, milestones, tasks), validate the plan with `mcp__orgx__orgx_validate_initiative_plan`, then create it in one call with `mcp__orgx__orgx_create_initiative_hierarchy` (`plan`, `idempotency_key`).
 

@@ -90,7 +90,7 @@ Type codes are `<domain>.<type_name>` (e.g. `sales.icp_offer_sequence`,
 measured checks apply — a mistyped artifact is judged on the wrong bar.
 
 - **Declare the type when you know it** — as `artifact_type` on
-  `orgx_attach_artifact` / `orgx_complete_work_with_proof` (its `artifact` argument).
+  `orgx_attach_artifact` / `orgx_complete_work_with_proof` (its `artifact` argument, plus the call's `idempotency_key`).
 - If you don't declare, a classifier infers the type. Generic outputs may be
   flagged `artifact_type_provisional: true` and judged on the general stack
   (fitness_to_intent, evidence, clarity, actionability) until promoted.
@@ -167,7 +167,7 @@ Don't:
 - Before writing: check the type code you'll produce and skim its layer stack.
 - On attach: `orgx_attach_artifact` (or `orgx_complete_work_with_proof`) with
   `artifact_type`, `business_outcome`, `owner`, `verification`.
-- On completion: `orgx_complete_work_with_proof` with `artifact`, `verification`
+- On completion: `orgx_complete_work_with_proof` with `artifact`, `verification`, `idempotency_key`
   (evidence URLs, reflecting what actually ran), `quality_score`, and a `note`
   carrying learnings; v2 has no separate learning-capture call. For an
   independent judgment use `orgx_request_independent_artifact_review`; a

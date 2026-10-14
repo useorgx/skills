@@ -21,19 +21,19 @@ Apply [orgx-capability-mindset](../orgx-capability-mindset) before orchestration
 2. Confirm the artifact or decision type and the target audience. If the work is task-bound, hydrate it with `mcp__orgx__orgx_inspect`; otherwise map the surrounding initiative with `mcp__orgx__orgx_search` and `mcp__orgx__orgx_get_next_actions`.
 3. Retrieve relevant precedent with `mcp__orgx__orgx_search` and prior coordination decisions with `mcp__orgx__orgx_search` (`type=decision`).
 4. Before creating or delegating workstreams, milestones, or tasks, inspect the active parent scope and reuse matching siblings. Treat `reused`, `duplicate_prevented`, or `_dedup` results as success and continue on the returned canonical entity ID.
-5. For new initiative formation, validate the plan with `mcp__orgx__orgx_validate_initiative_plan`, then create the whole hierarchy with `mcp__orgx__orgx_create_initiative_hierarchy` (`plan`, `idempotency_key`); for a single entity use `mcp__orgx__orgx_create_initiative`, `mcp__orgx__orgx_create_workstream`, `mcp__orgx__orgx_create_milestone`, or `mcp__orgx__orgx_create_task`. For strategy-heavy coordination work, run a planning loop: `mcp__orgx__orgx_start_plan` (`title`), `mcp__orgx__orgx_read_plan` to resume, `mcp__orgx__orgx_save_plan` (`session_id`, `plan_content`, `expected_version`) to improve, `mcp__orgx__orgx_record_plan_edit` for major revisions, then `mcp__orgx__orgx_complete_plan` with `attach_to`.
+5. For new initiative formation, validate the plan with `mcp__orgx__orgx_validate_initiative_plan`, then create the whole hierarchy with `mcp__orgx__orgx_create_initiative_hierarchy` (`plan`, `idempotency_key`); for a single entity use `mcp__orgx__orgx_create_initiative`, `mcp__orgx__orgx_create_workstream`, `mcp__orgx__orgx_create_milestone`, or `mcp__orgx__orgx_create_task`. For strategy-heavy coordination work, run a planning loop: `mcp__orgx__orgx_start_plan` (`title`, `idempotency_key`), `mcp__orgx__orgx_read_plan` to resume, `mcp__orgx__orgx_save_plan` (`session_id`, `plan_content`, `expected_version`, `idempotency_key`) to improve, `mcp__orgx__orgx_record_plan_edit` for major revisions, then `mcp__orgx__orgx_complete_plan` with `attach_to` and `idempotency_key`.
 6. Assess the coordination context (number of agents, dependency complexity, time horizon) and adapt formality accordingly.
 7. Produce the artifact using the contract below and return:
    - A concise summary (3-6 bullets)
    - The artifact body (JSON or structured Markdown)
    - 3 actionable next steps with owners and deadlines
 8. Attach proof back to the initiative, task, or decision with `mcp__orgx__orgx_attach_artifact` (or `mcp__orgx__orgx_complete_work_with_proof` when completing). When attaching, use `artifact_type=orchestration.next_initiative` for next-value initiative artifacts and pass `agent_type`, `company_stage`, `business_outcome`, `owner`, `review_date`, and `verification` as arguments.
-9. Before every delegation, run `mcp__orgx__orgx_estimate_agent_task` (`task`) — v2 has no separate guard call, so the estimate is the pre-dispatch check — then delegate an existing task with `mcp__orgx__orgx_start_agent_task` (`task_id`) or `mcp__orgx__orgx_handoff_task` (`task_id`, `agent_type`).
+9. Before every delegation, run `mcp__orgx__orgx_estimate_agent_task` (`task`) — v2 has no separate guard call, so the estimate is the pre-dispatch check — then delegate an existing task with `mcp__orgx__orgx_start_agent_task` (`task_id`, `idempotency_key`) or `mcp__orgx__orgx_handoff_task` (`task_id`, `agent_type`, `idempotency_key`).
    - Omit `model_tier`, `provider`, and exact `model` for normal work so OrgX auto-routes by task complexity and workspace policy.
    - Use `model_tier=standard` and `budget_mode=cheapest_valid` only for controlled reliability validation runs, test initiatives, or explicit budget-constrained verification.
    - Each delegation must name the target agent, acceptance criteria, expected receipt, and whether routing is auto or intentionally constrained.
    - A spawn starts a run; it does not complete one. Report delegated work as started, keep each `run_id`, and poll it with `mcp__orgx__orgx_get_operation_status` (`kind=run`, `id`; recheck after `next_poll_after_ms`, `null` means final) and `mcp__orgx__orgx_get_agent_status` before synthesizing its output. Decisions you raise wait on a person: report them as waiting, with their `review_url`.
-10. Record the outcome and quality with `mcp__orgx__orgx_complete_work_with_proof` (`quality_score`, `verification`, and the learnings stated in `note`). v2 has no separate learning-capture call; do not invent one. For an independent judgment, use `mcp__orgx__orgx_request_independent_artifact_review`.
+10. Record the outcome and quality with `mcp__orgx__orgx_complete_work_with_proof` (`quality_score`, `verification`, `idempotency_key`, and the learnings stated in `note`). v2 has no separate learning-capture call; do not invent one. For an independent judgment, use `mcp__orgx__orgx_request_independent_artifact_review`.
 
 Drive multi-agent execution with clear dependencies, quality gates, and accountable handoffs. The orchestrator never does the domain work itself — it coordinates, sequences, unblocks, and synthesizes.
 
@@ -204,16 +204,16 @@ python3 scripts/validate_orchestration.py <artifact_file> --type <artifact_type>
 12. Resolve all failed gates.
 13. Execute orchestration:
     - Create a new initiative hierarchy with `mcp__orgx__orgx_create_initiative_hierarchy` (`plan`, `idempotency_key`), or supporting entities one per call with `mcp__orgx__orgx_create_workstream`, `mcp__orgx__orgx_create_milestone`, `mcp__orgx__orgx_create_task`; a retried write reuses its `idempotency_key`
-    - Launch with `mcp__orgx__orgx_launch_initiative`; pause, resume, retry, or cancel with `mcp__orgx__orgx_pause_work`, `mcp__orgx__orgx_resume_work`, `mcp__orgx__orgx_retry_work`, `mcp__orgx__orgx_cancel_work` (`level`, `id`); check readiness with `mcp__orgx__orgx_check_execution_readiness`
+    - Launch with `mcp__orgx__orgx_launch_initiative`; pause, resume, retry, or cancel with `mcp__orgx__orgx_pause_work`, `mcp__orgx__orgx_resume_work`, `mcp__orgx__orgx_retry_work`, `mcp__orgx__orgx_cancel_work` (`level`, `id`, `idempotency_key`); check readiness with `mcp__orgx__orgx_check_execution_readiness`
     - Before each delegation, run `mcp__orgx__orgx_estimate_agent_task`, then delegate with `mcp__orgx__orgx_start_agent_task` or `mcp__orgx__orgx_handoff_task`
     - Progress is captured by the client's hooks; do not emit activity by hand. Record outcomes at each milestone with `mcp__orgx__orgx_complete_work_with_proof`
-    - Update state across several entities with typed `mcp__orgx__orgx_update_work` calls (`type`, `id`, `fields`); v2 has no multi-entity changeset
+    - Update state across several entities with typed `mcp__orgx__orgx_update_work` calls (`type`, `id`, `fields`, `idempotency_key`); v2 has no multi-entity changeset
 14. Attach coordination proof back to OrgX:
-    - `mcp__orgx__orgx_complete_plan` (`attach_to`) for planning sessions
-    - `mcp__orgx__orgx_attach_artifact` for initiative plans, synthesis, and risk registers (declare `artifact_type`)
+    - `mcp__orgx__orgx_complete_plan` (`attach_to`, `idempotency_key`) for planning sessions
+    - `mcp__orgx__orgx_attach_artifact` for initiative plans, synthesis, and risk registers (declare `artifact_type`; pass a fresh `idempotency_key`)
     - `mcp__orgx__orgx_update_work` for unblock requests, risk flags, and review notes; `mcp__orgx__orgx_capture_decision` when a risk needs a ruling. Decisions themselves are settled only by a person, so route them to the decision's `review_url` (`mcp__orgx__orgx_open_decision_review`)
 15. State learnings in the completion `note` of `mcp__orgx__orgx_complete_work_with_proof` with coordination-specific insight; v2 has no separate learning-capture call.
-16. Score the artifact with `quality_score` and `verification` on `mcp__orgx__orgx_complete_work_with_proof`, with evidence including at least one verifiable URL; use `mcp__orgx__orgx_request_independent_artifact_review` for an independent judgment.
+16. Score the artifact with `quality_score`, `verification`, and an `idempotency_key` on `mcp__orgx__orgx_complete_work_with_proof`, with evidence including at least one verifiable URL; use `mcp__orgx__orgx_request_independent_artifact_review` for an independent judgment.
 
 ## Artifact Contracts
 
@@ -479,7 +479,7 @@ The orchestrator's effectiveness compounds over time through systematic learning
 ### After Completion
 
 1. State coordination-specific learnings in the `note` of `mcp__orgx__orgx_complete_work_with_proof` (v2 has no separate learning-capture call). Good learning: "Cross-domain initiatives with shared database dependencies require a dedicated dependency resolution sprint at the start — skipping this added 2 weeks to the critical path." Bad learning: "Coordination is important."
-2. Record `quality_score` and `verification` per agent contribution on `mcp__orgx__orgx_complete_work_with_proof` with a specific rationale. This feeds future agent selection and calibration.
+2. Record `quality_score`, `verification`, and an `idempotency_key` per agent contribution on `mcp__orgx__orgx_complete_work_with_proof` with a specific rationale. This feeds future agent selection and calibration.
 3. Produce a retrospective artifact (`--type retro`) for every initiative that spans more than 2 weeks or involves more than 3 agents.
 
 ## Precision Loop (Run Every Time)
@@ -565,14 +565,14 @@ Any `*.structured_blocker` artifact — from any domain — is judged on the ops
 - `mcp__orgx__orgx_get_workspace_context` — read workspace scope (`workspace_id` optional; reads only, does not select a workspace or create a session)
 - `mcp__orgx__orgx_inspect` — hydrate orchestration work (`type`, `id`; `hydrate_context=true` for full context including attachments and plan sessions)
 - `mcp__orgx__orgx_search` — organizational precedent, existing entities, past coordination patterns, and prior decisions (`type=decision`)
-- `mcp__orgx__orgx_start_plan`, `mcp__orgx__orgx_read_plan`, `mcp__orgx__orgx_save_plan`, `mcp__orgx__orgx_record_plan_edit`, `mcp__orgx__orgx_complete_plan` — tracked plan sessions for initiative design and retrospectives (`save_plan` takes `session_id`, `plan_content`, `expected_version`; `complete_plan` takes `attach_to`)
+- `mcp__orgx__orgx_start_plan`, `mcp__orgx__orgx_read_plan`, `mcp__orgx__orgx_save_plan`, `mcp__orgx__orgx_record_plan_edit`, `mcp__orgx__orgx_complete_plan` — tracked plan sessions for initiative design and retrospectives (`save_plan` takes `session_id`, `plan_content`, `expected_version`; `complete_plan` takes `attach_to`; every write also takes `idempotency_key`)
 - `mcp__orgx__orgx_validate_initiative_plan`, `mcp__orgx__orgx_create_initiative_hierarchy` — validate, then create a whole hierarchy (`plan`, `idempotency_key`)
-- `mcp__orgx__orgx_create_initiative`, `mcp__orgx__orgx_create_workstream`, `mcp__orgx__orgx_create_milestone`, `mcp__orgx__orgx_create_task` — create one entity; `mcp__orgx__orgx_update_work` (`type`, `id`, `fields`) updates one
-- `mcp__orgx__orgx_launch_initiative`, `mcp__orgx__orgx_pause_work`, `mcp__orgx__orgx_resume_work`, `mcp__orgx__orgx_retry_work`, `mcp__orgx__orgx_cancel_work` — lifecycle changes (`level`, `id`). None of them settles a decision: only a person does, from the decision's `review_url`
-- `mcp__orgx__orgx_complete_work_with_proof` — complete work with `artifact`, `verification`, `quality_score`, `note`
+- `mcp__orgx__orgx_create_initiative`, `mcp__orgx__orgx_create_workstream`, `mcp__orgx__orgx_create_milestone`, `mcp__orgx__orgx_create_task` — create one entity; `mcp__orgx__orgx_update_work` (`type`, `id`, `fields`, `idempotency_key`) updates one
+- `mcp__orgx__orgx_launch_initiative`, `mcp__orgx__orgx_pause_work`, `mcp__orgx__orgx_resume_work`, `mcp__orgx__orgx_retry_work`, `mcp__orgx__orgx_cancel_work` — lifecycle changes (`level`, `id`, `idempotency_key`). None of them settles a decision: only a person does, from the decision's `review_url`
+- `mcp__orgx__orgx_complete_work_with_proof` — complete work with `artifact`, `verification`, `quality_score`, `note`, `idempotency_key`
 - `mcp__orgx__orgx_capture_decision`, `mcp__orgx__orgx_list_pending_decisions`, `mcp__orgx__orgx_open_decision_review` — raise and surface decisions; a person settles them
-- `mcp__orgx__orgx_attach_artifact` — attach artifacts and evidence (declare `artifact_type`, `business_outcome`, `owner`, `verification`)
-- `mcp__orgx__orgx_estimate_agent_task`, `mcp__orgx__orgx_start_agent_task`, `mcp__orgx__orgx_handoff_task` — delegation (estimate before dispatch; start takes the `task_id` of an existing task)
+- `mcp__orgx__orgx_attach_artifact` — attach artifacts and evidence (declare `artifact_type`, `business_outcome`, `owner`, `verification`; every write also takes `idempotency_key`)
+- `mcp__orgx__orgx_estimate_agent_task`, `mcp__orgx__orgx_start_agent_task`, `mcp__orgx__orgx_handoff_task` — delegation (estimate before dispatch; start takes the `task_id` of an existing task; every write also takes `idempotency_key`)
 - `mcp__orgx__orgx_get_operation_status` — real state of a started run, decision, or work command (`kind`, `id`); recheck after `next_poll_after_ms`, `null` means final
 - `mcp__orgx__orgx_get_agent_status`, `mcp__orgx__orgx_get_initiative_progress`, `mcp__orgx__orgx_get_next_actions` — agent state, initiative momentum, and queue pressure
 - `mcp__orgx__orgx_check_execution_readiness` — whether execution can start
