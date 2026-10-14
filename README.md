@@ -80,6 +80,23 @@ proof, recommendations, morning briefs, and skill improvement. Use local
 validator `--type` names inside each skill; use the MCP `artifact_type` values
 when saving the artifact to OrgX.
 
+## Idempotent Writes
+
+Every OrgX MCP write (`orgx_create_*`, `orgx_update_work`, the plan, lifecycle,
+dispatch, decision, artifact, and completion calls) requires `idempotency_key`;
+the server refuses a write without one with 400 `idempotency_key_required`.
+
+- Mint one key per intended change, e.g. `<skill>-<entity>-<purpose>-<uuid>`
+  (letters, digits, `.`, `_`, `:`, `/`, `-`; under 160 characters).
+- Reuse a key only to retry the identical input; changed input gets a new key.
+- On `outcome_unknown`, check `orgx_get_operation_status` and retry with the
+  SAME key. On `forbidden`, stop — never route around it through another tool.
+
+Agents may also see `approval_required`, `stale_version`, `stale_lease`,
+`budget_exhausted`, `rate_limited`, and `idempotency_key_conflict`. The full
+rule and what to do for each code live in
+[orgx-capability-mindset](./orgx-capability-mindset/SKILL.md#idempotent-writes).
+
 ## Quality Bar
 
 OrgX verifies every attached artifact with a four-lens system (judged,
@@ -98,6 +115,13 @@ python3 scripts/check_skill_tool_drift.py
 ```
 
 The check fails on deprecated OrgX tool names, unknown `mcp__orgx__*` references, and high-value workflow gaps such as spawning without `orgx_start_agent_task` or opening plan sessions without `orgx_start_plan`.
+
+It also fails any example call to a write tool (listed under `write_tools` in
+`scripts/orgx-v2-catalog.json`) that omits `idempotency_key`. A call is a tool
+reference followed by its arguments — `tool(...)` / `tool {...}` in a code
+block, prose `tool` (`arg`, ...), `tool` with `arg`, an inline
+`tool arg=... arg=...`, a tool-list entry `tool` — takes `arg`, or a JSON
+object naming the tool. Plain prose mentions of a tool name are not calls.
 
 ## Skill Format
 

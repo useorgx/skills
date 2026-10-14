@@ -32,7 +32,7 @@ Transform a goal into a structured OrgX initiative with milestones, workstreams,
 3. Validate the plan with `mcp__orgx__orgx_validate_initiative_plan`, then create the full hierarchy with `mcp__orgx__orgx_create_initiative_hierarchy` (`plan`, `idempotency_key`; put explicit workstreams in the `plan` to preserve the user's structure). Retry with the same `idempotency_key` if the outcome is unclear.
 4. If the user requests specific agent delegation:
    - call `mcp__orgx__orgx_estimate_agent_task` with the `task` first (v2 has no separate guard call; the estimate is the pre-dispatch check)
-   - then `mcp__orgx__orgx_start_agent_task` with the `task_id` of an existing task once the estimate is acceptable; omit `model_tier`/`provider`/`model` for normal work — OrgX auto-routes by task complexity and workspace policy
+   - then `mcp__orgx__orgx_start_agent_task` with the `task_id` of an existing task and a fresh `idempotency_key` once the estimate is acceptable; omit `model_tier`/`provider`/`model` for normal work — OrgX auto-routes by task complexity and workspace policy
    - report each start as started, not done; poll `mcp__orgx__orgx_get_operation_status` (honor `next_poll_after_ms`, read `waiting_on`) with the returned id before saying anything about the result
 5. Launch with `mcp__orgx__orgx_launch_initiative` when the initiative should go live immediately.
 6. Finish with `mcp__orgx__orgx_get_next_actions entity_type=initiative` so the user knows the first move after kickoff.

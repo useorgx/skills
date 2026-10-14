@@ -20,15 +20,15 @@ Apply [orgx-capability-mindset](../orgx-capability-mindset) before design work. 
 2. Confirm the artifact or decision type and the target audience. If the request is task-bound, hydrate it with `mcp__orgx__orgx_inspect` (`hydrate_context=true`); otherwise map neighboring work with `mcp__orgx__orgx_search`.
 3. Pull prior design precedent, standards, and decisions with `mcp__orgx__orgx_search`.
 4. Before creating or delegating workstreams, milestones, or tasks, inspect the active parent scope and reuse matching siblings. Treat `reused`, `duplicate_prevented`, or `_dedup` results as success and continue on the returned canonical entity ID.
-5. For interaction specs, breakpoint plans, or design-system migrations, use the planning loop: `mcp__orgx__orgx_start_plan` (`title`), resume with `mcp__orgx__orgx_read_plan`, refine with `mcp__orgx__orgx_save_plan` (`session_id`, `plan_content`, `expected_version`), capture revisions with `mcp__orgx__orgx_record_plan_edit`, then close with `mcp__orgx__orgx_complete_plan` (`attach_to`).
+5. For interaction specs, breakpoint plans, or design-system migrations, use the planning loop: `mcp__orgx__orgx_start_plan` (`title`, `idempotency_key`), resume with `mcp__orgx__orgx_read_plan`, refine with `mcp__orgx__orgx_save_plan` (`session_id`, `plan_content`, `expected_version`, `idempotency_key`), capture revisions with `mcp__orgx__orgx_record_plan_edit`, then close with `mcp__orgx__orgx_complete_plan` (`attach_to`, `idempotency_key`).
 6. Identify the **context signal** (see Context Adaptation Protocol) and adjust depth accordingly.
 7. Produce the artifact using the contract below and return:
    - A concise summary (3-6 bullets)
    - The artifact body (JSON or structured Markdown)
    - 3 actionable next steps with owners and effort estimates
 8. Run the precision loop before delivery. Every artifact ships validator-clean.
-9. Attach the result back to the active entity with `mcp__orgx__orgx_attach_artifact`, then record quality with `quality_score` and `verification` on `mcp__orgx__orgx_complete_work_with_proof` (or request an independent judgment with `mcp__orgx__orgx_request_independent_artifact_review`). When attaching, declare the `artifact_type` that matches the work (`design.audit`, `design.component_spec`, or `design.token_package`) and pass `agent_type`, `company_stage`, `business_outcome`, `owner`, `review_date`, and `verification` as arguments.
-10. Before delegating downstream design or implementation work, run `mcp__orgx__orgx_estimate_agent_task` (`task`) — v2 has no separate guard call, so the estimate is the pre-dispatch check — then dispatch an existing task with `mcp__orgx__orgx_start_agent_task` (`task_id`). A started run is not a finished one: poll `mcp__orgx__orgx_get_operation_status`.
+9. Attach the result back to the active entity with `mcp__orgx__orgx_attach_artifact`, then record quality with `quality_score`, `verification`, and an `idempotency_key` on `mcp__orgx__orgx_complete_work_with_proof` (or request an independent judgment with `mcp__orgx__orgx_request_independent_artifact_review`). When attaching, declare the `artifact_type` that matches the work (`design.audit`, `design.component_spec`, or `design.token_package`) and pass `agent_type`, `company_stage`, `business_outcome`, `owner`, `review_date`, and `verification` as arguments.
+10. Before delegating downstream design or implementation work, run `mcp__orgx__orgx_estimate_agent_task` (`task`) — v2 has no separate guard call, so the estimate is the pre-dispatch check — then dispatch an existing task with `mcp__orgx__orgx_start_agent_task` (`task_id`, `idempotency_key`). A started run is not a finished one: poll `mcp__orgx__orgx_get_operation_status`.
    - Omit `model_tier`, `provider`, and exact `model` for normal work so OrgX auto-routes by task complexity.
    - Use `model_tier=standard` and `budget_mode=cheapest_valid` only for controlled reliability validation runs, test initiatives, or explicit budget-constrained verification.
    - Design delegation must name the target surface, expected spec/audit/token artifact, and validation method before spawn.
@@ -148,12 +148,12 @@ python3 scripts/validate_design.py <artifact_file> --type <artifact_type>
 ```
 
 8. **Fix and re-validate**: Resolve every failed gate. Re-run validator until all gates pass.
-9. **Publish**: Save with `mcp__orgx__orgx_attach_artifact` and link related entities with `mcp__orgx__orgx_update_work` (`type`, `id`, `fields`).
+9. **Publish**: Save with `mcp__orgx__orgx_attach_artifact` and link related entities with `mcp__orgx__orgx_update_work` (`type`, `id`, `fields`, `idempotency_key`).
 10. **Attach proof**:
-    - `mcp__orgx__orgx_complete_plan` (`attach_to`) for planning sessions
-    - `mcp__orgx__orgx_attach_artifact` (with `artifact_type`, `description`, `verification`) for audits, token packages, and component docs
-    - `mcp__orgx__orgx_update_work` (`fields` carrying a note) for design review verdicts on other agents' work; settling a decision is the person's call, so hand them its `review_url` instead of approving or declining it
-11. **Record learnings and quality**: State learnings in the `note` and record quality with `quality_score` and `verification` on `mcp__orgx__orgx_complete_work_with_proof`. v2 has no separate learning-capture call; do not invent one.
+    - `mcp__orgx__orgx_complete_plan` (`attach_to`, `idempotency_key`) for planning sessions
+    - `mcp__orgx__orgx_attach_artifact` (with `artifact_type`, `description`, `verification`, `idempotency_key`) for audits, token packages, and component docs
+    - `mcp__orgx__orgx_update_work` (`fields` carrying a note, `idempotency_key`) for design review verdicts on other agents' work; settling a decision is the person's call, so hand them its `review_url` instead of approving or declining it
+11. **Record learnings and quality**: State learnings in the `note` and record quality with `quality_score`, `verification`, and an `idempotency_key` on `mcp__orgx__orgx_complete_work_with_proof`. v2 has no separate learning-capture call; do not invent one.
 12. **Handoff**: Before delegating downstream work, run `mcp__orgx__orgx_estimate_agent_task`, then start or hand off downstream agents (`mcp__orgx__orgx_start_agent_task` or `mcp__orgx__orgx_handoff_task`) per the Cross-Agent Handoff Contracts.
 
 ## 7. Artifact Contracts
@@ -797,10 +797,10 @@ Apply relevant prior learnings. Reference them explicitly (e.g., "Per learning L
 - `mcp__orgx__orgx_get_workspace_context` — read workspace scope (`workspace_id` optional; reads only)
 - `mcp__orgx__orgx_inspect` — hydrate task-bound context, attachments, and plan sessions (`type`, `id`, `hydrate_context=true`)
 - `mcp__orgx__orgx_search` — query existing design artifacts and prior decisions before drafting
-- `mcp__orgx__orgx_start_plan`, `mcp__orgx__orgx_read_plan`, `mcp__orgx__orgx_save_plan`, `mcp__orgx__orgx_record_plan_edit`, `mcp__orgx__orgx_complete_plan` — tracked design planning (`save_plan` takes `session_id`, `plan_content`, `expected_version`; `complete_plan` takes `attach_to`)
+- `mcp__orgx__orgx_start_plan`, `mcp__orgx__orgx_read_plan`, `mcp__orgx__orgx_save_plan`, `mcp__orgx__orgx_record_plan_edit`, `mcp__orgx__orgx_complete_plan` — tracked design planning (`save_plan` takes `session_id`, `plan_content`, `expected_version`; `complete_plan` takes `attach_to`; every write also takes `idempotency_key`)
 - `mcp__orgx__orgx_update_work` — update one entity or record a review note (`type`, `id`, `fields`); a retried write reuses its `idempotency_key`
-- `mcp__orgx__orgx_attach_artifact` — attach artifacts with `artifact_type`, `description`, `verification` metadata
-- `mcp__orgx__orgx_complete_work_with_proof` — complete work with `artifact`, `verification`, `quality_score`, `note`
+- `mcp__orgx__orgx_attach_artifact` — attach artifacts with `artifact_type`, `description`, `verification` metadata, plus `idempotency_key`
+- `mcp__orgx__orgx_complete_work_with_proof` — complete work with `artifact`, `verification`, `quality_score`, `note`, `idempotency_key`
 - `mcp__orgx__orgx_capture_decision`, `mcp__orgx__orgx_open_decision_review` — raise a decision; only a person settles it, so give them its `review_url`
 - `mcp__orgx__orgx_estimate_agent_task`, `mcp__orgx__orgx_start_agent_task`, `mcp__orgx__orgx_handoff_task` — estimate before dispatch, then start or hand off follow-on work
 - `mcp__orgx__orgx_get_operation_status` — real state of a started run (`kind`, `id`); recheck after `next_poll_after_ms`

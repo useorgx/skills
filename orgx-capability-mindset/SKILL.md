@@ -1,6 +1,6 @@
 ---
 name: orgx-capability-mindset
-version: "2.3.0"
+version: "2.4.0"
 description: |
   Shared Software 3.0 operating mindset for every OrgX agent. Use whenever an agent plans, implements, reviews, delegates, ships, or produces an artifact. Pushes capability by enforcing agent-native outputs, verifier-first execution, jagged-intelligence routing, adversarial review, durable progress artifacts, and human-governed decisions.
 ---
@@ -26,8 +26,8 @@ Always bind the mindset to the current OrgX MCP surface.
 - Start with `mcp__orgx__orgx_get_workspace_context`; use its returned workspace and policy context as the initial scope. It reads context; it does not select a workspace or create a session.
 - Use sensors before actuators: `mcp__orgx__orgx_search`, `mcp__orgx__orgx_inspect`, `mcp__orgx__orgx_get_next_actions`, and `mcp__orgx__orgx_read_plan` when the exact state or contract matters.
 - Use actuators deliberately: the typed create calls (`mcp__orgx__orgx_create_initiative`, `mcp__orgx__orgx_create_workstream`, `mcp__orgx__orgx_create_milestone`, `mcp__orgx__orgx_create_task`), `mcp__orgx__orgx_update_work`, the lifecycle calls (`mcp__orgx__orgx_launch_initiative`, `mcp__orgx__orgx_pause_work`, `mcp__orgx__orgx_resume_work`, `mcp__orgx__orgx_retry_work`, `mcp__orgx__orgx_cancel_work`), `mcp__orgx__orgx_attach_artifact`, and `mcp__orgx__orgx_capture_decision`. Progress is captured by the client's hooks; there is no call to emit activity.
-- Use verification receipts: `mcp__orgx__orgx_inspect` for completion evidence, and `mcp__orgx__orgx_complete_work_with_proof` (`quality_score`, `verification`, and a `note` carrying learnings) to record outcomes. v2 has no separate learning-capture call. For an independent quality judgment call `mcp__orgx__orgx_request_independent_artifact_review`; for a portable Agent Work Receipt use `mcp__orgx__orgx_submit_work_receipt`.
-- Before delegation, run `mcp__orgx__orgx_estimate_agent_task` (v2 has no separate guard call; the estimate is the pre-dispatch check); then dispatch with `mcp__orgx__orgx_start_agent_task` (an existing `task_id`) or `mcp__orgx__orgx_handoff_task` when allowed.
+- Use verification receipts: `mcp__orgx__orgx_inspect` for completion evidence, and `mcp__orgx__orgx_complete_work_with_proof` (`quality_score`, `verification`, `idempotency_key`, and a `note` carrying learnings) to record outcomes. v2 has no separate learning-capture call. For an independent quality judgment call `mcp__orgx__orgx_request_independent_artifact_review`; for a portable Agent Work Receipt use `mcp__orgx__orgx_submit_work_receipt`.
+- Before delegation, run `mcp__orgx__orgx_estimate_agent_task` (v2 has no separate guard call; the estimate is the pre-dispatch check); then dispatch with `mcp__orgx__orgx_start_agent_task` (an existing `task_id`, `idempotency_key`) or `mcp__orgx__orgx_handoff_task` when allowed.
 
 Log the sensor-to-actuator transition in the work record. This is where stale state and hidden assumptions compound.
 
@@ -37,7 +37,48 @@ Report the state OrgX actually holds, never the state you asked for.
 
 - **Only a person settles a decision.** Agents never approve or reject anything. `mcp__orgx__orgx_capture_decision` files the decision and returns where the person decides; `mcp__orgx__orgx_open_decision_review` returns the same place for an existing one — the Approve button in the decisions widget for ordinary decisions in hosts that render it, otherwise the decision page in OrgX (`review_url`). Give the person the `review_url` and say the decision is waiting on them. Never say a decision was approved or rejected unless OrgX shows it settled. `orgx_widget_decide` is widget-only, driven by a single-use token the model never sees; never call it.
 - **Started is not done.** Dispatching, delegating, launching, or raising a decision starts something. Report it as "started" or "waiting on <person>", keep the returned operation / run / decision ID, and check before you claim an outcome. Call `mcp__orgx__orgx_get_operation_status` with that `id` (and `kind` when known): `state` is `queued`, `held`, `running`, `succeeded`, `failed`, `cancelled`, or `not_found`; `waiting_on` says whether a `person` or an `agent` holds it; check again after `next_poll_after_ms`, and treat `null` as final. You can also read the entity with `mcp__orgx__orgx_inspect` or `mcp__orgx__orgx_get_agent_status`. Only `succeeded` plus proof counts as done.
-- **Retry writes with the same key.** OrgX stores the response for each `idempotency_key`: retrying the same write with the same key replays that response instead of duplicating work, so retry a write whose outcome you did not see rather than guessing or deduplicating by hand. Reusing a key with a different body is refused (422) — a different change needs a new key. A 409 means the first attempt is still in flight; wait, then retry with the same key.
+- **Retry writes with the same key.** Every write takes an `idempotency_key` (see Idempotent Writes below). OrgX stores the response for each key: retrying the same write with the same key replays that response instead of duplicating work, so retry a write whose outcome you did not see rather than guessing or deduplicating by hand. Reusing a key with a different body is refused (`idempotency_key_conflict`) — a different change needs a new key. A 409 means the first attempt is still in flight; wait, then retry with the same key.
+
+## Idempotent Writes
+
+Every OrgX write requires `idempotency_key`; a call without one is refused with
+400 `idempotency_key_required` and nothing is written. This covers
+`orgx_start_plan`, `orgx_save_plan`, `orgx_complete_plan`,
+`orgx_record_plan_edit`, `orgx_create_initiative_hierarchy`,
+`orgx_create_initiative`, `orgx_create_workstream`, `orgx_create_milestone`,
+`orgx_create_task`, `orgx_update_work`, `orgx_start_agent_task`,
+`orgx_handoff_task`, `orgx_launch_initiative`, `orgx_pause_work`,
+`orgx_resume_work`, `orgx_retry_work`, `orgx_cancel_work`,
+`orgx_capture_decision`, `orgx_attach_artifact`,
+`orgx_request_independent_artifact_review`, `orgx_complete_work_with_proof`,
+and `orgx_submit_work_receipt`.
+
+- **Mint one key per intended change**, before the first attempt:
+  `<skill>-<entity>-<purpose>-<uuid>`, for example
+  `task-protocol-task-complete-3f9c2a1e-6b7d-4c1a-9e2f-0a8b5c4d3e21`. Keep it to
+  letters, digits, `.`, `_`, `:`, `/`, and `-`, starting with a letter or digit,
+  and under 160 characters.
+- **Reuse a key only to retry the identical input** — after a timeout, a
+  dropped connection, `rate_limited`, or `outcome_unknown`. OrgX applies a keyed
+  write at most once and replays the original result.
+- **Changed input means a new key.** A corrected payload, a re-read
+  `expected_version`, or a second entity in a batch is a different change.
+  Never reuse a key from an example or from another call.
+
+Failures come back as a typed `error.code` with
+`details.suggested_next_calls`. Act on the code, not the message text:
+
+| Code | What it means | What to do |
+| --- | --- | --- |
+| `approval_required` | The write needs a recorded human approval first. | Do not approve it yourself. Surface the decision (`orgx_list_pending_decisions`, `orgx_open_decision_review`), give the person its `review_url`, and retry with the same key only after OrgX shows it approved. |
+| `stale_version` | The record changed since you read it; nothing was written. | Re-read (`orgx_read_plan` / `orgx_inspect`), reapply your change to the latest content, and retry with the returned `expected_version` and a new key. |
+| `stale_lease` | Your execution lease expired or another agent holds the work. | Inspect the work. Do not overwrite another agent's work — coordinate through a handoff. If your own lease lapsed, resume to reclaim it, then retry with a new key. |
+| `budget_exhausted` | The workspace or task budget does not cover the operation. | Do not retry until the budget resets or a person raises it; re-estimate a cheaper route with `orgx_estimate_agent_task` if the work allows. |
+| `rate_limited` | The request was not applied. | Wait `retry_after_seconds`, then retry the identical call with the same key. |
+| `outcome_unknown` | The write was sent but not confirmed; it may or may not have applied. | Check `orgx_get_operation_status` (or read the entity back), and if the change is absent retry the identical call with the SAME key. Never mint a new key here — that is how duplicates happen. |
+| `forbidden` | Your identity lacks the role or scope. | Stop. Report the missing permission to a person. Do not route around it through another tool. |
+| `idempotency_key_required` | The write had no key; nothing was written. | Mint a key for this change and resend. |
+| `idempotency_key_conflict` | The key was already used with different input. | Resend the original input if you meant to retry; otherwise use a new key. |
 
 ## Record Work as an Agent Work Receipt
 

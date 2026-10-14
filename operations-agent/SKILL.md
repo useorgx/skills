@@ -20,15 +20,15 @@ Apply [orgx-capability-mindset](../orgx-capability-mindset) before operations wo
 2. Confirm the artifact or decision type and the target audience. If the request is task-bound, hydrate it with `mcp__orgx__orgx_inspect`; otherwise map related work with `mcp__orgx__orgx_search`.
 3. Pull precedent with `mcp__orgx__orgx_search` (prior incidents, playbooks, and decisions).
 4. Before creating or delegating workstreams, milestones, or tasks, inspect the active parent scope and reuse matching siblings. Treat `reused`, `duplicate_prevented`, or `_dedup` results as success and continue on the returned canonical entity ID.
-5. For playbooks, migrations, or SLO programs, use the planning loop: `mcp__orgx__orgx_start_plan` (`title`), resume with `mcp__orgx__orgx_read_plan`, refine with `mcp__orgx__orgx_save_plan` (`session_id`, `plan_content`, `expected_version`), capture major revisions with `mcp__orgx__orgx_record_plan_edit`, then finalize with `mcp__orgx__orgx_complete_plan` and `attach_to`.
+5. For playbooks, migrations, or SLO programs, use the planning loop: `mcp__orgx__orgx_start_plan` (`title`, `idempotency_key`), resume with `mcp__orgx__orgx_read_plan`, refine with `mcp__orgx__orgx_save_plan` (`session_id`, `plan_content`, `expected_version`, `idempotency_key`), capture major revisions with `mcp__orgx__orgx_record_plan_edit`, then finalize with `mcp__orgx__orgx_complete_plan` and `attach_to`.
 6. Identify the operational maturity stage (see Context Adaptation Protocol) and calibrate depth.
 7. Produce the artifact using the contract below and return:
    - A concise summary (3-6 bullets)
    - The artifact body (JSON or structured Markdown)
    - 3 actionable next steps
 8. Run the Precision Loop before publishing.
-9. Attach the result back to the active task or initiative with `mcp__orgx__orgx_attach_artifact`, then record quality with `quality_score` and `verification` on `mcp__orgx__orgx_complete_work_with_proof` (or request an independent judgment with `mcp__orgx__orgx_request_independent_artifact_review`). When attaching, use the MCP artifact type that matches the work (`ops.operator_brief`, `ops.runbook`, `ops.budget_envelope`, or `ops.incident_status`) and pass `agent_type`, `company_stage`, `business_outcome`, `owner`, `review_date`, and `verification` as arguments.
-10. Before delegating operational follow-up work, run `mcp__orgx__orgx_estimate_agent_task` (`task`) — v2 has no separate guard call, so the estimate is the pre-dispatch check — then dispatch an existing task with `mcp__orgx__orgx_start_agent_task` (`task_id`) or `mcp__orgx__orgx_handoff_task` (`task_id`, `agent_type`). A started run is not a finished one: poll `mcp__orgx__orgx_get_operation_status`.
+9. Attach the result back to the active task or initiative with `mcp__orgx__orgx_attach_artifact`, then record quality with `quality_score`, `verification`, and an `idempotency_key` on `mcp__orgx__orgx_complete_work_with_proof` (or request an independent judgment with `mcp__orgx__orgx_request_independent_artifact_review`). When attaching, use the MCP artifact type that matches the work (`ops.operator_brief`, `ops.runbook`, `ops.budget_envelope`, or `ops.incident_status`) and pass `agent_type`, `company_stage`, `business_outcome`, `owner`, `review_date`, and `verification` as arguments.
+10. Before delegating operational follow-up work, run `mcp__orgx__orgx_estimate_agent_task` (`task`) — v2 has no separate guard call, so the estimate is the pre-dispatch check — then dispatch an existing task with `mcp__orgx__orgx_start_agent_task` (`task_id`, `idempotency_key`) or `mcp__orgx__orgx_handoff_task` (`task_id`, `agent_type`, `idempotency_key`). A started run is not a finished one: poll `mcp__orgx__orgx_get_operation_status`.
    - Omit `model_tier`, `provider`, and exact `model` for normal work so OrgX auto-routes by task complexity.
    - Use `model_tier=standard` and `budget_mode=cheapest_valid` only for controlled reliability validation runs, test initiatives, or explicit budget-constrained verification.
    - Operations delegation must name the reliability/cost outcome, expected report/runbook/fix, and verification evidence before dispatch.
@@ -214,12 +214,12 @@ python3 scripts/validate_ops.py <artifact_file> --type <artifact_type>
 
 11. Resolve all failed gates, then publish via `mcp__orgx__orgx_attach_artifact`.
 12. Attach proof or conclusions back to the active work:
-    - `mcp__orgx__orgx_complete_plan` (`attach_to`) for plan sessions
+    - `mcp__orgx__orgx_complete_plan` (`attach_to`, `idempotency_key`) for plan sessions
     - `mcp__orgx__orgx_attach_artifact` for incidents, SLOs, budgets, and playbooks
-    - `mcp__orgx__orgx_update_work` (`type`, `id`, `fields`) for escalation notes (content only; status changes go through `mcp__orgx__orgx_pause_work`, `mcp__orgx__orgx_resume_work`, `mcp__orgx__orgx_cancel_work`, or `mcp__orgx__orgx_complete_work_with_proof`); `mcp__orgx__orgx_capture_decision` when a risk needs a ruling (only a person settles it, from the decision's `review_url`)
+    - `mcp__orgx__orgx_update_work` (`type`, `id`, `fields`, `idempotency_key`) for escalation notes (content only; status changes go through `mcp__orgx__orgx_pause_work`, `mcp__orgx__orgx_resume_work`, `mcp__orgx__orgx_cancel_work`, or `mcp__orgx__orgx_complete_work_with_proof`); `mcp__orgx__orgx_capture_decision` when a risk needs a ruling (only a person settles it, from the decision's `review_url`)
 13. State learnings in the `note` of `mcp__orgx__orgx_complete_work_with_proof`. v2 has no separate learning-capture call; do not invent one.
 14. Record measurable outcomes with `mcp__orgx__orgx_complete_work_with_proof` when the artifact closes a reliability or cost event.
-15. Record artifact quality with `quality_score` and `verification` on `mcp__orgx__orgx_complete_work_with_proof` (a self-assessed score you can defend layer by layer, with at least one verifiable evidence URL). Portable Agent Work Receipts go through `mcp__orgx__orgx_submit_work_receipt`.
+15. Record artifact quality with `quality_score`, `verification`, and an `idempotency_key` on `mcp__orgx__orgx_complete_work_with_proof` (a self-assessed score you can defend layer by layer, with at least one verifiable evidence URL). Portable Agent Work Receipts go through `mcp__orgx__orgx_submit_work_receipt`.
 
 ---
 
@@ -603,10 +603,10 @@ Incorporate relevant prior learnings into the artifact. Reference them explicitl
 - `mcp__orgx__orgx_get_workspace_context` — read workspace scope (`workspace_id` optional; reads only)
 - `mcp__orgx__orgx_inspect` — hydrate context (`type`, `id`; `hydrate_context=true` for full context)
 - `mcp__orgx__orgx_search` — retrieve organizational context, prior decisions, and entity lists before drafting
-- `mcp__orgx__orgx_start_plan`, `mcp__orgx__orgx_read_plan`, `mcp__orgx__orgx_save_plan`, `mcp__orgx__orgx_record_plan_edit`, `mcp__orgx__orgx_complete_plan` — tracked planning sessions for playbooks, migrations, and SLO programs (`save_plan` takes `session_id`, `plan_content`, `expected_version`; `complete_plan` takes `attach_to`)
+- `mcp__orgx__orgx_start_plan`, `mcp__orgx__orgx_read_plan`, `mcp__orgx__orgx_save_plan`, `mcp__orgx__orgx_record_plan_edit`, `mcp__orgx__orgx_complete_plan` — tracked planning sessions for playbooks, migrations, and SLO programs (`save_plan` takes `session_id`, `plan_content`, `expected_version`; `complete_plan` takes `attach_to`; every write also takes `idempotency_key`)
 - `mcp__orgx__orgx_create_task`, `mcp__orgx__orgx_create_milestone`, `mcp__orgx__orgx_update_work` — create or update one operational entity; a retried write reuses its `idempotency_key`
-- `mcp__orgx__orgx_attach_artifact` — attach artifacts and evidence (`artifact_type`, `location`, `description`, `owner`, `verification`)
-- `mcp__orgx__orgx_complete_work_with_proof` — complete work with `artifact`, `verification`, `quality_score`, `note`
+- `mcp__orgx__orgx_attach_artifact` — attach artifacts and evidence (`artifact_type`, `location`, `description`, `owner`, `verification`, `idempotency_key`)
+- `mcp__orgx__orgx_complete_work_with_proof` — complete work with `artifact`, `verification`, `quality_score`, `note`, `idempotency_key`
 - `mcp__orgx__orgx_capture_decision`, `mcp__orgx__orgx_open_decision_review` — raise a decision; only a person settles it, from its `review_url`
 - `mcp__orgx__orgx_estimate_agent_task`, `mcp__orgx__orgx_start_agent_task`, `mcp__orgx__orgx_handoff_task` — delegate operational follow-up (estimate before dispatch)
 - `mcp__orgx__orgx_get_operation_status` — real state of a started run (`kind`, `id`); recheck after `next_poll_after_ms`

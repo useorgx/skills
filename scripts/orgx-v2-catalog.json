@@ -2,8 +2,9 @@
  "_comment": "Generated from the hosted OrgX MCP default v2 catalog (tools/list, profile v2). Regenerate when orgx-mcp changes its catalog.",
  "source": {
   "repo": "useorgx/orgx-mcp",
-  "commit": "e8a3ef9",
-  "profile": "v2"
+  "commit": "147b2af",
+  "profile": "v2",
+  "ref": "claude/agent-front-door-typed-remedies (useorgx/orgx-mcp#527)"
  },
  "widget_only": [
   "orgx_panel_snapshot",
@@ -13,6 +14,31 @@
   "orgx_widget_request_artifact_changes",
   "orgx_widget_select_workspace",
   "resume_agent_run"
+ ],
+ "_write_tools_comment": "Tools that require idempotency_key on every call (orgx-mcp#527). The drift check fails any example call to one of these that omits it.",
+ "write_tools": [
+  "orgx_start_plan",
+  "orgx_save_plan",
+  "orgx_complete_plan",
+  "orgx_create_initiative_hierarchy",
+  "orgx_create_initiative",
+  "orgx_create_workstream",
+  "orgx_create_milestone",
+  "orgx_create_task",
+  "orgx_update_work",
+  "orgx_start_agent_task",
+  "orgx_handoff_task",
+  "orgx_launch_initiative",
+  "orgx_pause_work",
+  "orgx_resume_work",
+  "orgx_retry_work",
+  "orgx_cancel_work",
+  "orgx_capture_decision",
+  "orgx_attach_artifact",
+  "orgx_request_independent_artifact_review",
+  "orgx_complete_work_with_proof",
+  "orgx_record_plan_edit",
+  "orgx_submit_work_receipt"
  ],
  "tools": [
   {
@@ -123,7 +149,8 @@
    "name": "orgx_start_plan",
    "read_only": false,
    "required": [
-    "title"
+    "title",
+    "idempotency_key"
    ],
    "properties": [
     "idempotency_key",
@@ -147,11 +174,13 @@
    "required": [
     "session_id",
     "plan_content",
-    "expected_version"
+    "expected_version",
+    "idempotency_key"
    ],
    "properties": [
     "edit_summary",
     "expected_version",
+    "idempotency_key",
     "plan_content",
     "session_id",
     "title",
@@ -164,11 +193,13 @@
    "required": [
     "session_id",
     "plan_content",
-    "expected_version"
+    "expected_version",
+    "idempotency_key"
    ],
    "properties": [
     "attach_to",
     "expected_version",
+    "idempotency_key",
     "plan_content",
     "session_id",
     "workspace_id"
@@ -205,7 +236,8 @@
    "name": "orgx_create_initiative",
    "read_only": false,
    "required": [
-    "title"
+    "title",
+    "idempotency_key"
    ],
    "properties": [
     "description",
@@ -224,7 +256,8 @@
    "read_only": false,
    "required": [
     "title",
-    "initiative_id"
+    "initiative_id",
+    "idempotency_key"
    ],
    "properties": [
     "description",
@@ -244,7 +277,8 @@
    "read_only": false,
    "required": [
     "title",
-    "workstream_id"
+    "workstream_id",
+    "idempotency_key"
    ],
    "properties": [
     "description",
@@ -266,7 +300,8 @@
    "read_only": false,
    "required": [
     "title",
-    "workstream_id"
+    "workstream_id",
+    "idempotency_key"
    ],
    "properties": [
     "description",
@@ -290,7 +325,8 @@
    "required": [
     "type",
     "id",
-    "fields"
+    "fields",
+    "idempotency_key"
    ],
    "properties": [
     "fields",
@@ -323,7 +359,8 @@
    "name": "orgx_start_agent_task",
    "read_only": false,
    "required": [
-    "task_id"
+    "task_id",
+    "idempotency_key"
    ],
    "properties": [
     "acceptance",
@@ -351,7 +388,8 @@
    "read_only": false,
    "required": [
     "task_id",
-    "agent_type"
+    "agent_type",
+    "idempotency_key"
    ],
    "properties": [
     "acceptance",
@@ -378,7 +416,8 @@
    "name": "orgx_launch_initiative",
    "read_only": false,
    "required": [
-    "initiative_id"
+    "initiative_id",
+    "idempotency_key"
    ],
    "properties": [
     "idempotency_key",
@@ -392,10 +431,12 @@
    "read_only": false,
    "required": [
     "level",
-    "id"
+    "id",
+    "idempotency_key"
    ],
    "properties": [
     "id",
+    "idempotency_key",
     "level"
    ]
   },
@@ -404,10 +445,12 @@
    "read_only": false,
    "required": [
     "level",
-    "id"
+    "id",
+    "idempotency_key"
    ],
    "properties": [
     "id",
+    "idempotency_key",
     "level"
    ]
   },
@@ -416,10 +459,12 @@
    "read_only": false,
    "required": [
     "level",
-    "id"
+    "id",
+    "idempotency_key"
    ],
    "properties": [
     "id",
+    "idempotency_key",
     "level"
    ]
   },
@@ -428,10 +473,12 @@
    "read_only": false,
    "required": [
     "level",
-    "id"
+    "id",
+    "idempotency_key"
    ],
    "properties": [
     "id",
+    "idempotency_key",
     "level"
    ]
   },
@@ -439,7 +486,8 @@
    "name": "orgx_capture_decision",
    "read_only": false,
    "required": [
-    "decision"
+    "decision",
+    "idempotency_key"
    ],
    "properties": [
     "context",
@@ -481,7 +529,8 @@
     "id",
     "name",
     "artifact_type",
-    "location"
+    "location",
+    "idempotency_key"
    ],
    "properties": [
     "agent_type",
@@ -515,10 +564,12 @@
    "name": "orgx_request_independent_artifact_review",
    "read_only": false,
    "required": [
-    "artifact_id"
+    "artifact_id",
+    "idempotency_key"
    ],
    "properties": [
-    "artifact_id"
+    "artifact_id",
+    "idempotency_key"
    ]
   },
   {
@@ -527,7 +578,8 @@
    "required": [
     "type",
     "id",
-    "artifact"
+    "artifact",
+    "idempotency_key"
    ],
    "properties": [
     "artifact",
@@ -546,7 +598,8 @@
    "read_only": false,
    "required": [
     "session_id",
-    "edit_summary"
+    "edit_summary",
+    "idempotency_key"
    ],
    "properties": [
     "edit_summary",
@@ -558,7 +611,8 @@
    "name": "orgx_submit_work_receipt",
    "read_only": false,
    "required": [
-    "receipt"
+    "receipt",
+    "idempotency_key"
    ],
    "properties": [
     "idempotency_key",
