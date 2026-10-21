@@ -333,7 +333,7 @@ Required fields:
 
 ### Handoff Quality Gate
 
-Every handoff document must include:
+For substantial handoffs, include the applicable details below:
 
 1. **Objective** — one sentence describing what the receiving agent should produce
 2. **Context** — relevant background the receiving agent needs (link to artifacts, not inline duplication)
@@ -341,7 +341,7 @@ Every handoff document must include:
 4. **Deadline** — when the output is needed
 5. **Evidence Bundle** — links to supporting research, data, or prior artifacts
 
-A handoff without all five elements is incomplete. The agent must flag missing elements and request them before proceeding.
+Infer routine details from the request and available evidence. Continue independent work with stated assumptions; ask only when a missing detail materially blocks correctness or authority.
 
 ---
 
@@ -412,7 +412,11 @@ python3 scripts/validate_artifact.py <artifact_file> --type <type>
 
 ## Quality Bar (Four-Lens Verification)
 
-Every artifact you attach is verified four-lens — judged (layered LLM scoring), measured (deterministic checks), observed (flagged issues), and outcome (reality events) — and gated at AQ 0.85; below-gate work parks in `changes_requested` and comes back as rework. See the `orgx-quality-bar` skill for the full system.
+For artifacts tracked in OrgX, use the four verification lenses described in
+`orgx-quality-bar` and read the actual receipt and configured threshold before
+claiming a pass. AQ 0.85 is a suggested target, not a prerequisite for routine
+repository work or merges. Do not invent a review or rework requirement when
+no applicable runtime policy or acceptance criterion requires it.
 
 Product artifacts are judged on this layer stack (layers are scored separately and never averaged — a weak layer stays visible):
 
@@ -473,7 +477,7 @@ One honesty caution: no self-describing quality preambles ("This well-researched
 | Failure Mode | Detection | Response |
 |-------------|-----------|----------|
 | Missing user evidence | No research, no support data, no usage analytics | Include explicit research gap in artifact header. Downgrade confidence to "low." Attach a research brief as immediate next step. |
-| Missing metric baselines | Success metrics proposed without current values | Block artifact completion. Generate a measurement plan as an addendum. Mark metrics as "pending baseline" with a 2-week deadline. |
+| Missing metric baselines | Success metrics proposed without current values | Mark metrics as "pending baseline" and include a measurement plan and owner when relevant. A missing baseline does not block a planning deliverable; block only a claim or action that actually depends on the missing measurement. |
 | Validator errors | `validate_artifact.py` returns non-zero | Do not publish. Fix all errors. Re-run validator. Never override the validator. |
 | Conflicting stakeholder input | Two stakeholders want contradictory features | Document both positions. Apply RICE or ICE scoring to each. Present the scoring to both stakeholders. Escalate if unresolved. |
 | Scope creep during drafting | Artifact grows beyond original request | Pause. Restate the original scope. Move excess content to a "Future Considerations" section. Never silently expand scope. |

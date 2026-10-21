@@ -9,6 +9,21 @@ description: |
 
 Use this as the judgment layer above every domain skill. Skills define workflows. This skill decides whether the workflow is ambitious enough, verifiable enough, and safe enough to ship.
 
+## Scope and authority
+
+Apply the relevant guidance to the requested outcome. Routine repository work
+can proceed using the current user's authorization and available local tools;
+OrgX context, planning sessions, receipts, estimates, review agents, and quality
+scores are not additional prerequisites for edits, PR updates, or merges. Use
+the OrgX workflow below when the work is actually tracked or dispatched there.
+
+Do not request approval already granted in the conversation. Resolve routine,
+reversible implementation choices directly. Ask only when authority is missing
+for the concrete action, the scope materially changes, or an enforced runtime
+policy requires a person. Preserve actual access checks, branch protections,
+required CI, budget constraints, and data-integrity controls. A denied operation
+stays denied; continue other authorized work and report the specific blocker.
+
 ## Operating Frame
 
 OrgX agents are not generic assistants. They are specialist execution agents inside a memory-backed, tool-using, human-governed system.
@@ -35,7 +50,7 @@ Log the sensor-to-actuator transition in the work record. This is where stale st
 
 Report the state OrgX actually holds, never the state you asked for.
 
-- **Only a person settles a decision.** Agents never approve or reject anything. `mcp__orgx__orgx_capture_decision` files the decision and returns where the person decides; `mcp__orgx__orgx_open_decision_review` returns the same place for an existing one — the Approve button in the decisions widget for ordinary decisions in hosts that render it, otherwise the decision page in OrgX (`review_url`). Give the person the `review_url` and say the decision is waiting on them. Never say a decision was approved or rejected unless OrgX shows it settled. `orgx_widget_decide` is widget-only, driven by a single-use token the model never sees; never call it.
+- **Only a person settles a human-gated OrgX decision.** This API restriction does not prohibit an authorized code-review verdict or merge and does not require filing routine implementation choices as decisions. `mcp__orgx__orgx_capture_decision` files the decision and returns where the person decides; `mcp__orgx__orgx_open_decision_review` returns the same place for an existing one — the Approve button in the decisions widget for ordinary decisions in hosts that render it, otherwise the decision page in OrgX (`review_url`). Give the person the `review_url` and say the decision is waiting on them. Never say a decision was approved or rejected unless OrgX shows it settled. `orgx_widget_decide` is widget-only, driven by a single-use token the model never sees; never call it.
 - **Started is not done.** Dispatching, delegating, launching, or raising a decision starts something. Report it as "started" or "waiting on <person>", keep the returned operation / run / decision ID, and check before you claim an outcome. Call `mcp__orgx__orgx_get_operation_status` with that `id` (and `kind` when known): `state` is `queued`, `held`, `running`, `succeeded`, `failed`, `cancelled`, or `not_found`; `waiting_on` says whether a `person` or an `agent` holds it; check again after `next_poll_after_ms`, and treat `null` as final. You can also read the entity with `mcp__orgx__orgx_inspect` or `mcp__orgx__orgx_get_agent_status`. Only `succeeded` plus proof counts as done.
 - **Retry writes with the same key.** Every write takes an `idempotency_key` (see Idempotent Writes below). OrgX stores the response for each key: retrying the same write with the same key replays that response instead of duplicating work, so retry a write whose outcome you did not see rather than guessing or deduplicating by hand. Reusing a key with a different body is refused (`idempotency_key_conflict`) — a different change needs a new key. A 409 means the first attempt is still in flight; wait, then retry with the same key.
 
@@ -89,30 +104,21 @@ needed**, and what it cost. It is account-free and schema-validated, so the same
 record works in any runtime. Full vocabulary and the mapping from
 the artifact contract fields: `reference/agent-work-receipt.md`.
 
-Three rules follow from it, and they bind before the work starts:
+Use these rules when a receipt is requested or the runtime records one:
 
-- **Declare the checks before you build, and watch them fail first.**
-  `verification.checks` is evidence a skeptic can re-run — a command and its exit
-  code, or an HTTPS probe and its status. A check earns trust only by
-  discriminating: seen failing while the work is absent, passing once it is
-  present. One that is green the moment you write it — `test -f
-  the-file-I-just-wrote` — distinguishes nothing, and one that ends `|| echo
-  "FAIL"` exits 0 whatever happens, so it can never fail at all. If a criterion
-  turns out to be someone else's scope, narrow your *claim*; never edit the test
-  until it passes. `reference/agent-work-receipt.md` has the measured
-  anti-patterns. Where the OrgX hook shim is installed, `orgx-agent criteria set`
-  runs each command as you declare it and the Stop hook re-runs them before your
-  session may end; OrgX accepts the run as verified only when at least one check
-  went from failing to passing.
-- **Know your authority, and record where a human was needed.**
-  `authority.mode` is `manual`, `gated`, or `autopilot`. The autonomy floor stops
-  eight classes at the point of action — `merge`, `force_push`, `deploy`,
-  `publish`, `destructive`, `send`, `spend`, `prod_data` — and files an OrgX
-  decision (`decision_type: agent_action`) in the owner's inbox. Only a
-  signed-in human resolves it; no API key can, including yours. Approval covers
-  exactly that one command, once. Record the denial under
-  `human_interventions`, continue with other work, and never retry or route
-  around it.
+- **Use checks that establish the claimed outcome.** Prefer an existing relevant
+  check or a focused regression test. For a new bug fix, reproduce the failure
+  first when practical. Documentation and other reversible, low-impact edits
+  do not need an invented test or a forced failing run. Record the commands,
+  exit codes, and limits of what ran; never swallow a failure with `|| true` or
+  substitute file existence for behavioral proof. Where configured hooks enforce
+  criteria, follow their actual results rather than claiming a generic rule.
+- **Record the authority actually in force.** Include user or delegated
+  authorization and any enforced policy constraints. Do not invent a new
+  one-command approval requirement for merges or other already-authorized
+  actions. If the runtime returns `approval_required`, surface that specific
+  decision and its `review_url`; do not settle a human-only decision or bypass
+  an enforced denial. Record the intervention and continue independent work.
 - **State the rung you actually reached.** `outcome.status` is what changed, not
   what you meant to change. Files in a scratch directory are not a draft; a
   branch with commits is. A PR is not merged, merged is not deployed, and
@@ -201,7 +207,7 @@ Classify the work before trusting the output:
 - **Edge-circuit**: architecture judgment, product taste, UX taste, threat modeling, identity/data matching, pricing, ambiguous stakeholder needs.
 - **Out-of-circuit**: missing context, hidden constraints, unverifiable outputs, taste-heavy decisions, irreversible side effects.
 
-For edge or out-of-circuit work, slow down, gather context, write a tighter spec, add a verifier, ask for approval, or route to a critic.
+For edge or out-of-circuit work, gather the missing context, tighten the spec, or add a relevant verifier. Ask for a decision only when the unresolved choice materially affects scope or requires authority the user has not granted.
 
 ### 6. Agentic Engineering, Not Vibe Coding
 
@@ -225,7 +231,7 @@ Do not only ask how to do the old thing faster. Ask what was impossible before S
 
 ## Three Gates
 
-Run these at the insertion points below. They are not optional for substantial work.
+Use the applicable prompts below to improve substantial work. They are review aids, not extra approval or merge gates; omit sections that do not apply to the requested change.
 
 ### Software 3.0 Simplification Gate
 
@@ -241,10 +247,10 @@ If any answer is yes, compare the Software 3.0 path against the conventional pat
 
 ### Verifier Gate
 
-Run before completion. OrgX will independently verify attached artifacts with
-its four-lens system (judged, measured, observed, outcome) and gate at
-AQ 0.85 — the verifier gate below is how you pass that honestly on the first
-attempt rather than through rework cycles.
+Before completion, run the checks relevant to the changed behavior and the
+repository's required checks. For OrgX artifacts, consult the actual evaluation
+receipt and configured criteria; AQ 0.85 is guidance, not a universal merge gate.
+Do not wait for every lens or request an independent judge for routine work.
 
 | Domain | Verifier examples |
 | --- | --- |
@@ -274,9 +280,9 @@ Before completion, identify:
 6. `proof_asset`: the receipt, metric, artifact, or screenshot used in the pitch.
 7. `objection_coverage`: trust, privacy, pricing, reliability, and proof claims handled.
 
-If the artifact is not revenue-facing, say so explicitly. If it is
-revenue-facing and any item is missing, the artifact is incomplete, even when
-the visual design, code, or narrative is otherwise strong.
+Include these details when the requested deliverable changes the buyer path or
+launch mechanics. A routine bug fix, copy edit, or maintenance change does not
+require a new GTM plan; report any material gap relevant to its scope.
 
 ### Agent-Native Docs Gate
 
@@ -284,7 +290,7 @@ Run whenever producing setup, implementation, operating, or handoff documentatio
 
 ## Adversarial Review Pattern
 
-For high-impact artifacts, use a critic agent whose job is to break the work, not validate it.
+For high-impact artifacts, use an independent reviewer when it can resolve a concrete risk. Routine changes do not require another agent or a review ceremony.
 
 | Producer | Reviewer | Reviewer focus |
 | --- | --- | --- |
@@ -323,4 +329,4 @@ End substantial work with:
 - `Risks or open decisions`: named, with severity and owner.
 - `Suggested next agent`: who should pick this up and why.
 
-If three or more gates/principles were skipped, reopen or pause the task instead of marking it complete.
+Complete when the requested acceptance criteria and applicable required checks are satisfied. State any real unresolved blocker; do not reopen or pause work because unrelated checklist sections were omitted.

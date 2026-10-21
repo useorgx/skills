@@ -450,7 +450,7 @@ The orchestrator is the coordination hub. It sends to and receives from every do
 
 ### Delegation Quality Standard
 
-Every delegation the orchestrator sends MUST include these 7 elements. A delegation missing any element is incomplete and must not be sent. See `reference/delegation-template.md` for the template with quality checklist.
+Use these elements when they help the receiving agent execute substantial work. Infer routine details and omit irrelevant fields; a missing deadline or escalation template does not block delegation. Ask only about gaps that materially affect correctness, scope, or authority. See `reference/delegation-template.md` for a fuller template.
 
 1. **Context**: Why this work matters, linked to initiative success metrics and the broader strategic objective. The receiving agent should understand not just what to do but why it matters.
 2. **Objective**: What "done" looks like, stated in measurable terms. Not "build the feature" but "deliver an RFC with effort estimate and migration plan by March 25."
@@ -484,7 +484,7 @@ The orchestrator's effectiveness compounds over time through systematic learning
 
 ## Precision Loop (Run Every Time)
 
-Five passes, every artifact, no exceptions.
+Use the passes relevant to this artifact and its risk; a routine repo change does not require a separate document or five-pass ceremony.
 
 ### Pass 1: Dependency
 
@@ -519,7 +519,11 @@ If the initiative is not revenue-facing, document that non-applicability in the 
 
 ## Quality Bar (Four-Lens Verification)
 
-Every artifact this agent attaches is verified by a four-lens system — judged (layered LLM comparison against pinned references), measured (deterministic checks), observed (flagged issues that cap confidence), and outcome (reality events, scored separately) — and gated at AQ 0.85. Below-gate work parks in `changes_requested` and comes back as rework; see the `orgx-quality-bar` skill for the full system.
+For artifacts tracked in OrgX, use the four verification lenses described in
+`orgx-quality-bar` and read the actual receipt and configured threshold before
+claiming a pass. AQ 0.85 is a suggested target, not a prerequisite for routine
+repository work or merges. Do not invent a review or rework requirement when
+no applicable runtime policy or acceptance criterion requires it.
 
 Orchestration artifacts are judged on this stack (layers scored separately, never averaged):
 

@@ -20,6 +20,15 @@ the defect and supporting artifact span or observation. A holistic score without
 per-layer findings must not be reported as proof that every layer passed. Every
 claim of done carries its receipt.
 
+## Applicability
+
+Use this rubric for requested artifact review and for work actually evaluated
+in OrgX. It does not require a judge, a quality score, a receipt, or a new human
+approval before routine edits, PR updates, or an authorized merge. Respect
+repository checks and any actual enforced runtime requirement; report its exact
+failure and continue unrelated authorized work. Never claim a lens ran without
+its evaluation evidence.
+
 ## Client work
 
 For client strategy, research, design exports, and review delivery, apply
@@ -133,7 +142,7 @@ When an operator requests changes, your draft parks in `changes_requested`
 2. Change what the feedback names. Below-bar feedback is specific — layer,
    quoted evidence, reference comparison. Resubmitting near-identical work
    fails the same layers again.
-3. Produce a fresh artifact version; it supersedes on pass (≥ 0.85). Version
+3. Produce a fresh artifact version; use the actual configured acceptance criterion rather than assuming a fixed score. Version
    lineage records the chain (v1 → changes_requested → v2 → approved), so
    the iteration history is visible — make each version a real response.
 

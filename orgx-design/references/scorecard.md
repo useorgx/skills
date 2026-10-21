@@ -1,10 +1,10 @@
 # OrgX Design Scorecard & Critique Protocol
 
-Read this before shipping any OrgX surface. This is the quality gate.
+Use this rubric for new surfaces, substantial redesigns, or requested critiques. Focused maintenance can use only the relevant dimensions; no self-assessed score adds a merge gate.
 
 ## Weighted Scorecard (100 points)
 
-Score every surface against this rubric. **Under 85 = do not ship. Revise.**
+For a full design review, use 85 as a suggested overall target and identify the concrete defects behind lower scores. Apply actual repository acceptance criteria rather than holding routine work for a number.
 
 | Dimension | Weight | What it measures |
 |-----------|--------|-----------------|

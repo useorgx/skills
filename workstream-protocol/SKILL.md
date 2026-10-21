@@ -31,12 +31,12 @@ description: |
 
 ### 3. Handle Blockers
 
-- Pause with `mcp__orgx__orgx_pause_work level=workstream id=<stream_id> idempotency_key=<key>`, and state the blocking dependency on the stream with `mcp__orgx__orgx_update_work`.
+- Pause only the affected work when no independent work can proceed, using `mcp__orgx__orgx_pause_work level=workstream id=<stream_id> idempotency_key=<key>`, and state the blocking dependency on the stream with `mcp__orgx__orgx_update_work`.
 - Attach a `*.structured_blocker` artifact for detailed blocker context — repo, branch, command, exact error. Blockers are judged on the ops stack: they must be actionable at 3am.
 - Before delegating new work, call `mcp__orgx__orgx_estimate_agent_task` (v2 has no separate guard call; the estimate is the pre-dispatch check).
 - Dispatch with `mcp__orgx__orgx_start_agent_task` (an existing `task_id`, `idempotency_key`) or `mcp__orgx__orgx_handoff_task` (`task_id`, `agent_type`, `idempotency_key`) only after the estimate is acceptable.
 - A dispatched run is started, not done: report it as started and poll `mcp__orgx__orgx_get_operation_status` (honor `next_poll_after_ms`, read `waiting_on`) or `mcp__orgx__orgx_get_agent_status` before treating its output as landed.
-- A blocker that needs a decision is filed with `mcp__orgx__orgx_capture_decision` (reuse its `idempotency_key` on retry) and waits on a person: give them the decision's `review_url` and keep the stream blocked until OrgX shows the decision settled. Never approve or reject it yourself.
+- A blocker that needs a decision is filed with `mcp__orgx__orgx_capture_decision` (reuse its `idempotency_key` on retry) and waits on a person: give them the decision's `review_url` and hold only the work that depends on it until OrgX shows the decision settled. Continue independent work; routine choices within existing authorization do not need a decision. Never approve or reject it yourself.
 
 ### 4. Complete
 

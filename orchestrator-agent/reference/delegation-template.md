@@ -1,6 +1,6 @@
 # Delegation Template
 
-Use this template for every delegation the orchestrator sends to a domain agent. All 7 sections are required. A delegation missing any section is incomplete and must not be sent.
+Use the applicable sections for substantial delegations. Include enough context, scope, and acceptance criteria for the receiving agent to work independently; omit irrelevant fields and state reasonable assumptions. Missing template sections alone do not block delegation.
 
 ---
 
