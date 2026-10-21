@@ -24,7 +24,7 @@ npx add-skill useorgx/skills --list
 | [bulk-create](./bulk-create)               | Create multiple tasks from markdown checklists                              |
 | [nightly-recap](./nightly-recap)           | End-of-day activity summary                                                 |
 | [orgx-capability-mindset](./orgx-capability-mindset) | Shared Software 3.0 judgment layer: verifier gates, agent-native outputs, jagged-risk routing, adversarial review, and MCP progress ledger |
-| [orgx-quality-bar](./orgx-quality-bar)     | How OrgX judges artifacts: four-lens verification, domain layer stacks, the AQ 0.85 gate, artifact type codes and the mistype guard, GTM sendability checks, and the rework loop |
+| [orgx-quality-bar](./orgx-quality-bar)     | How OrgX reviews artifacts: four-lens verification, domain layer stacks, configured acceptance criteria, artifact types, GTM sendability checks, and the rework loop |
 | [orgx-design](./orgx-design)               | Canonical OrgX product design system: full-surface audits, app and widget patterns, responsive/accessibility verification, cut protocol, and cross-tool drift control |
 | [product-agent](./product-agent)           | 100x product domain expert: PRDs, initiatives, canvases, research briefs, competitive analyses, prioritization matrices, pivot evaluations, dashboard specs, launch readiness |
 | [engineering-agent](./engineering-agent)   | 100x engineering domain expert: RFCs, ADRs, code reviews, postmortems, tech debt inventories, capacity plans, runbooks, migration playbooks, dependency audits, perf budgets |
@@ -40,7 +40,11 @@ npx add-skill useorgx/skills --list
 
 ## Requirements
 
-These skills require the [OrgX MCP server](https://mcp.useorgx.com) to be configured:
+OrgX entity, dispatch, and reporting workflows require the
+[OrgX MCP server](https://mcp.useorgx.com) to be configured. Routine repository
+edits, PR updates, and authorized merges can proceed with local tools and the
+repository's applicable checks; optional tracking is not a prerequisite.
+Existing user authorization carries forward without repeated approval prompts.
 
 ```json
 {
@@ -99,10 +103,12 @@ rule and what to do for each code live in
 
 ## Quality Bar
 
-OrgX verifies every attached artifact with a four-lens system (judged,
-measured, observed, outcome) and gates shipping at AQ 0.85. The
-`artifact_type` you declare selects which domain layer stack judges the work,
-and below-gate artifacts come back as rework with layer-specific feedback.
+OrgX supports four verification lenses (judged, measured, observed, outcome).
+Use the actual evaluation receipt and configured acceptance criteria; AQ 0.85
+is a suggested target, not a universal shipping or merge requirement. The
+`artifact_type` selects the domain layer stack, and an evaluation can return
+layer-specific rework. Do not claim a lens ran without its evidence or require
+an artifact evaluation for unrelated repository work.
 [orgx-quality-bar](./orgx-quality-bar) documents the full system — every
 domain agent's Quality Bar section is derived from it.
 

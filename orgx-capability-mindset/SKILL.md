@@ -168,7 +168,7 @@ recommendations, proof cards, and morning briefs can reason across domains.
 The `artifact_type` also selects the layer stack OrgX's four-lens verification
 judges the artifact on — a mistyped artifact is judged on the wrong bar and
 may be flagged provisional by the mistype guard. See the `orgx-quality-bar`
-skill for the four lenses, domain layer stacks, the AQ 0.85 gate, GTM
+skill for the four lenses, domain layer stacks, configured acceptance criteria, GTM
 sendability checks, and the rework loop.
 Cost controls are execution constraints, not an agent mindset: use
 `model_tier=standard` plus `budget_mode=cheapest_valid` only for controlled
