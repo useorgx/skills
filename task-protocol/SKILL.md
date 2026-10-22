@@ -10,6 +10,12 @@ description: |
 
 # Task Execution Protocol
 
+Apply this lifecycle to an existing or explicitly requested OrgX task. It does
+not require creating a task, planning session, or receipt before ordinary repo
+work. Use the current user's authority; only an actual missing permission or
+enforced policy needs a new decision. Pause only the affected work and continue
+independent actions.
+
 ## Starting a Task
 
 - Read workspace context with `mcp__orgx__orgx_get_workspace_context`; pass `workspace_id` if the target workspace differs from the auto-resolved one. It reads context; it does not select a workspace or create a session.
@@ -32,7 +38,7 @@ description: |
 
 ## Handling Blockers
 
-- Pause with `mcp__orgx__orgx_pause_work level=task id=<task_id> idempotency_key=<key>` and state the blocker on the task with `mcp__orgx__orgx_update_work`.
+- If no useful work on this task can continue, pause with `mcp__orgx__orgx_pause_work level=task id=<task_id> idempotency_key=<key>` and state the blocker on the task with `mcp__orgx__orgx_update_work`.
 - When the blocker needs an explicit approval, tradeoff, or de-stall decision,
   create it with `mcp__orgx__orgx_capture_decision` (`decision`, `context`, `idempotency_key`) and
   an idempotency key tied to the task/run. Only a person settles
@@ -51,9 +57,10 @@ description: |
 
 ## Completing
 
-- Validate output against acceptance criteria and the domain's layer stack
-  (`orgx-quality-bar`): OrgX verifies artifacts four-lens and gates at AQ 0.85.
-- Run domain-specific quality gates.
+- Validate output against the task's acceptance criteria and the applicable
+  checks. Use `orgx-quality-bar` as guidance; consult actual runtime criteria
+  for evaluated artifacts instead of assuming a universal AQ 0.85 gate.
+- Run relevant domain checks; omit unrelated ceremony.
 - Attach final proof if anything is still only in the transcript — complete with
   `mcp__orgx__orgx_complete_work_with_proof type=task id=<task_id> artifact=... verification=... quality_score=... note=... idempotency_key=<key>`
   so completion and evidence land together.

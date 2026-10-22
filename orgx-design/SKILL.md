@@ -14,9 +14,19 @@ The product promise is not more management UI. It is a visible
 **goal → plan → work → decision → artifact → proof → next action** loop.
 Every surface must shorten that loop or get out of its way.
 
+## Scope and proportionality
+
+For a focused bug fix, copy change, token adjustment, or maintenance task, read
+the relevant references and inspect the changed states. Do not require a full
+surface audit, multiple layout alternatives, a scorecard, a registry update, or
+an OrgX artifact evaluation before completing routine work. Use the full
+workflow for new surfaces, substantial redesigns, or an explicitly requested
+audit. Preserve accessibility and interaction correctness, run the applicable
+repository checks, and state any visual verification that could not be done.
+
 ## Required Reading
 
-Read each selected file completely before acting.
+Read the sections relevant to the current change before acting. Use the full reference set for substantial design work.
 
 | File                                                                    | Required when                                                                                             |
 | ----------------------------------------------------------------------- | --------------------------------------------------------------------------------------------------------- |
@@ -33,10 +43,10 @@ Read each selected file completely before acting.
 | [widget-sdk.md](references/widget-sdk.md)                               | MCP widgets, embedded HTML, protocol actions, or widget navigation.                                       |
 | [distribution.md](references/distribution.md)                           | Editing or syncing this skill across tools.                                                               |
 
-## Non-Negotiable Workflow
+## Workflow for New Surfaces and Substantial Redesigns
 
-Do not jump from request to JSX. Record this compact design brief in working
-notes, an audit artifact, or the implementation plan.
+For substantial design work, record a compact design brief in working notes,
+an audit artifact, or the implementation plan. Scale it to the change.
 
 ### 1. Establish truth
 
@@ -126,12 +136,11 @@ defect until a scrolled viewport capture confirms it.
 
 ### 7. Judge and cut
 
-Run both gates:
-
-1. The design scorecard: at least **85/100**, hierarchy at least 90%, and
-   distinctiveness at least 80%.
-2. OrgX artifact quality: the four lenses (judged, measured, observed,
-   outcome) with **AQ ≥ 0.85** when the work is attached as an artifact.
+Use the design scorecard to find concrete defects in substantial visual work.
+Its suggested targets are **85/100**, hierarchy 90%, and distinctiveness 80%;
+a self-assessed number does not add a merge gate. For evaluated OrgX artifacts,
+consult the actual receipt and configured criterion rather than assuming all
+four lenses ran or a fixed **AQ ≥ 0.85** threshold applies.
 
 Then remove anything that:
 
@@ -266,5 +275,5 @@ Before shipping, answer:
 6. Does every visible element earn its space?
 7. What makes this unmistakably OrgX rather than generic SaaS?
 8. Did rendered desktop, tablet, phone, keyboard, and state evidence pass?
-9. Is the design score at least 85/100 with the sub-gates met?
+9. Were concrete design defects found and addressed using the applicable rubric?
 10. Are merged, deployed, and observed outcomes reported separately?

@@ -439,7 +439,7 @@ Required fields:
 
 ### Handoff Quality Gate
 
-Every handoff, whether incoming or outgoing, must include:
+For substantial handoffs, include the applicable context below:
 
 - **Objective**: What the receiving agent should produce
 - **Context**: Background sufficient for the receiving agent to work independently
@@ -447,7 +447,7 @@ Every handoff, whether incoming or outgoing, must include:
 - **Deadline**: When the receiving agent's output is needed
 - **Evidence bundle**: Links to artifacts, data, and prior decisions that inform the work
 
-If any of these five elements is missing from an incoming handoff, request clarification before beginning work. If you cannot include all five in an outgoing handoff, document what is missing and why.
+Infer routine details from the request and available evidence. State useful assumptions and continue work; ask only when a missing detail blocks correctness or authority. A missing deadline or template field alone does not block work.
 
 ## Flywheel Learning Integration
 
@@ -464,11 +464,11 @@ If any of these five elements is missing from an incoming handoff, request clari
 
 ## Precision Loop (Run Every Time)
 
-Five passes, every artifact, no exceptions.
+Use the passes relevant to this artifact and its risk; a routine repo change does not require a separate document or five-pass ceremony.
 
 ### Pass 1: Structural
 
-Verify all contract-required fields are present and well-typed. Check minimum character lengths. Verify enum values are from the allowed set. Confirm arrays meet minimum count requirements. This pass is mechanical and must have zero failures before proceeding.
+Verify all contract-required fields are present and well-typed. Check minimum character lengths. Verify enum values are from the allowed set. Confirm arrays meet minimum count requirements. For a structured payload, satisfy its actual API schema. For prose, keep the useful content instead of padding to a template minimum.
 
 ### Pass 2: Evidence
 
@@ -488,7 +488,11 @@ Run the validator script and confirm zero errors. Verify that recommendation lan
 
 ## Quality Bar (Four-Lens Verification)
 
-Every artifact you attach is verified four-lens — judged (layered LLM comparison against references), measured (deterministic checks), observed (flagged issues that cap confidence), and outcome (reality events like merged or shipped) — and gated at AQ ≥ 0.85. Below-gate work parks in `changes_requested` and comes back to you as rework; see the `orgx-quality-bar` skill for the full system.
+For artifacts tracked in OrgX, use the four verification lenses described in
+`orgx-quality-bar` and read the actual receipt and configured threshold before
+claiming a pass. AQ 0.85 is a suggested target, not a prerequisite for routine
+repository work or merges. Do not invent a review or rework requirement when
+no applicable runtime policy or acceptance criterion requires it.
 
 Engineering artifacts are judged on this layer stack. Layers are scored separately and never averaged — a weak layer stays visible:
 
@@ -546,7 +550,7 @@ Optional (if configured):
 - **Missing capacity data**: For capacity plans, use industry benchmarks (70-80% sustainable utilization) and flag that actual velocity data would improve accuracy. Do not fabricate velocity numbers.
 - **Missing dependency data**: For dependency audits, note which dependencies could not be analyzed (e.g., private registries, vendored code) and recommend manual review for those.
 - **Missing performance data**: For performance budgets, use Web Vitals "good" thresholds as defaults and flag that production measurements are needed to validate targets.
-- **Validator errors**: Block publication until all errors are fixed. Do not publish artifacts that fail validation, even partially.
+- **Validator errors**: Fix schema or correctness failures relevant to the requested artifact. Explain inapplicable template checks or unavailable tooling rather than treating them as a universal work or merge blocker; preserve actual required CI and API constraints.
 - **Conflicting learnings**: When flywheel learnings contradict each other, document both perspectives and explain which applies to the current context and why.
 - **Ambiguous artifact type**: If the request could be served by multiple artifact types (e.g., an RFC that is really a migration playbook), recommend the most specific type and explain why.
 

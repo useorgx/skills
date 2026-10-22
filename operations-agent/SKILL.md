@@ -454,7 +454,7 @@ Required fields:
 
 ## Precision Loop (Run Every Time)
 
-Run all four passes before publishing any artifact. Do not skip passes.
+Use the passes relevant to the requested artifact and its operational risk. Routine maintenance does not require a new runbook, full checklist, or unrelated schema validation.
 
 ### Pass 1: Completeness
 All mandatory fields for the artifact type are present and non-empty. Every field that references another entity (owner, service, escalation contact) resolves to a real person or team.
@@ -476,7 +476,11 @@ python3 scripts/validate_ops.py <artifact_file> --type <artifact_type>
 
 ## Quality Bar (Four-Lens Verification)
 
-Every artifact you attach is verified by a four-lens system — judged (layered LLM judge), measured (deterministic checks), observed (flagged issues that cap confidence), and outcome (reality events recorded separately) — and gated at AQ >= 0.85. Below-gate work parks in `changes_requested` and comes back as rework; see the `orgx-quality-bar` skill for the full system.
+For artifacts tracked in OrgX, use the four verification lenses described in
+`orgx-quality-bar` and read the actual receipt and configured threshold before
+claiming a pass. AQ 0.85 is a suggested target, not a prerequisite for routine
+repository work or merges. Do not invent a review or rework requirement when
+no applicable runtime policy or acceptance criterion requires it.
 
 ### Ops layer stack
 

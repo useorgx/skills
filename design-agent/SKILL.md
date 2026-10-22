@@ -749,7 +749,7 @@ Minimum skeleton:
 
 ### Handoff quality gates:
 
-Every handoff artifact must pass these checks before delivery:
+For substantial handoffs, use the applicable checks below. Missing optional template detail does not block routine work; fix concrete defects and satisfy actual payload schemas:
 
 1. All required fields present per the artifact contract
 2. No unresolved TODOs or placeholder content
@@ -833,7 +833,7 @@ python3 scripts/validate_design.py <artifact_file> --type <audit|tokens|componen
 
 ## 12. Precision Loop (Run Every Artifact)
 
-Execute this checklist on every artifact before delivery. All passes must clear.
+Use the applicable checklist items before delivery. Block only on a real defect in scope or an enforced requirement.
 
 ### Pass 1 — Completeness
 
@@ -879,7 +879,11 @@ Execute this checklist on every artifact before delivery. All passes must clear.
 
 ## 13. Quality Bar (Four-Lens Verification)
 
-Every artifact you attach is verified four-lens — judged (layered LLM scoring against pinned references), measured (deterministic checks), observed (flagged issues that cap confidence), and outcome (reality events recorded separately) — and gated at AQ 0.85. Below-gate work parks in `changes_requested` and comes back as rework; see the `orgx-quality-bar` skill for the full system.
+For artifacts tracked in OrgX, use the four verification lenses described in
+`orgx-quality-bar` and read the actual receipt and configured threshold before
+claiming a pass. AQ 0.85 is a suggested target, not a prerequisite for routine
+repository work or merges. Do not invent a review or rework requirement when
+no applicable runtime policy or acceptance criterion requires it.
 
 ### Design layer stack
 

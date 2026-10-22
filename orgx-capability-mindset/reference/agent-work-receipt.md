@@ -40,19 +40,18 @@ records usually miss.
   **`authority.approvals`** holds the approvals you were granted, and
   `authority.constraints` the budget or time limits you ran under.
 - **`verification.checks`** is the evidence a skeptic can re-run: a command with
-  its exit code, an HTTPS probe with its status, or an independent judge. Declare
-  the checks **before** you build, not after — a check written to match what you
-  already produced verifies nothing. Where the OrgX hook shim is installed,
-  `orgx-agent criteria set` records them, and the Stop hook runs the command
-  checks in your working copy before the session is allowed to end.
-- **`human_interventions`** is every point a human had to act. The autonomy floor
-  stops eight classes of action at the point of action — `merge`, `force_push`,
-  `deploy`, `publish`, `destructive`, `send`, `spend`, `prod_data` — and files an
-  OrgX decision (`decision_type: agent_action`) in the owner's decision inbox.
-  Only a signed-in human can resolve it; no API key can, including yours.
-  Approval covers exactly that one command, once. A denial is not a failure to
-  hide: record it as an intervention, carry on with other work, and never retry
-  or work around it.
+  its exit code, an HTTPS probe with its status, or an independent judge. Choose
+  checks that test the requested outcome; prefer existing checks and reproduce
+  a bug before fixing it when practical. Routine documentation edits do not
+  need a forced failing test. Where the OrgX hook shim is configured,
+  `orgx-agent criteria set` records checks and the Stop hook may enforce them;
+  report what actually ran and any real failure.
+- **`human_interventions`** records the points where a human actually had to act.
+  Use the current user's authorization and the runtime's enforced policy; this
+  receipt format adds no approval requirement for merges or other actions. If
+  an operation returns `approval_required`, give the person its `review_url`.
+  Only the authorized human can settle a human-gated OrgX decision. Record an
+  enforced denial, continue independent work, and do not route around it.
 - **`outcome.status`** is how far the work actually got, not how far you intended
   it to get. "Wrote files into a scratch directory" is not `drafted`; a branch
   with commits is. A PR is not merged. Merged is not deployed. Deployed is not
@@ -84,10 +83,10 @@ non-zero when the work is missing.
 
 **A check that was already green when you wrote it.** `test -f the-doc-I-just-wrote.md`
 passes the moment it is declared, so it cannot distinguish done from not-done.
-A criterion earns trust only by being seen to fail while the work is absent and
-pass once it is present. Declare it first, watch it fail, then make it pass.
-That is also the cheapest way to discover that your check tests the wrong
-thing.
+A behavioral regression test is stronger when it fails for the original bug
+and passes for the fix. Use that comparison when practical; an existing test or
+a relevant documentation check can still provide evidence without an artificial
+failure. Check that the assertion can detect the defect you claim to fix.
 
 **Prose in place of a check.** One agent declared eight criteria and wrote seven
 of them as rubrics for a future judge, leaving one file-existence check to carry

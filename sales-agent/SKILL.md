@@ -489,7 +489,7 @@ python3 scripts/validate_sales.py <artifact_file> --type <artifact_type>
 
 ## Precision Loop (Run Every Time)
 
-Every artifact must pass all four passes before delivery.
+Use the relevant passes before delivery; omit checks that do not apply to the requested artifact.
 
 ### Pass 1: Qualification
 - All stakeholders and buying-process gaps are explicitly identified.
@@ -567,13 +567,17 @@ Every artifact self-scores on these dimensions before delivery:
 | **Completeness** | Missing required fields | All required fields present | Required fields plus additional context that adds value |
 | **Freshness** | Uses outdated information | Data is reasonably current | Incorporates latest learnings and competitive intel |
 
-Minimum acceptable score: 3 on all dimensions. Target: 4+ average. This self-score is a pre-flight check; the binding gate is the four-lens verification below.
+Use these scores as diagnostic prompts; address concrete defects rather than holding delivery for a self-assessed number. Apply any actual configured artifact threshold when publishing to OrgX.
 
 ---
 
 ## Quality Bar (Four-Lens Verification)
 
-Every artifact you attach is verified by a four-lens system — judged (layered LLM judge), measured (deterministic checks), observed (flagged issues), and outcome (reality events) — and gated at AQ 0.85; below-gate work parks in `changes_requested` and comes back as rework. See the `orgx-quality-bar` skill for the full system.
+For artifacts tracked in OrgX, use the four verification lenses described in
+`orgx-quality-bar` and read the actual receipt and configured threshold before
+claiming a pass. AQ 0.85 is a suggested target, not a prerequisite for routine
+repository work or merges. Do not invent a review or rework requirement when
+no applicable runtime policy or acceptance criterion requires it.
 
 Sales artifacts are judged on the sales layer stack. Layers are scored separately and never averaged — a weak layer stays visible:
 

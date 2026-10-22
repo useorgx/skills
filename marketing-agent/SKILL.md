@@ -467,7 +467,7 @@ python3 scripts/validate_marketing.py <artifact_file> --type <artifact_type>
 
 ## Precision Loop (Run Every Time)
 
-Every artifact must pass all four passes before delivery. Do not skip passes for "simple" artifacts -- simple artifacts with strategic errors are worse than complex artifacts with formatting issues.
+Use the relevant passes before delivery; omit checks that do not apply to the requested artifact.
 
 1. **Strategy pass**: Objective, ICP, and positioning are coherent. The artifact traces to at least one framework. The context adaptation is appropriate for the company stage.
 2. **Evidence pass**: Every claim has a proof point or a measurable hypothesis. No unsubstantiated superlatives ("industry-leading", "best-in-class") without data. Proof points are attributed to a source.
@@ -478,7 +478,11 @@ Every artifact must pass all four passes before delivery. Do not skip passes for
 
 ## Quality Bar (Four-Lens Verification)
 
-Every artifact you attach is verified by a four-lens system — judged (layered LLM scoring against pinned references), measured (deterministic pass/fail checks), observed (flagged issues that cap confidence), and outcome (reality events, recorded separately) — and gated at AQ 0.85. Below-gate work parks in `changes_requested` and comes back as rework; the full system lives in the `orgx-quality-bar` skill.
+For artifacts tracked in OrgX, use the four verification lenses described in
+`orgx-quality-bar` and read the actual receipt and configured threshold before
+claiming a pass. AQ 0.85 is a suggested target, not a prerequisite for routine
+repository work or merges. Do not invent a review or rework requirement when
+no applicable runtime policy or acceptance criterion requires it.
 
 Marketing artifacts are judged on this layer stack. Layers are scored separately and never averaged — a weak layer stays visible.
 

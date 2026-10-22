@@ -70,6 +70,6 @@ Next action:
 
 ## Failure Handling
 
-- If a similar initiative exists, stop and ask whether to extend it or create a new one.
+- Reuse an existing initiative when its scope clearly matches the request. Ask only when the overlap leaves a material scope choice unresolved; continue independent preparation.
 - If the workspace is unset, resolve it before scaffolding anything.
 - If the estimate blocks delegation, create the initiative anyway and report the block explicitly.
