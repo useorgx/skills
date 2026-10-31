@@ -1,11 +1,11 @@
 {
   "name": "design-agent-evaluation",
-  "version": "1.0.0",
-  "description": "Evaluation scenarios for the OrgX Design Agent skill. Each scenario tests a different artifact type with realistic inputs and expected quality gates.",
+  "version": "1.1.0",
+  "description": "Design artifact rehearsal scenarios and offline evidence-integrity regressions. Named screenshots and synthetic checks do not establish live tool access, rendered QA, customer outcomes or a practitioner percentile.",
   "scenarios": [
     {
       "id": "accessibility-audit-checkout",
-      "name": "Accessibility Audit — Checkout Flow",
+      "name": "Accessibility Audit \u2014 Checkout Flow",
       "description": "Audit the checkout flow (cart review through order confirmation) for WCAG AA compliance. Tests the agent's ability to identify real accessibility barriers, map them to specific WCAG criteria, and provide actionable remediation with effort estimates.",
       "artifact_type": "audit",
       "inputs": {
@@ -25,7 +25,8 @@
             "Users report difficulty tabbing through the payment form",
             "Error messages disappear after 3 seconds"
           ],
-          "tech_stack": "Next.js, Tailwind CSS, Radix UI primitives"
+          "tech_stack": "Next.js, Tailwind CSS, Radix UI primitives",
+          "status": "Reported fixture inputs; screenshot names are not proof that assets were retrieved or tests performed."
         }
       },
       "expected_output": {
@@ -45,23 +46,25 @@
         ],
         "quality_checks": [
           {
-            "check": "issues_minimum_count",
-            "description": "Must identify at least 5 issues given the known problems",
-            "threshold": 5
+            "check": "findings_grounded",
+            "description": "Every asserted finding traces to inspected evidence; no minimum issue count and no invented findings to fill a quota.",
+            "threshold": 0,
+            "measurement": "Unsupported asserted findings"
           },
           {
-            "check": "critical_issues_present",
-            "description": "Payment form tab order and disappearing errors should surface as critical or major",
+            "check": "reported_problems_preserved",
+            "description": "Preserve both supplied user reports as reported problems; confirm actual severity and behavior only after exercising the target.",
             "threshold": 2
           },
           {
-            "check": "wcag_criteria_coverage",
-            "description": "Issues should reference at least 4 distinct WCAG success criteria",
-            "threshold": 4
+            "check": "wcag_mapping_supported",
+            "description": "Map exercised defects to applicable criteria and identify untested criteria without inventing coverage.",
+            "threshold": 0,
+            "measurement": "Unsupported criterion pass or fail claims"
           },
           {
             "check": "remediation_specificity",
-            "description": "Every remediation must include either a code snippet, CSS property, or ARIA attribute — not just prose",
+            "description": "Every remediation must include either a code snippet, CSS property, or ARIA attribute \u2014 not just prose",
             "validation": "All issues[].remediation contain technical specifics"
           },
           {
@@ -75,9 +78,10 @@
             "validation": "First recommendation addresses a critical-severity issue"
           },
           {
-            "check": "screen_reader_tested",
-            "description": "At least one screen reader listed",
-            "threshold": 1
+            "check": "screen_reader_evidence_honesty",
+            "description": "Each claimed screen-reader test names a recording, transcript or report and exact target revision. If unavailable, use an empty tested list and explicit not_tested limitations.",
+            "threshold": 0,
+            "measurement": "Tests claimed without matching evidence"
           }
         ]
       },
@@ -85,15 +89,15 @@
         "pass_threshold": 0.85,
         "weights": {
           "completeness": 0.25,
-          "accuracy": 0.30,
+          "accuracy": 0.3,
           "actionability": 0.25,
-          "accessibility_depth": 0.20
+          "accessibility_depth": 0.2
         }
       }
     },
     {
       "id": "design-tokens-v2",
-      "name": "Design Tokens — v2 System Migration",
+      "name": "Design Tokens \u2014 v2 System Migration",
       "description": "Author a v2 design token package that migrates from flat tokens to a three-layer architecture (primitive, semantic, component). Tests the agent's understanding of token architecture, naming conventions, and multi-platform considerations.",
       "artifact_type": "tokens",
       "inputs": {
@@ -112,7 +116,7 @@
             "font_family": "Inter"
           },
           "known_issues": [
-            "Current tokens are flat — no semantic layer",
+            "Current tokens are flat \u2014 no semantic layer",
             "Dark mode requires manual overrides in 47 places",
             "iOS app uses different token names than web"
           ],
@@ -173,8 +177,8 @@
       "scoring": {
         "pass_threshold": 0.85,
         "weights": {
-          "completeness": 0.20,
-          "architecture": 0.30,
+          "completeness": 0.2,
+          "architecture": 0.3,
           "naming_quality": 0.25,
           "platform_readiness": 0.25
         }
@@ -182,7 +186,7 @@
     },
     {
       "id": "interaction-spec-modal",
-      "name": "Interaction Spec — Multi-step Configuration Modal",
+      "name": "Interaction Spec \u2014 Multi-step Configuration Modal",
       "description": "Produce a complete interaction specification for a 3-step modal that collects initiative configuration. Tests the agent's ability to map all states, transitions, keyboard behavior, responsive adaptations, and error handling.",
       "artifact_type": "interaction",
       "inputs": {
@@ -224,7 +228,7 @@
           {
             "check": "transition_coverage",
             "description": "Every state pair reachable in the flow has a defined transition",
-            "validation": "No orphan states — every state has at least one entry and one exit transition"
+            "validation": "No orphan states \u2014 every state has at least one entry and one exit transition"
           },
           {
             "check": "keyboard_completeness",
@@ -261,16 +265,16 @@
       "scoring": {
         "pass_threshold": 0.85,
         "weights": {
-          "completeness": 0.20,
+          "completeness": 0.2,
           "state_accuracy": 0.25,
           "accessibility": 0.25,
-          "implementation_readiness": 0.30
+          "implementation_readiness": 0.3
         }
       }
     },
     {
       "id": "dark-mode-audit",
-      "name": "Dark Mode Audit — Live Dashboard",
+      "name": "Dark Mode Audit \u2014 Live Dashboard",
       "description": "Audit the OrgX Live Dashboard for dark mode readiness, including palette mapping, contrast verification, elevation strategy, and image handling. Tests the agent's understanding of dark mode design constraints and common pitfalls.",
       "artifact_type": "dark-mode",
       "inputs": {
@@ -320,9 +324,10 @@
             "validation": "All 11 current palette colors have corresponding dark values"
           },
           {
-            "check": "no_pure_black",
-            "description": "Dark background must not be #000000",
-            "validation": "No dark mode surface value is #000000"
+            "check": "palette_constraints_grounded",
+            "description": "Use existing tenant palette constraints and computed contrast; pure black is not itself a WCAG failure.",
+            "threshold": 0,
+            "measurement": "Invented accessibility failures based on palette taste"
           },
           {
             "check": "elevation_levels",
@@ -359,8 +364,8 @@
       "scoring": {
         "pass_threshold": 0.85,
         "weights": {
-          "completeness": 0.20,
-          "contrast_accuracy": 0.30,
+          "completeness": 0.2,
+          "contrast_accuracy": 0.3,
           "practical_guidance": 0.25,
           "agent_ui_awareness": 0.25
         }
@@ -370,7 +375,7 @@
   "global_checks": [
     {
       "check": "validator_passes",
-      "description": "Every output artifact must pass validate_design.py with zero errors",
+      "description": "For audit, tokens and component only, run validate_design.py and resolve structural errors. Other artifact types must record unsupported CLI validation and use explicit evidence review; never treat zero available gates as a pass.",
       "applies_to": "all"
     },
     {
@@ -385,7 +390,7 @@
     },
     {
       "check": "next_steps_present",
-      "description": "Summary includes exactly 3 actionable next steps",
+      "description": "Include only necessary next steps with owners; do not manufacture exactly three actions.",
       "applies_to": "all"
     },
     {
@@ -393,5 +398,16 @@
       "description": "Every recommendation references specific evidence or design principle, not opinion",
       "applies_to": "all"
     }
-  ]
+  ],
+  "adversarial_regression_suite": {
+    "command": "python3 -m unittest discover -s skills/design-agent/scripts -p 'test_*.py' -v",
+    "environment": "offline synthetic fixtures, no providers or browser",
+    "acceptance": {
+      "test_failures": 0,
+      "unknown_type_vacuous_successes": 0,
+      "contradictory_count_successes": 0,
+      "unbound_screen_reader_claim_successes": 0
+    },
+    "limits": "Passing references validates their shape and revision consistency only. Independent retrieval and inspection are required to establish actual observation. No comparative practitioner evidence is established."
+  }
 }

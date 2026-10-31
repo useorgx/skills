@@ -1,6 +1,6 @@
 ---
 name: orgx-design-agent
-version: "2.2.0"
+version: "2.3.0"
 description: |
   Produce high-confidence design artifacts for OrgX: WCAG accessibility audits, design token packages, component documentation, interaction specs, UX research plans, design critiques, motion specs, dark mode audits, and responsive breakpoint maps.
   Use when work requires design-system decisions, accessibility validation, interaction design, or design-to-engineering handoff quality gates.
@@ -26,14 +26,14 @@ Apply [orgx-capability-mindset](../orgx-capability-mindset) before design work. 
    - A concise summary (3-6 bullets)
    - The artifact body (JSON or structured Markdown)
    - 3 actionable next steps with owners and effort estimates
-8. Run the precision loop before delivery. Every artifact ships validator-clean.
+8. Run the precision loop before delivery. Apply the supported validator and record actual verification limits.
 9. Attach the result back to the active entity with `mcp__orgx__orgx_attach_artifact`, then record quality with `quality_score`, `verification`, and an `idempotency_key` on `mcp__orgx__orgx_complete_work_with_proof` (or request an independent judgment with `mcp__orgx__orgx_request_independent_artifact_review`). When attaching, declare the `artifact_type` that matches the work (`design.audit`, `design.component_spec`, or `design.token_package`) and pass `agent_type`, `company_stage`, `business_outcome`, `owner`, `review_date`, and `verification` as arguments.
 10. Before delegating downstream design or implementation work, run `mcp__orgx__orgx_estimate_agent_task` (`task`) — v2 has no separate guard call, so the estimate is the pre-dispatch check — then dispatch an existing task with `mcp__orgx__orgx_start_agent_task` (`task_id`, `idempotency_key`). A started run is not a finished one: poll `mcp__orgx__orgx_get_operation_status`.
    - Omit `model_tier`, `provider`, and exact `model` for normal work so OrgX auto-routes by task complexity.
    - Use `model_tier=standard` and `budget_mode=cheapest_valid` only for controlled reliability validation runs, test initiatives, or explicit budget-constrained verification.
    - Design delegation must name the target surface, expected spec/audit/token artifact, and validation method before spawn.
 
-Deliver design artifacts that are implementation-ready, accessibility-compliant, and validator-clean.
+Deliver implementation-ready design artifacts with evidence for each verification claim. A valid document, contrast calculation, or screenshot does not establish a coherent interface or WCAG conformance.
 
 ## 2. Trigger Map
 
@@ -82,7 +82,7 @@ These are rapid-fire diagnostic checks. When you observe the pattern, suspect th
 
 - No focus states visible: keyboard users are blocked. Add visible focus rings meeting 3:1 contrast ratio against adjacent colors.
 - Color-only status indication: colorblind users are excluded. Add an icon, text label, or pattern as a secondary indicator.
-- Touch target smaller than 44px: fat finger errors on mobile. Increase to 44x44px minimum; 48x48px recommended per WCAG 2.5.8.
+- Measure pointer targets and spacing. WCAG 2.2 SC 2.5.8 (AA) requires 24x24 CSS pixels with spacing and other exceptions; 44x44 is the enhanced SC 2.5.5 target. A team's 44/48px touch preference is a design constraint, not the AA requirement.
 - More than 5 top-level nav items: cognitive overload per Miller's Law. Group into categories, prioritize by frequency, or use progressive disclosure.
 - Modal stacked on modal: z-index conflicts, context loss, and accessibility nightmare. Redesign the flow to avoid stacking; use inline expansion or step-based flow instead.
 - Inconsistent spacing between siblings: visual noise that erodes trust. Audit against the 8pt grid and normalize gaps.
@@ -147,6 +147,12 @@ If inputs are incomplete, declare assumptions explicitly at the top of the artif
 python3 scripts/validate_design.py <artifact_file> --type <artifact_type>
 ```
 
+The CLI supports only `audit`, `tokens`, and `component`. Other artifact types below require their stated evidence review; report CLI validation as unavailable. Its checks validate structure and reference consistency, not the contents of linked proof, tool access, rendered behavior, or accessibility conformance. Never invent tests to satisfy a template.
+
+Use the existing design system and retain source/revision references. For an interface handoff, cover loading, empty, error and recovery states, keyboard focus, status announcements and reflow. Attach observed results for the exact revision or state what remains untested. A screenshot establishes appearance at its captured state, not keyboard or screen-reader behavior.
+
+Primary references: [W3C evaluation tool limits](https://www.w3.org/WAI/test-evaluate/tools/selecting/), [target size](https://www.w3.org/WAI/WCAG22/Understanding/target-size-minimum.html), [320 CSS pixel reflow](https://www.w3.org/WAI/WCAG22/Understanding/reflow.html), [modal keyboard and focus behavior](https://www.w3.org/WAI/ARIA/apg/patterns/dialog-modal/) and [status messages](https://www.w3.org/WAI/WCAG22/Understanding/status-messages.html). Apply criteria to observed behavior; these sources do not certify the artifact.
+
 8. **Fix and re-validate**: Resolve every failed gate. Re-run validator until all gates pass.
 9. **Publish**: Save with `mcp__orgx__orgx_attach_artifact` and link related entities with `mcp__orgx__orgx_update_work` (`type`, `id`, `fields`, `idempotency_key`).
 10. **Attach proof**:
@@ -177,23 +183,25 @@ Required fields:
   - `impact`: Who is affected and how
   - `remediation`: Specific fix with code example where applicable
   - `effort`: `low` | `medium` | `high`
-- `testing_notes.screen_readers_tested[]`: At least one entry (VoiceOver, NVDA, JAWS)
-- `testing_notes.browsers_tested[]`: At least one entry
-- `testing_notes.tools_used[]`: Automated tools run (axe, Lighthouse, WAVE)
-- `recommendations[]`: At least three entries, ordered by impact
+- `testing_notes.screen_readers_tested[]`: Only technologies actually exercised; use `[]` when untested
+- `testing_notes.screen_reader_status`: `observed` or `not_tested`; untested reports require nonempty `limitations[]`
+- For each claimed test, `screen_reader_evidence[]` contains `technology`, `evidence_ref`, `target_revision`, and `outcome` (`pass` or `fail`); its revision must match the audit's `target_revision`
+- `testing_notes.browsers_tested[]` and `tools_used[]`: Only tools actually exercised; record unavailable checks as limitations
+- `recommendations[]`: Actions for observed findings, ordered by impact; an empty findings list may use `[]`
 - `pass_criteria`: Conditions under which this audit is considered resolved
 
 Minimum skeleton:
 
 ```json
 {
-  "scope": "Checkout flow — cart review through confirmation",
+  "scope": "Illustrative checkout fixture; not a live audit",
+  "target_revision": "fixture-v1",
   "wcag_level": "AA",
   "summary": {
-    "total_issues": 7,
-    "critical_count": 2,
-    "major_count": 3,
-    "minor_count": 2
+    "total_issues": 1,
+    "critical_count": 1,
+    "major_count": 0,
+    "minor_count": 0
   },
   "issues": [
     {
@@ -208,16 +216,17 @@ Minimum skeleton:
     }
   ],
   "testing_notes": {
-    "screen_readers_tested": ["VoiceOver on macOS"],
-    "browsers_tested": ["Chrome 120", "Safari 17"],
-    "tools_used": ["axe-core 4.8", "Lighthouse"]
+    "screen_readers_tested": [],
+    "screen_reader_status": "not_tested",
+    "screen_reader_evidence": [],
+    "limitations": ["Illustrative fixture; no screen reader, browser or automated scan was run"],
+    "browsers_tested": [],
+    "tools_used": []
   },
   "recommendations": [
-    "Fix all critical focus visibility issues before next release",
-    "Add skip-to-content link at page top",
-    "Implement live region announcements for cart total updates"
+    "Repair and retest the focus indicator on the exact implementation revision"
   ],
-  "pass_criteria": "Zero critical issues, zero major issues, all automated scans pass"
+  "pass_criteria": "Retest the focus defect, keyboard behavior and assistive technology on the exact revision; report untested scope"
 }
 ```
 
@@ -326,7 +335,7 @@ Minimum skeleton:
 }
 ```
 
-### Interaction Spec (`--type interaction`)
+### Interaction Spec (evidence review; no CLI validator)
 
 Required fields:
 
@@ -401,7 +410,7 @@ Minimum skeleton:
 }
 ```
 
-### UX Research Plan (`--type research-plan`)
+### UX Research Plan (evidence review; no CLI validator)
 
 Required fields:
 
@@ -463,7 +472,7 @@ Minimum skeleton:
 }
 ```
 
-### Design Critique (`--type critique`)
+### Design Critique (evidence review; no CLI validator)
 
 Required fields:
 
@@ -521,7 +530,7 @@ Minimum skeleton:
 }
 ```
 
-### Motion Spec (`--type motion`)
+### Motion Spec (evidence review; no CLI validator)
 
 Required fields:
 
@@ -597,7 +606,7 @@ Minimum skeleton:
 }
 ```
 
-### Dark Mode Audit (`--type dark-mode`)
+### Dark Mode Audit (evidence review; no CLI validator)
 
 Required fields:
 
@@ -663,7 +672,7 @@ Minimum skeleton:
 }
 ```
 
-### Responsive Breakpoint Map (`--type breakpoints`)
+### Responsive Breakpoint Map (evidence review; no CLI validator)
 
 Required fields:
 
@@ -753,7 +762,7 @@ For substantial handoffs, use the applicable checks below. Missing optional temp
 
 1. All required fields present per the artifact contract
 2. No unresolved TODOs or placeholder content
-3. Validator passes with zero errors
+3. Supported structural validator passes; unsupported checks are named with their actual verification method
 4. Cross-references to related entities are linked
 5. Downstream agent's input requirements are met
 
@@ -792,6 +801,39 @@ Apply relevant prior learnings. Reference them explicitly (e.g., "Per learning L
 
 ## 10. Tooling
 
+### Executable handoff coverage
+
+The existing `design.accessibility.audit` tool accepts `{ handoff: ... }` for a
+bounded specification check. Its source schema is
+`lib/agents/design/handoff.ts`; a complete fictional example lives in
+`tests/fixtures/designHandoff.ts`. This checks supplied structure and produces
+requested inspection probes. `needs_verification` is not rendered QA.
+
+- Bind `workspaceId` and `target` (`artifactId`, design `revision`, candidate
+  `implementationRevision`, or `null` until code exists).
+- Supply `brief` (`problem`, `audience`, `evidenceIds`, `constraints`,
+  `assumptions`); versioned `sources` (`id`, `reference`, `revision`); and
+  `system` (`sourceId`, reused `components` with `id` and `sourceId`).
+- Each `journeys` entry has `id`, `goal`, `asynchronous`, `states`, and
+  `transitions`. States have `id`, `kind`, `componentIds`, `visibleContent`,
+  `primaryAction`, `keyboardBehavior`, and `screenReaderBehavior`. Async
+  journeys cover `idle`, `loading`, `empty`, `error`, `recovery`, `success`.
+  Transitions specify `from`, `to`, `action`, `preservesUserInput`, `retryPolicy`.
+- Supply `responsive` width/behavior entries at 320 CSS pixels and desktop,
+  `reducedMotion`, and `implementation` owner/acceptanceCriteria. Split scopes
+  exceeding 120 checks (states × declared widths × five check types) before
+  requesting inspection. A six-state journey at two widths needs 60 checks.
+- The trusted `DesignEvidenceReader` extension accepts exact source and
+  implementation revision probes. A caller cannot submit its own executed
+  observations through tool arguments. No live reader is wired by this change.
+- The legacy `design.prototype.publish` name records an existing link as an
+  unverified reference. It does not publish a design. Nested Figma exports
+  remain blocked until the shared owner supplies a workspace/resource-authorized
+  reader; the legacy user-level grant lookup is insufficient.
+- Microcopy requires a supplied `surface` and explicit action/subject `entries`.
+  Optional `voice` is caller-supplied; absent voice produces a neutral draft.
+  No OrgX brand voice or token palette is inherited by a client.
+
 ### Primary:
 
 - `mcp__orgx__orgx_get_workspace_context` — read workspace scope (`workspace_id` optional; reads only)
@@ -815,7 +857,7 @@ Apply relevant prior learnings. Reference them explicitly (e.g., "Per learning L
 ### Validation:
 
 ```bash
-python3 scripts/validate_design.py <artifact_file> --type <audit|tokens|component|interaction|research-plan|critique|motion|dark-mode|breakpoints>
+python3 scripts/validate_design.py <artifact_file> --type <audit|tokens|component>
 ```
 
 ## 11. Failure Handling
@@ -873,9 +915,9 @@ Use the applicable checklist items before delivery. Block only on a real defect 
 
 ### Pass 6 — Validator
 
-- Run `python3 scripts/validate_design.py` and confirm zero errors
-- No warnings that indicate missing recommended fields
-- Artifact is publication-ready
+- Run `python3 scripts/validate_design.py` for a supported type and confirm zero errors
+- Record unavailable validation and test limitations; review actual evidence independently
+- Verify delivery requirements separately; structural validation does not authorize publication
 
 ## 13. Quality Bar (Four-Lens Verification)
 
@@ -935,7 +977,7 @@ An artifact is done when all of the following are true:
 
 - Artifact type matches the request and conforms to its schema contract
 - All precision loop passes clear
-- Validator passes with zero errors
+- Supported structural validator passes; other required checks have explicit verification evidence or blockers
 - Findings and recommendations are specific, actionable, and evidence-backed
 - Public or revenue-facing work passes the GTM Outcome Gate or explicitly documents why it is not applicable
 - Downstream agent handoff requirements are met
