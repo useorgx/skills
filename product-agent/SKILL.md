@@ -1,6 +1,6 @@
 ---
 name: orgx-product-agent
-version: "2.2.0"
+version: "2.3.0"
 description: |
   Produce high-confidence product artifacts for OrgX: PRDs, initiative plans, product canvases, user research briefs, competitive analyses, feature prioritization matrices, pivot evaluations, metric dashboard specs, and launch readiness checklists.
   Use when problem framing, user/value articulation, prioritization, and measurable product outcomes are required.
@@ -25,7 +25,7 @@ Apply [orgx-capability-mindset](../orgx-capability-mindset) before product work.
    - A concise summary (3-6 bullets)
    - The artifact body (JSON or structured Markdown)
    - 3 actionable next steps with owners
-7. Validate with `python3 scripts/validate_artifact.py <file> --type <type>`.
+7. From the app root, validate structured PRDs, initiatives and canvases with `python3 skills/product-agent/scripts/validate_artifact.py <file> --type <prd|initiative|canvas>`. Other artifact kinds need their applicable verifier; an unsupported kind must not be reported as passing this validator. Passing checks structure and declared evidence, not source authenticity or customer outcomes.
 8. Publish by attaching the artifact to the task or initiative with `mcp__orgx__orgx_attach_artifact` (`type`, `id`, `name`, `artifact_type`, `location`, `idempotency_key`), and record quality with `quality_score` and `verification` on `mcp__orgx__orgx_complete_work_with_proof`. When attaching, use the MCP artifact type that matches the work (`product.customer_discovery`, `product.prd`, `product.pricing_hypothesis`, or `product.decision_record`) and include `agent_type`, `company_stage`, `business_outcome`, `owner`, `review_date`, and `verification`.
 9. Before delegating follow-on execution, run `mcp__orgx__orgx_estimate_agent_task` (`task`); v2 has no separate guard call. Then start it with `mcp__orgx__orgx_start_agent_task` (`task_id` of an existing task, `idempotency_key`; create it with `mcp__orgx__orgx_create_task` first); a started run is not a finished one, so poll `mcp__orgx__orgx_get_operation_status`, and a retried start reuses its `idempotency_key`.
    - Omit `model_tier`, `provider`, and exact `model` for normal work so OrgX auto-routes by task complexity.
@@ -33,6 +33,32 @@ Apply [orgx-capability-mindset](../orgx-capability-mindset) before product work.
    - Product delegation must name the measurable outcome, expected artifact, and validation signal before spawn.
 
 Create product artifacts that are decision-ready, measurable, and execution-aligned.
+
+### Implemented product review boundary
+
+Where the runtime exposes it, use `nova.plan.guardrails.check` with `mode: decision` and a
+`product-decision@1` packet to review source revisions, observations versus
+assumptions, contradictions, bounded PRD scope, acceptance criteria, owned
+dependencies, four product risk dimensions and post-delivery measurement.
+The typed input lives in `lib/agents/product/decisionSchema.ts`. Use
+`mode: prioritization` for comparable RICE inputs from
+`lib/agents/product/prioritization.ts`.
+
+This app runtime tool performs bounded consistency checks without external
+calls. Keep `blocked`, `learning_pending` and `negative_result` findings in
+the handoff. `ready_for_review` means the supplied measurement meets its
+registered target; it is not proof of source authenticity, significance or
+causality. A delivery receipt leaves customer impact unmeasured. The returned
+input digest binds the reviewed packet; independently read the sources before
+claiming live validation. The legacy research/forecast tools remain unavailable.
+If this tool is absent from the current client's manifest, retain that named
+dependency and use the local structured validator; do not claim equivalent
+live coverage or attempt to grant access.
+
+Missing evidence is a valid discovery draft when assumptions and an owned
+research action are explicit. Do not invent customer stories or interpret
+synthetic rehearsal as customer validation. Preserve negative and inconclusive
+learning and the resulting stop, wait or revise decision.
 
 Worked examples live in `examples/` — `prd-authentication.md` is the canonical PRD shape, `competitive-analysis.md` is the canonical analysis shape. When producing a new artifact, mirror their structure and specificity.
 
@@ -68,7 +94,7 @@ This section encodes the product thinking the agent must internalize. Every arti
 
 ### Frameworks
 
-**RICE Scoring** — Reach x Impact x Confidence / Effort. Quantitative prioritization. Use when you need to rank 5+ features against each other with heterogeneous stakeholder input. Reach = number of users affected per quarter. Impact = {3: massive, 2: high, 1: medium, 0.5: low, 0.25: minimal}. Confidence = percentage (100%, 80%, 50%). Effort = person-months. Final score enables direct comparison across unrelated features.
+**RICE Scoring** — Reach x Impact x Confidence / Effort. Compare candidates against the same objective, time period and reach unit. Impact = {3: massive, 2: high, 1: medium, 0.5: low, 0.25: minimal}. Confidence is a fraction in tool inputs (1, 0.8, 0.5); unmeasured estimates are capped at 0.5. Effort is positive person-months across the team. Retain dependencies and assumption labels; the score is an estimate, not a delivery commitment.
 
 **Kano Model** — Categorize features into Must-be (expected, absence causes dissatisfaction), One-dimensional (satisfaction scales linearly with implementation), Attractive (unexpected delight, absence does not cause dissatisfaction). Use when deciding between "fix the basics" and "build something exciting." Must-be features never create competitive advantage but their absence kills retention.
 
