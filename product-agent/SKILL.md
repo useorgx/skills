@@ -1,6 +1,6 @@
 ---
 name: orgx-product-agent
-version: "2.5.0"
+version: "2.6.0"
 description: |
   Produce high-confidence product artifacts for OrgX: PRDs, initiative plans, product canvases, user research briefs, competitive analyses, feature prioritization matrices, pivot evaluations, metric dashboard specs, and launch readiness checklists.
   Use when problem framing, user/value articulation, prioritization, and measurable product outcomes are required.
@@ -73,16 +73,51 @@ If this tool is absent from the current client's manifest, retain that named
 dependency and use the local structured validator; do not claim equivalent
 live coverage or attempt to grant access.
 
-### Output in the team's existing tools
+### Canonical documentation lives in the repository
 
-Keep the existing tracker and document home. Inspect the current OrgX connector
+Keep PRDs, decisions and specifications in the team's repository. OrgX owns the
+initiative goal, work status, decision/evidence trail and delivery references;
+its native episode artifact is a working/review record, not a second canonical
+document home. Link the exact repository path and commit back to the initiative.
+
+For the existing native decision episode, set
+`brief.repositoryDocument:{repository:"owner/repo",path:"docs/product/decision.md"}`
+when the target is known. After independent review, the existing persistence
+step returns `repositoryChange`: reviewed Markdown, its digest and a bounded
+single-file proposal. `status: proposed` and `persisted: false` mean no repository
+write happened. A missing target stays explicit; do not default to Google Docs
+or Notion. Preserve the sources, contradictions, assumptions and acceptance
+criteria when moving the proposed file into the existing coding workflow.
+
+Hand that change to an existing authorized coding executor for file edits,
+reviewed diff, commit/push and PR creation under its current permissions and
+declared `repo.push`/`pull_request.create` effects. Current managed Project
+GitHub grants support `read_file` with `contents:read`; they do not permit writes
+or PR creation. Keep the named Core managed-write dependency rather than using
+a legacy token, another repository or a new grant. A read-only Codex mission
+node is not a repository writer. Do not claim dispatch, a commit or a PR from a
+proposed handoff alone.
+
+When `product.repository.reference` is exposed, provide the stable operation ID,
+current initiative ID/version timestamp, explicit repository/path, full 40-digit
+commit SHA, title and expected Markdown content digest from the proposal. It
+uses the current managed read grant to compare the exact file and saves/reads
+back a draft initiative permalink. Reuse the same operation on retries; it does
+not copy the document body into another store. An optional PR number supplies
+an unverified link: PR head/membership, merge, quality, acceptance, completion
+and customer outcomes require their own evidence. The attachment enters the
+existing quality loop and its budget controls; it is not a free evaluation.
+
+### Optional external document compatibility
+
+Use another document destination only when explicitly selected. Inspect the current OrgX connector
 catalog and account/tool grant for the target workspace; a plugin in this chat
 does not make it available to the deployed agent. Notion, Linear, Atlassian,
 PostHog and Intercom hosted-MCP names require actual discovery. Do not infer
 REST/SDK access from a hosted-MCP OAuth sign-in or claim that a Calendar probe
 verified Google Docs delivery.
 
-When Google Docs is the selected document home and the runtime exposes the
+When Google Docs is explicitly selected and the runtime exposes the
 new tools, use `product.document.read({documentId})` for the exact body/revision.
 Use `product.document.sync({operation:{mode:create, operationId, title, folderId,
 content}})` to create a populated document in an explicitly selected existing
