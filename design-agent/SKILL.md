@@ -830,6 +830,26 @@ requested inspection probes. `needs_verification` is not rendered QA.
   unverified reference. It does not publish a design. Nested Figma exports
   remain blocked until the shared owner supplies a workspace/resource-authorized
   reader; the legacy user-level grant lookup is insufficient.
+- The additional `design.prototype.publish({ runId, episode: { plan, handoff } })`
+  path composes an editable draft through the existing managed Figma capability
+  boundary. `plan` names `episodeId`, `fileKey`, `parentNodeId`, `componentNodeId`,
+  `title`, and `scenes` (`id`, `kind`, `width`, `padding`, `gap`, existing
+  TEXT/BOOLEAN `properties`). Each scene ID is `journeyId/stateId/width` and
+  must cover the handoff's complete state/viewport product. No caller code or
+  caller QA observations are accepted.
+- The bounded episode creates existing component instances, reads the native
+  tree, critiques native overflow and opaque normal-text contrast, revises
+  overflow, requests a preview, saves the exact native revision, and resumes
+  through fresh readback without a new mutation. A preview URL establishes
+  neither rendered QA nor keyboard, screen-reader or implementation acceptance.
+  Keep those checks pending and request independent review of the actual artifact.
+- Canvas transports are shipped as candidate declarations. Current workspace,
+  file, project, active-run effect, connector/account and native cash admission
+  must all be established before invocation. This change grants none of them.
+  Unavailable, expired or revoked access and unknown outcomes return a held
+  result with the original target/stage; reconcile it instead of changing the
+  episode ID or retrying a mutation. Do not infer live Figma access, free
+  provider execution or practitioner percentile from synthetic transport tests.
 - Microcopy requires a supplied `surface` and explicit action/subject `entries`.
   Optional `voice` is caller-supplied; absent voice produces a neutral draft.
   No OrgX brand voice or token palette is inherited by a client.
