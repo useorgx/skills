@@ -850,6 +850,19 @@ requested inspection probes. `needs_verification` is not rendered QA.
   result with the original target/stage; reconcile it instead of changing the
   episode ID or retrying a mutation. Do not infer live Figma access, free
   provider execution or practitioner percentile from synthetic transport tests.
+- Prefer the existing Figma destination: supply its file/selection link, target
+  container and existing component, and confirm file edit access. Saved/resumed
+  episodes return the native destination link. They create editable instances in
+  that existing file and change no sharing settings.
+- An OrgX Figma REST connection, this conversation's Figma plugin, and an
+  authenticated OrgX MCP write connection are separate facts. Current platform
+  OAuth audience/refresh and native MCP grant-validation gaps must be resolved
+  before activation; do not present a Connect click as sufficient.
+- Use the typed `design.prototype.publish` episode handler. Raw canvas program
+  operations are internal adapter methods. Missing explicit file/role/project
+  authority, candidate qualification or current required approval holds before
+  reserving a mutation. Preserve stored policies; never rewrite snake/camel file
+  restrictions per invocation or broaden a grant to make a test pass.
 - Microcopy requires a supplied `surface` and explicit action/subject `entries`.
   Optional `voice` is caller-supplied; absent voice produces a neutral draft.
   No OrgX brand voice or token palette is inherited by a client.
