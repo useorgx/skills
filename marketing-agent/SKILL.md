@@ -34,6 +34,62 @@ Apply [orgx-capability-mindset](../orgx-capability-mindset) before marketing wor
 
 Deliver conversion-oriented, evidence-backed marketing assets with deterministic quality gates.
 
+## Source and outcome contract
+
+The runtime tool names and `lib/` paths below refer to the companion
+`hopeatina/orgx` application. This skill does not install or activate them.
+Use them only when the connected runtime exposes the reviewed implementation;
+otherwise name the missing capability and retain a reviewable local draft.
+
+Observed evidence, interpretation, hypotheses, draft artifacts, accepted leads,
+qualified buyers and delivery receipts are separate states. Preserve their
+definitions and original source dates. Reuse the existing discovery pipeline's
+`PainObservation`, `PainEvidence`, `PainPerson`, `PainOutcome` and
+`DiscoveryPipelineAdapter` contracts; do not create a parallel tracker or sender.
+Keep contrary evidence and disqualification reasons in the review packet.
+
+In the application runtime, `marketing.briefs.create_or_update` accepts an
+optional `experimentReview` planning packet: ICP pain/workflow references,
+disqualifiers, channel evidence and alternative/tradeoff, funnel outcome and
+denominator, allocation/sample rationale, attribution limits, decision owner,
+stop rule and downstream evidence-contract reference. The packet's ICP, channel
+and hypothesis must match the brief; omitted fields derive from it and additional
+channels/hypotheses remain unassessed. The isolated method is
+`lib/agents/marketingPractitioner/experimentReview.ts`. Unknown baseline/sample
+inputs can support exploratory planning; they cannot support a confirmatory
+design or a scale decision. References remain caller-supplied until reviewed.
+
+For claims, use the optional `claimReview` on a brief or content item. A brief's
+review text must exactly match its effective objective and normalized messaging
+pillars joined with newlines; a content item's review text must exactly match
+its trimmed body. The local method in `claimsReview.ts` checks declared spans,
+literal source excerpts, original-source freshness and declared conflicts. It
+retains provenance, visibly separates hypotheses/inferences and blocks changed
+drafts. It never establishes semantic truth, complete claim coverage, compliance
+or publication approval. Inspect the complete draft and original sources.
+The legacy standalone claims tool remains quarantined; do not claim it is live.
+
+`marketing.content_pack.generate` saves actual supplied `items`, including
+optional claim packets. With channel names alone it returns evidence-needed.
+Benchmark, competitor, library and performance compatibility tools also return
+blocked results until their source adapters exist. A stored reference manifest
+does not prove visuals were generated. A saved draft cannot approve itself.
+
+Numeric goals are plans, not observed outcomes. Structural validators and
+heuristic engagement scores do not verify facts or customer fit. Never invent
+claims, baselines or channels to satisfy a template. Measure relevance, novelty,
+source age, unsupported claims, downstream acceptance, review effort and actual
+cost/latency separately. Unknown cost is not zero; synthetic proof is not live
+access or customer traction. A top-of-funnel goal is never a send quota. Use the
+current canonical operating cap, all suppression sources and the sole sender;
+drafting grants no outbound, followup, activation or enrollment authority.
+
+Method sources: [FTC substantiation policy](https://www.ftc.gov/legal-library/browse/ftc-policy-statement-regarding-advertising-substantiation)
+supports obtaining evidence before objective claims are disseminated.
+[NIST experiment objectives](https://www.itl.nist.gov/div898/handbook/pri/section3/pri31.htm)
+supports choosing objectives before design. These inform review methods, not an
+automatic legal verdict or a claim that a planned experiment is statistically adequate.
+
 Worked examples live in `examples/` — `campaign-product-launch.md` is the canonical launch-brief shape, `positioning-document.md` is the canonical positioning shape. When producing a new artifact, mirror their structure and the specificity of claim/proof/channel sequencing.
 
 ## Trigger Map
@@ -97,7 +153,7 @@ This agent reasons from established marketing and growth frameworks. Use a frame
 
 **Content-Market Fit**: The intersection of what you can credibly say and what your audience needs to hear. Use to filter content ideas. If you cannot credibly say it (no proof) or the audience does not need to hear it (no job), kill the idea.
 
-**Message-Market Fit Testing**: Minimum 3 message variants, statistical significance before scaling. Use before committing budget to any paid channel. Define the test matrix, sample size, and significance threshold in the campaign brief.
+**Message-Market Fit Testing**: Choose variants and design to match the objective, evidence, traffic and capacity. Before a confirmatory comparison, predeclare the outcome, allocation, sample-size rationale, detectable effect, observation window and decision rules. Keep exploratory learning and observational attribution limits visible; do not invent significance or scale from missing measurements.
 
 **Full-Funnel Attribution**: Multi-touch modeling, not just last-click. Use when defining success metrics. Every campaign brief must specify the attribution model and acknowledge its limitations.
 
@@ -163,7 +219,7 @@ Required fields:
 - `target_audience.primary_icp`
 - `target_audience.pain_points` (>=2)
 - `messaging_pillars` (>=3, each with `proof_points`)
-- `channels` (>=2)
+- `channels` (>=1, each justified by audience evidence and capacity)
 - `success_metrics` (>=3 with numeric targets)
 - `timeline` (>=2 milestones)
 - `hypotheses` (>=1)
@@ -562,9 +618,9 @@ Optional (if configured):
 ## Failure Handling
 
 - **Missing ICP precision**: Provide two candidate ICPs with reasoning for each. Mark the primary as an assumption. Do not proceed with generic targeting.
-- **Missing brand rules**: Default to existing OrgX tone from org memory and tag all creative direction as provisional. Query: `mcp__orgx__orgx_search({ query: "brand voice guidelines" })`.
+- **Missing brand rules**: Resolve the current workspace's own voice references. If absent, prepare a neutral provisional draft with stated assumptions; request exemplars when voice fidelity is required. Never substitute OrgX's voice for a customer workspace.
 - **Missing competitive intel**: State what is known, flag gaps explicitly, and recommend competitive research as a prerequisite task via `mcp__orgx__orgx_create_task` and `mcp__orgx__orgx_start_agent_task`.
-- **Missing performance data**: Use industry benchmarks as starting baselines, cite the source, and flag that baselines should be updated with actual data within 30 days.
+- **Missing performance data**: Keep the workspace baseline unknown and name the authorized export or measurement needed. External benchmarks may be separately labeled comparisons after cohort/definition/freshness review; they are not the workspace's observed baseline.
 - **Validator errors**: Do not publish until fixed. Never override validation gates.
 - **Conflicting inputs**: When product-agent and sales-agent provide conflicting positioning, flag the conflict explicitly, present both framings, and recommend a positioning alignment session.
 - **Scope creep**: If a request expands beyond the original artifact type, split into multiple artifacts rather than producing one bloated document.

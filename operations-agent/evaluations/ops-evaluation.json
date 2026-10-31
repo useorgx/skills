@@ -16,14 +16,14 @@
         "revenue_impact": "estimated $8,200 in failed transactions"
       },
       "expected_behaviors": [
-        "Creates detailed timeline with at least 7 timestamped events",
+        "Builds a chronological timeline from supported events only; missing timestamps remain unknown",
         "Identifies root cause as connection leak in batch job, not the batch job itself",
-        "Applies Five Whys to get past surface cause",
+        "Uses causal questions to compare supported mechanisms and distinguish hypotheses from facts",
         "Maps contributing factors using Swiss Cheese model",
         "Quantifies impact in users and revenue",
         "Includes MTTD and MTTR metrics",
         "Proposes at least 4 action items with owners and due dates",
-        "Uses blameless language throughout — no 'should have' or 'failed to'",
+        "Avoids personal blame while describing technical failures precisely",
         "Includes detection analysis (why was detection delayed 5 minutes)",
         "References prior learnings if available"
       ],
@@ -35,7 +35,7 @@
         "contributing_factors has >= 2 entries",
         "action_items >= 3 with owner and due_date on each",
         "lessons_learned >= 2",
-        "No blame words detected (fault, blame, failed to, should have)",
+        "Likely personal blame is flagged for review; technical failure observations remain precise",
         "detection block present with method and MTTD",
         "response_metrics block present with MTTD and MTTR"
       ]
@@ -170,12 +170,12 @@
       "Action items without owners or due dates",
       "No error budget policy despite proposing SLOs"
     ],
-    "pass_rate": "25%"
+    "pass_rate": "unmeasured; previous 25% label had no attached comparison evidence"
   },
   "target_with_skill": {
-    "expected_pass_rate": "90%",
+    "expected_pass_rate": "target only; no model/practitioner comparison has been measured",
     "key_improvements": [
-      "Blameless language enforced by validator",
+      "Likely personal blame flagged for independent semantic review",
       "Swiss Cheese model applied to every incident",
       "SLO targets justified by customer need, not vanity",
       "Error budget policy with concrete deploy-freeze criteria",
@@ -184,5 +184,16 @@
       "Cross-agent handoffs triggered when appropriate",
       "Prior learnings incorporated into new artifacts"
     ]
+  },
+  "qualification_evidence": {
+    "suite": "hopeatina/orgx:orgx/lib/agents/operations/practitioner.eval.spec.ts",
+    "runtime_integration": "companion application source; installed tool availability and release status must be checked independently",
+    "local_validator_suite": "operations-agent/scripts/validate_ops.test.py",
+    "scope": "isolated synthetic deterministic method and adapter tests",
+    "critical_target": "100% of truthfulness, scope, uncertainty and authority cases; zero false recovery or mutations",
+    "live_provider_access": "not tested",
+    "customer_outcomes": "not measured",
+    "practitioner_percentile": "not measured",
+    "model_cost_usd": 0
   }
 }
