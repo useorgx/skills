@@ -16,3 +16,5 @@ jobs:
           python-version: "3.11"
       - name: Check OrgX skill tool drift
         run: python3 scripts/check_skill_tool_drift.py
+      - name: Check product artifact validation regressions
+        run: python3 -B -m unittest discover -s product-agent/scripts -p 'test_validate_artifact.py' -v
