@@ -37,6 +37,52 @@ Deliver operational artifacts that reduce incident risk, improve response qualit
 
 Worked examples live in `examples/` — `incident-analysis.md` is the canonical incident-report shape, `slo-proposal.md` is the canonical SLO-proposal shape. When producing a new artifact, mirror their structure, depth of root-cause analysis, and specificity of remediation.
 
+## Incident method, runtime integration and evidence limits
+
+The companion OrgX runtime integration extends the existing
+`operations.cause.recover` practice. In the `hopeatina/orgx` application
+repository, its source paths from the repository root are
+`orgx/lib/agents/expertPractices.ts`, `orgx/lib/agents/operations/`, and
+`orgx/lib/server/agentTools/operationsToolConfigs.ts`. These files are not
+included in this skill repository. Availability in an installed runtime must
+be checked against its actual schemas and version; publishing this skill
+does not install or qualify those tools.
+
+- `ops.incident.timeline.build` accepts an admitted `runId` for stored step
+  observations or a `packet` with workspace/service/environment, exact resource
+  IDs, frozen `asOf`, incident window, telemetry availability/completeness and
+  timestamped observations with credential-free provenance. Do not backfill
+  missing events. Keep provider terminal outcomes resource-specific.
+- `ops.playbook.generate` needs `runId`, `packet` and `proposal` (kind, owner,
+  exact target IDs, duration and cost ceilings, plus rollback for changes).
+  It saves a plan draft. Diagnosis and remediation have separate authority;
+  the plan never executes a change or grants permission. Keep central release
+  and infrastructure owners in control of their existing workflows.
+- `ops.response_template.generate` drafts current stakeholder status from the
+  same packet. It does not send a message. An unresolved incident stays open.
+- Read tools return bounded requester-owned OrgX records with source references.
+  They do not establish provider connectivity, full incident coverage, spend,
+  SLA compliance or a healthy service. Capacity and runbook coverage return an
+  explicit dependency until their actual adapters are qualified.
+- Reconcile an uncertain prior effect using its original identity and readback
+  before considering retry. An unconfirmed report save returns its attempted
+  artifact identity and frozen `retry` object. Read back that identity first;
+  if absent, replay the same tool with that object instead of refreshing data.
+- Recovery needs fresh, complete independent post-change observations covering
+  every affected resource with no contradictory failure. Supplied observations
+  remain unauthenticated; only the independent provider observer can establish
+  live verification. Agent completion events and saved artifacts do not do so.
+
+The companion application's isolated synthetic acceptance suite is
+`orgx/lib/agents/operations/practitioner.eval.spec.ts` in `hopeatina/orgx`,
+plus tool/registration tests. This repository's isolated validator regressions
+run with `python3 -B operations-agent/scripts/validate_ops.test.py`.
+Critical truthfulness, scope, uncertainty and authority cases must all pass;
+false recovery claims and mutation dispatches must remain zero. Record latency,
+failures and actual cost separately. This is source-level qualification, not a
+measured practitioner percentile. The legacy Python validator checks structure
+and timestamp integrity, not factual completeness or semantic correctness.
+
 ## Trigger Map
 
 Use this skill for:
@@ -98,7 +144,7 @@ Always identify the Cynefin domain before recommending a response strategy. A Co
 Multiple defensive layers each have holes. Incidents happen when holes align across layers. Every incident analysis must identify which layers failed and which layers caught the problem. Never point to a single cause — always map the full alignment of failures.
 
 #### Five Whys
-Iterative root cause drilling. Ask "why" at least five times to get past surface-level symptoms. Stop when you reach a systemic or organizational cause, not an individual action. If the fifth "why" ends at a person ("because Bob forgot"), you stopped too early — ask why the system allowed that to happen.
+Iterative root cause drilling. Follow causal questions only as far as the evidence supports; state remaining causes as hypotheses. Stop when you reach a systemic or organizational cause, not an individual action. If a causal explanation ends at a person ("because Bob forgot"), you stopped too early — ask why the system allowed that to happen.
 
 #### SLI/SLO/SLA Triangle
 - **SLI (Service Level Indicator)**: A quantitative measurement of service behavior (e.g., request latency p99, error rate, throughput).
