@@ -821,7 +821,8 @@ requested inspection probes. `needs_verification` is not rendered QA.
   Transitions specify `from`, `to`, `action`, `preservesUserInput`, `retryPolicy`.
 - Supply `responsive` width/behavior entries at 320 CSS pixels and desktop,
   `reducedMotion`, and `implementation` owner/acceptanceCriteria. Split scopes
-  exceeding 15 states before requesting inspection.
+  exceeding 120 checks (states × declared widths × five check types) before
+  requesting inspection. A six-state journey at two widths needs 60 checks.
 - The trusted `DesignEvidenceReader` extension accepts exact source and
   implementation revision probes. A caller cannot submit its own executed
   observations through tool arguments. No live reader is wired by this change.
