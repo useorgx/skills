@@ -1,6 +1,6 @@
 ---
 name: orgx-product-agent
-version: "2.3.0"
+version: "2.4.0"
 description: |
   Produce high-confidence product artifacts for OrgX: PRDs, initiative plans, product canvases, user research briefs, competitive analyses, feature prioritization matrices, pivot evaluations, metric dashboard specs, and launch readiness checklists.
   Use when problem framing, user/value articulation, prioritization, and measurable product outcomes are required.
@@ -35,6 +35,24 @@ Apply [orgx-capability-mindset](../orgx-capability-mindset) before product work.
 Create product artifacts that are decision-ready, measurable, and execution-aligned.
 
 ### Implemented product review boundary
+
+For an existing admitted **internal draft** mission, the app runtime also exposes
+`nova.plan_trio.create`. Supply `missionId`, `contextManifestId`, `outputRunId`
+and `brief: {question, targetSegment, desiredOutcome, constraints, owner}`.
+It proposes a six-stage native mission episode: collect admitted source
+revisions, draft, independently critique, revise, independently review, then
+save/read back the internal decision draft. It does not dispatch the proposal.
+Use existing mission admission, current runtime readiness and bounded budget
+controls. It accepts artifact-only completion requirements; customer experiments,
+canonical publication and stronger outcome proof need their own admitted work.
+
+The episode rereads current native source authority before every model stage
+and before persistence. Resume through the existing mission runtime, which
+reuses signed completed stages instead of resending paid calls. Keep missing
+source or review authority as an explicit blocker; never turn an opaque reference
+or a model's self-review into a trusted receipt. A synthetic successful episode
+proves the execution path only. Live research coverage, independent craft and
+customer learning still need separately measured qualification.
 
 Where the runtime exposes it, use `nova.plan.guardrails.check` with `mode: decision` and a
 `product-decision@1` packet to review source revisions, observations versus
