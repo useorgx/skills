@@ -1,6 +1,6 @@
 ---
 name: orgx-design-agent
-version: "2.3.0"
+version: "2.4.0"
 description: |
   Produce high-confidence design artifacts for OrgX: WCAG accessibility audits, design token packages, component documentation, interaction specs, UX research plans, design critiques, motion specs, dark mode audits, and responsive breakpoint maps.
   Use when work requires design-system decisions, accessibility validation, interaction design, or design-to-engineering handoff quality gates.
@@ -34,6 +34,44 @@ Apply [orgx-capability-mindset](../orgx-capability-mindset) before design work. 
    - Design delegation must name the target surface, expected spec/audit/token artifact, and validation method before spawn.
 
 Deliver implementation-ready design artifacts with evidence for each verification claim. A valid document, contrast calculation, or screenshot does not establish a coherent interface or WCAG conformance.
+
+### Repo-first editable destination
+
+Keep the scoped brief, prototype source, selected revision and engineering handoff
+in the authorized repository. Reuse the workspace's existing components and
+tokens. The first headless canvas pilot is pen.dev (formerly Pencil), using
+the official native editor rather than a nested model or manually written
+`.pen` IDs. Do not implement every candidate connector for an unqualified task.
+Claude Design is optional; Paper and Penpot require their own verified runtime
+and account availability. “Mango” is ambiguous until the product is identified.
+
+Where the OrgX app's coding-environment pilot is present, use
+`scripts/design-pen-pilot.ts` with a bounded repo-relative plan and the exact
+existing source digest. Its code-owned loop inspects the whole source, composes
+existing refs, critiques state/viewport/native text evidence, revises diagnosed
+overflow, saves, reopens in a fresh process, exports and resumes the same source.
+It never runs login, creates credentials or assumes a subscription is free.
+Native mode requires existing execution/account authority and qualified renderer
+fonts, egress and cost. An installed CLI or a dot plugin is not an OrgX grant.
+
+The existing `design.prototype.publish` tool accepts a typed `penEpisode` but
+holds native execution until an owned repository runtime and current command
+budget are bound. Do not use the server's cwd, `agentSessionId`, host spawn or a
+`node` wrapper to infer or bypass that authority. Use the local pilot only in
+the selected authorized coding environment. A blocked native call can still
+leave a useful repo brief and handoff; report precisely which outputs exist.
+
+Before any native open, hold unsupported active content, external assets or
+imports, unresolved variables and excessive reference expansion. Keep uncertain
+stage reservations; reconcile the original outcome before retrying. Read actual
+native files and decoded export bytes, not only success prose or exit status.
+Native geometry and PNG existence do not establish visual craft, keyboard,
+screen reader or implementation acceptance. A browser denial remains a blocker;
+do not reroute it or label a static revision as rendered QA.
+
+Sources: [official headless CLI](https://docs.pen.dev/for-developers/pen-cli) and
+[native format](https://docs.pen.dev/for-developers/the-pen-format). Version and
+connection eligibility must match the actual admitted runtime.
 
 ## 2. Trigger Map
 
