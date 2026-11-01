@@ -1,6 +1,6 @@
 ---
 name: orgx-product-agent
-version: "2.3.0"
+version: "2.6.1"
 description: |
   Produce high-confidence product artifacts for OrgX: PRDs, initiative plans, product canvases, user research briefs, competitive analyses, feature prioritization matrices, pivot evaluations, metric dashboard specs, and launch readiness checklists.
   Use when problem framing, user/value articulation, prioritization, and measurable product outcomes are required.
@@ -36,6 +36,37 @@ Create product artifacts that are decision-ready, measurable, and execution-alig
 
 ### Implemented product review boundary
 
+Before using `nova.plan_trio.create`, inspect its current manifest schema.
+Require inputs `missionId`, `contextManifestId`, `outputRunId` and
+`brief: {question, targetSegment, desiredOutcome, constraints, owner}`. The tool
+name alone is insufficient: a legacy handler with the same name saves section
+names and returns an artifact ID, without the native episode contract. If the
+schema is absent, generic or legacy, keep the native-runtime readiness blocker
+and use the local structured validator without claiming equivalent execution.
+Do not make an implicit paid probe to discover whether the episode is available.
+
+For an existing admitted **internal draft** mission with that contract, the
+response must contain `data.status: proposal`, `data.dispatched: false` and a
+native `data.plan` with the six handlers `orgx.product_decision.collect`,
+`orgx.product_decision.create`, `orgx.product_decision.critique`,
+`orgx.product_decision.revise`, `orgx.product_decision.review` and
+`orgx.product_decision.persist`. These collect admitted source revisions, draft,
+independently critique, revise, independently review, then save/read back the
+internal decision draft. A section list, artifact ID or generic success does
+not satisfy this response contract; preserve the readiness blocker instead.
+The proposal grants no permission and dispatches no work. Use existing mission
+admission, current runtime readiness and bounded budget controls. It accepts
+artifact-only completion requirements; customer experiments, canonical
+publication and stronger outcome proof need their own admitted work.
+
+The episode rereads current native source authority before every model stage
+and before persistence. Resume through the existing mission runtime, which
+reuses signed completed stages instead of resending paid calls. Keep missing
+source or review authority as an explicit blocker; never turn an opaque reference
+or a model's self-review into a trusted receipt. A synthetic successful episode
+proves the execution path only. Live research coverage, independent craft and
+customer learning still need separately measured qualification.
+
 Where the runtime exposes it, use `nova.plan.guardrails.check` with `mode: decision` and a
 `product-decision@1` packet to review source revisions, observations versus
 assumptions, contradictions, bounded PRD scope, acceptance criteria, owned
@@ -54,6 +85,75 @@ claiming live validation. The legacy research/forecast tools remain unavailable.
 If this tool is absent from the current client's manifest, retain that named
 dependency and use the local structured validator; do not claim equivalent
 live coverage or attempt to grant access.
+
+### Canonical documentation lives in the repository
+
+Keep PRDs, decisions and specifications in the team's repository. OrgX owns the
+initiative goal, work status, decision/evidence trail and delivery references;
+its native episode artifact is a working/review record, not a second canonical
+document home. Link the exact repository path and commit back to the initiative.
+
+For the existing native decision episode, set
+`brief.repositoryDocument:{repository:"owner/repo",path:"docs/product/decision.md"}`
+when the target is known. After independent review, the existing persistence
+step returns `repositoryChange`: reviewed Markdown, its digest and a bounded
+single-file proposal. `status: proposed` and `persisted: false` mean no repository
+write happened. A missing target stays explicit; do not default to Google Docs
+or Notion. Preserve the sources, contradictions, assumptions and acceptance
+criteria when moving the proposed file into the existing coding workflow.
+
+Hand that change to an existing authorized coding executor for file edits,
+reviewed diff, commit/push and PR creation under its current permissions and
+declared `repo.push`/`pull_request.create` effects. Current managed Project
+GitHub grants support `read_file` with `contents:read`; they do not permit writes
+or PR creation. Keep the named Core managed-write dependency rather than using
+a legacy token, another repository or a new grant. A read-only Codex mission
+node is not a repository writer. Do not claim dispatch, a commit or a PR from a
+proposed handoff alone.
+
+When `product.repository.reference` is exposed, provide the stable operation ID,
+current initiative ID/version timestamp, explicit repository/path, full 40-digit
+commit SHA, title and expected Markdown content digest from the proposal. It
+uses the current managed read grant to compare the exact file and saves/reads
+back a draft initiative permalink. Reuse the same operation on retries; it does
+not copy the document body into another store. An optional PR number supplies
+an unverified link: PR head/membership, merge, quality, acceptance, completion
+and customer outcomes require their own evidence. The attachment enters the
+existing quality loop and its budget controls; it is not a free evaluation.
+
+### Optional external document compatibility
+
+Use another document destination only when explicitly selected. Inspect the current OrgX connector
+catalog and account/tool grant for the target workspace; a plugin in this chat
+does not make it available to the deployed agent. Notion, Linear, Atlassian,
+PostHog and Intercom hosted-MCP names require actual discovery. Do not infer
+REST/SDK access from a hosted-MCP OAuth sign-in or claim that a Calendar probe
+verified Google Docs delivery.
+
+When Google Docs is explicitly selected and the runtime exposes the
+new tools, use `product.document.read({documentId})` for the exact body/revision.
+Use `product.document.sync({operation:{mode:create, operationId, title, folderId,
+content}})` to create a populated document in an explicitly selected existing
+folder, or `mode: revise` with `documentId`, `expectedRevision` and `content`.
+The stable operation ID identifies one intended effect. Resume with only
+`{operation:{mode:resume, operationId}}`; it loads the authenticated native
+checkpoint and never creates a replacement. Preserve returned Google links,
+body digest, native receipt and current blockers in the handoff.
+
+External delivery is separate from the internal draft episode. It needs current
+Google Workspace grants for `drive_create_file`, `docs_get_document` and
+`docs_batch_update`, a declared `document.write` effect, destination access and
+the existing per-call approval. No tool registration creates these permissions.
+An ambiguous create without a recorded remote ID stays held; do not choose a
+new operation ID to hide a retry. Completed operations verify only and preserve
+human edits. Rich, partial or suggested content needs separate review.
+
+`files.createDoc` is only an inline Markdown download (`persisted: false`).
+The actual document body must be read back before claiming delivery. Research
+can use the implemented `research.web_search` tool when execution credentials
+and budget permit; connected PostHog/Intercom evidence is preferable for claims
+about this product's customers. Synthetic provider responses prove transport
+and control flow, not live delivery, research quality or customer results.
 
 Missing evidence is a valid discovery draft when assumptions and an owned
 research action are explicit. Do not invent customer stories or interpret
