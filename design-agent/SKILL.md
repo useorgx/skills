@@ -1,6 +1,6 @@
 ---
 name: orgx-design-agent
-version: "2.3.0"
+version: "2.4.0"
 description: |
   Produce high-confidence design artifacts for OrgX: WCAG accessibility audits, design token packages, component documentation, interaction specs, UX research plans, design critiques, motion specs, dark mode audits, and responsive breakpoint maps.
   Use when work requires design-system decisions, accessibility validation, interaction design, or design-to-engineering handoff quality gates.
@@ -34,6 +34,44 @@ Apply [orgx-capability-mindset](../orgx-capability-mindset) before design work. 
    - Design delegation must name the target surface, expected spec/audit/token artifact, and validation method before spawn.
 
 Deliver implementation-ready design artifacts with evidence for each verification claim. A valid document, contrast calculation, or screenshot does not establish a coherent interface or WCAG conformance.
+
+### Repo-first editable destination
+
+Keep the scoped brief, prototype source, selected revision and engineering handoff
+in the authorized repository. Reuse the workspace's existing components and
+tokens. The first headless canvas pilot is pen.dev (formerly Pencil), using
+the official native editor rather than a nested model or manually written
+`.pen` IDs. Do not implement every candidate connector for an unqualified task.
+Claude Design is optional; Paper and Penpot require their own verified runtime
+and account availability. “Mango” is ambiguous until the product is identified.
+
+Where the OrgX app's coding-environment pilot is present, use
+`scripts/design-pen-pilot.ts` with a bounded repo-relative plan and the exact
+existing source digest. Its code-owned loop inspects the whole source, composes
+existing refs, critiques state/viewport/native text evidence, revises diagnosed
+overflow, saves, reopens in a fresh process, exports and resumes the same source.
+It never runs login, creates credentials or assumes a subscription is free.
+Native mode requires existing execution/account authority and qualified renderer
+fonts, egress and cost. An installed CLI or a dot plugin is not an OrgX grant.
+
+The existing `design.prototype.publish` tool accepts a typed `penEpisode` but
+holds native execution until an owned repository runtime and current command
+budget are bound. Do not use the server's cwd, `agentSessionId`, host spawn or a
+`node` wrapper to infer or bypass that authority. Use the local pilot only in
+the selected authorized coding environment. A blocked native call can still
+leave a useful repo brief and handoff; report precisely which outputs exist.
+
+Before any native open, hold unsupported active content, external assets or
+imports, unresolved variables and excessive reference expansion. Keep uncertain
+stage reservations; reconcile the original outcome before retrying. Read actual
+native files and decoded export bytes, not only success prose or exit status.
+Native geometry and PNG existence do not establish visual craft, keyboard,
+screen reader or implementation acceptance. A browser denial remains a blocker;
+do not reroute it or label a static revision as rendered QA.
+
+Sources: [official headless CLI](https://docs.pen.dev/for-developers/pen-cli) and
+[native format](https://docs.pen.dev/for-developers/the-pen-format). Version and
+connection eligibility must match the actual admitted runtime.
 
 ## 2. Trigger Map
 
@@ -830,6 +868,39 @@ requested inspection probes. `needs_verification` is not rendered QA.
   unverified reference. It does not publish a design. Nested Figma exports
   remain blocked until the shared owner supplies a workspace/resource-authorized
   reader; the legacy user-level grant lookup is insufficient.
+- The additional `design.prototype.publish({ runId, episode: { plan, handoff } })`
+  path composes an editable draft through the existing managed Figma capability
+  boundary. `plan` names `episodeId`, `fileKey`, `parentNodeId`, `componentNodeId`,
+  `title`, and `scenes` (`id`, `kind`, `width`, `padding`, `gap`, existing
+  TEXT/BOOLEAN `properties`). Each scene ID is `journeyId/stateId/width` and
+  must cover the handoff's complete state/viewport product. No caller code or
+  caller QA observations are accepted.
+- The bounded episode creates existing component instances, reads the native
+  tree, critiques native overflow and opaque normal-text contrast, revises
+  overflow, requests a preview, saves the exact native revision, and resumes
+  through fresh readback without a new mutation. A preview URL establishes
+  neither rendered QA nor keyboard, screen-reader or implementation acceptance.
+  Keep those checks pending and request independent review of the actual artifact.
+- Canvas transports are shipped as candidate declarations. Current workspace,
+  file, project, active-run effect, connector/account and native cash admission
+  must all be established before invocation. This change grants none of them.
+  Unavailable, expired or revoked access and unknown outcomes return a held
+  result with the original target/stage; reconcile it instead of changing the
+  episode ID or retrying a mutation. Do not infer live Figma access, free
+  provider execution or practitioner percentile from synthetic transport tests.
+- Prefer the existing Figma destination: supply its file/selection link, target
+  container and existing component, and confirm file edit access. Saved/resumed
+  episodes return the native destination link. They create editable instances in
+  that existing file and change no sharing settings.
+- An OrgX Figma REST connection, this conversation's Figma plugin, and an
+  authenticated OrgX MCP write connection are separate facts. Current platform
+  OAuth audience/refresh and native MCP grant-validation gaps must be resolved
+  before activation; do not present a Connect click as sufficient.
+- Use the typed `design.prototype.publish` episode handler. Raw canvas program
+  operations are internal adapter methods. Missing explicit file/role/project
+  authority, candidate qualification or current required approval holds before
+  reserving a mutation. Preserve stored policies; never rewrite snake/camel file
+  restrictions per invocation or broaden a grant to make a test pass.
 - Microcopy requires a supplied `surface` and explicit action/subject `entries`.
   Optional `voice` is caller-supplied; absent voice produces a neutral draft.
   No OrgX brand voice or token palette is inherited by a client.
