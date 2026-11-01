@@ -1,6 +1,6 @@
 ---
 name: orgx-product-agent
-version: "2.6.0"
+version: "2.6.1"
 description: |
   Produce high-confidence product artifacts for OrgX: PRDs, initiative plans, product canvases, user research briefs, competitive analyses, feature prioritization matrices, pivot evaluations, metric dashboard specs, and launch readiness checklists.
   Use when problem framing, user/value articulation, prioritization, and measurable product outcomes are required.
@@ -36,15 +36,28 @@ Create product artifacts that are decision-ready, measurable, and execution-alig
 
 ### Implemented product review boundary
 
-For an existing admitted **internal draft** mission, the app runtime also exposes
-`nova.plan_trio.create`. Supply `missionId`, `contextManifestId`, `outputRunId`
-and `brief: {question, targetSegment, desiredOutcome, constraints, owner}`.
-It proposes a six-stage native mission episode: collect admitted source
-revisions, draft, independently critique, revise, independently review, then
-save/read back the internal decision draft. It does not dispatch the proposal.
-Use existing mission admission, current runtime readiness and bounded budget
-controls. It accepts artifact-only completion requirements; customer experiments,
-canonical publication and stronger outcome proof need their own admitted work.
+Before using `nova.plan_trio.create`, inspect its current manifest schema.
+Require inputs `missionId`, `contextManifestId`, `outputRunId` and
+`brief: {question, targetSegment, desiredOutcome, constraints, owner}`. The tool
+name alone is insufficient: a legacy handler with the same name saves section
+names and returns an artifact ID, without the native episode contract. If the
+schema is absent, generic or legacy, keep the native-runtime readiness blocker
+and use the local structured validator without claiming equivalent execution.
+Do not make an implicit paid probe to discover whether the episode is available.
+
+For an existing admitted **internal draft** mission with that contract, the
+response must contain `data.status: proposal`, `data.dispatched: false` and a
+native `data.plan` with the six handlers `orgx.product_decision.collect`,
+`orgx.product_decision.create`, `orgx.product_decision.critique`,
+`orgx.product_decision.revise`, `orgx.product_decision.review` and
+`orgx.product_decision.persist`. These collect admitted source revisions, draft,
+independently critique, revise, independently review, then save/read back the
+internal decision draft. A section list, artifact ID or generic success does
+not satisfy this response contract; preserve the readiness blocker instead.
+The proposal grants no permission and dispatches no work. Use existing mission
+admission, current runtime readiness and bounded budget controls. It accepts
+artifact-only completion requirements; customer experiments, canonical
+publication and stronger outcome proof need their own admitted work.
 
 The episode rereads current native source authority before every model stage
 and before persistence. Resume through the existing mission runtime, which
