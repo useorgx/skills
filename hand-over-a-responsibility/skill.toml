@@ -1,0 +1,7 @@
+name = "hand-over-a-responsibility"
+version = "1.0.0"
+description = "Set up an ongoing responsibility in OrgX as a readable operating agreement, record work against it with receipts, and resume it from its brief; ships sales follow-ups as a drafts-only first path"
+entry_instructions = "SKILL.md"
+required_tools = ["mcp__orgx__orgx_get_workspace_context", "mcp__orgx__orgx_start_plan", "mcp__orgx__orgx_save_plan", "mcp__orgx__orgx_complete_plan", "mcp__orgx__orgx_submit_work_receipt"]
+required_scopes = []
+resources = []

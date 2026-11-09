@@ -23,6 +23,7 @@ npx add-skill useorgx/skills --list
 | [initiative-kickoff](./initiative-kickoff) | Create complete initiatives from a one-line goal                            |
 | [bulk-create](./bulk-create)               | Create multiple tasks from markdown checklists                              |
 | [nightly-recap](./nightly-recap)           | End-of-day activity summary                                                 |
+| [hand-over-a-responsibility](./hand-over-a-responsibility) | Set up an ongoing responsibility as a readable operating agreement, record work against it, and resume it from its brief; sales follow-ups as a drafts-only first path |
 | [orgx-capability-mindset](./orgx-capability-mindset) | Shared Software 3.0 judgment layer: verifier gates, agent-native outputs, jagged-risk routing, adversarial review, and MCP progress ledger |
 | [orgx-quality-bar](./orgx-quality-bar)     | How OrgX reviews artifacts: four-lens verification, domain layer stacks, configured acceptance criteria, artifact types, GTM sendability checks, and the rework loop |
 | [orgx-design](./orgx-design)               | Canonical OrgX product design system: full-surface audits, app and widget patterns, responsive/accessibility verification, cut protocol, and cross-tool drift control |
