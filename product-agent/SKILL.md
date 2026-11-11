@@ -1,6 +1,6 @@
 ---
 name: orgx-product-agent
-version: "2.1.0"
+version: "2.6.1"
 description: |
   Produce high-confidence product artifacts for OrgX: PRDs, initiative plans, product canvases, user research briefs, competitive analyses, feature prioritization matrices, pivot evaluations, metric dashboard specs, and launch readiness checklists.
   Use when problem framing, user/value articulation, prioritization, and measurable product outcomes are required.
@@ -16,23 +16,149 @@ Apply [orgx-capability-mindset](../orgx-capability-mindset) before product work.
 
 ## Quick Start
 
-1. Run `mcp__orgx__orgx_bootstrap` — it auto-resolves the active workspace (no second confirmation call needed).
+1. Run `mcp__orgx__orgx_get_workspace_context` — it reads the active workspace; it does not select one or open a session.
 2. Confirm the artifact type (`--type`) and the target audience. If the request is task-bound, hydrate it with `mcp__orgx__orgx_inspect`; otherwise pull surrounding context with `mcp__orgx__orgx_search`.
 3. Pull precedent with `mcp__orgx__orgx_search` — prior artifacts, related decisions, and flywheel learnings.
 4. Before creating or delegating workstreams, milestones, or tasks, inspect the active parent scope and reuse matching siblings. Treat `reused`, `duplicate_prevented`, or `_dedup` results as success and continue on the returned canonical entity ID.
-5. If the output is a plan, start a planning loop with `mcp__orgx__orgx_plan` (`action=start`), refine with `action=improve`, record material revisions with `action=record_edit`, and close it with `action=complete` using `attach_to=[...]`.
+5. If the output is a plan, start a planning loop with `mcp__orgx__orgx_start_plan` (`title`, `idempotency_key`), resume with `mcp__orgx__orgx_read_plan`, refine with `mcp__orgx__orgx_save_plan` (`session_id`, `plan_content`, `expected_version`, `idempotency_key`), record material revisions with `mcp__orgx__orgx_record_plan_edit`, and close it with `mcp__orgx__orgx_complete_plan` using `attach_to=[...]`.
 6. Produce the artifact using the contract below and return:
    - A concise summary (3-6 bullets)
    - The artifact body (JSON or structured Markdown)
    - 3 actionable next steps with owners
-7. Validate with `python3 scripts/validate_artifact.py <file> --type <type>`.
-8. Publish via `mcp__orgx__orgx_write` (`operation=create`), attach evidence back to the task or initiative with `mcp__orgx__orgx_attach`, and record quality via `mcp__orgx__orgx_submit_receipt` (`receipt_type=quality`). When attaching, use the MCP artifact type that matches the work (`product.customer_discovery`, `product.prd`, `product.pricing_hypothesis`, or `product.decision_record`) and include `metadata.artifact_contract` with `agent_type`, `company_stage`, `business_outcome`, `owner`, `review_date`, and `verification`.
-9. Before delegating follow-on execution, run `mcp__orgx__orgx_spawn` (`action=guard`), then spawn with `action=spawn`.
+7. From the app root, validate structured PRDs, initiatives and canvases with `python3 skills/product-agent/scripts/validate_artifact.py <file> --type <prd|initiative|canvas>`. Other artifact kinds need their applicable verifier; an unsupported kind must not be reported as passing this validator. Passing checks structure and declared evidence, not source authenticity or customer outcomes.
+8. Publish by attaching the artifact to the task or initiative with `mcp__orgx__orgx_attach_artifact` (`type`, `id`, `name`, `artifact_type`, `location`, `idempotency_key`), and record quality with `quality_score` and `verification` on `mcp__orgx__orgx_complete_work_with_proof`. When attaching, use the MCP artifact type that matches the work (`product.customer_discovery`, `product.prd`, `product.pricing_hypothesis`, or `product.decision_record`) and include `agent_type`, `company_stage`, `business_outcome`, `owner`, `review_date`, and `verification`.
+9. Before delegating follow-on execution, run `mcp__orgx__orgx_estimate_agent_task` (`task`); v2 has no separate guard call. Then start it with `mcp__orgx__orgx_start_agent_task` (`task_id` of an existing task, `idempotency_key`; create it with `mcp__orgx__orgx_create_task` first); a started run is not a finished one, so poll `mcp__orgx__orgx_get_operation_status`, and a retried start reuses its `idempotency_key`.
    - Omit `model_tier`, `provider`, and exact `model` for normal work so OrgX auto-routes by task complexity.
    - Use `model_tier=standard` and `budget_mode=cheapest_valid` only for controlled reliability validation runs, test initiatives, or explicit budget-constrained verification.
    - Product delegation must name the measurable outcome, expected artifact, and validation signal before spawn.
 
 Create product artifacts that are decision-ready, measurable, and execution-aligned.
+
+### Implemented product review boundary
+
+Before using `nova.plan_trio.create`, inspect its current manifest schema.
+Require inputs `missionId`, `contextManifestId`, `outputRunId` and
+`brief: {question, targetSegment, desiredOutcome, constraints, owner}`. The tool
+name alone is insufficient: a legacy handler with the same name saves section
+names and returns an artifact ID, without the native episode contract. If the
+schema is absent, generic or legacy, keep the native-runtime readiness blocker
+and use the local structured validator without claiming equivalent execution.
+Do not make an implicit paid probe to discover whether the episode is available.
+
+For an existing admitted **internal draft** mission with that contract, the
+response must contain `data.status: proposal`, `data.dispatched: false` and a
+native `data.plan` with the six handlers `orgx.product_decision.collect`,
+`orgx.product_decision.create`, `orgx.product_decision.critique`,
+`orgx.product_decision.revise`, `orgx.product_decision.review` and
+`orgx.product_decision.persist`. These collect admitted source revisions, draft,
+independently critique, revise, independently review, then save/read back the
+internal decision draft. A section list, artifact ID or generic success does
+not satisfy this response contract; preserve the readiness blocker instead.
+The proposal grants no permission and dispatches no work. Use existing mission
+admission, current runtime readiness and bounded budget controls. It accepts
+artifact-only completion requirements; customer experiments, canonical
+publication and stronger outcome proof need their own admitted work.
+
+The episode rereads current native source authority before every model stage
+and before persistence. Resume through the existing mission runtime, which
+reuses signed completed stages instead of resending paid calls. Keep missing
+source or review authority as an explicit blocker; never turn an opaque reference
+or a model's self-review into a trusted receipt. A synthetic successful episode
+proves the execution path only. Live research coverage, independent craft and
+customer learning still need separately measured qualification.
+
+Where the runtime exposes it, use `nova.plan.guardrails.check` with `mode: decision` and a
+`product-decision@1` packet to review source revisions, observations versus
+assumptions, contradictions, bounded PRD scope, acceptance criteria, owned
+dependencies, four product risk dimensions and post-delivery measurement.
+The typed input lives in `lib/agents/product/decisionSchema.ts`. Use
+`mode: prioritization` for comparable RICE inputs from
+`lib/agents/product/prioritization.ts`.
+
+This app runtime tool performs bounded consistency checks without external
+calls. Keep `blocked`, `learning_pending` and `negative_result` findings in
+the handoff. `ready_for_review` means the supplied measurement meets its
+registered target; it is not proof of source authenticity, significance or
+causality. A delivery receipt leaves customer impact unmeasured. The returned
+input digest binds the reviewed packet; independently read the sources before
+claiming live validation. The legacy research/forecast tools remain unavailable.
+If this tool is absent from the current client's manifest, retain that named
+dependency and use the local structured validator; do not claim equivalent
+live coverage or attempt to grant access.
+
+### Canonical documentation lives in the repository
+
+Keep PRDs, decisions and specifications in the team's repository. OrgX owns the
+initiative goal, work status, decision/evidence trail and delivery references;
+its native episode artifact is a working/review record, not a second canonical
+document home. Link the exact repository path and commit back to the initiative.
+
+For the existing native decision episode, set
+`brief.repositoryDocument:{repository:"owner/repo",path:"docs/product/decision.md"}`
+when the target is known. After independent review, the existing persistence
+step returns `repositoryChange`: reviewed Markdown, its digest and a bounded
+single-file proposal. `status: proposed` and `persisted: false` mean no repository
+write happened. A missing target stays explicit; do not default to Google Docs
+or Notion. Preserve the sources, contradictions, assumptions and acceptance
+criteria when moving the proposed file into the existing coding workflow.
+
+Hand that change to an existing authorized coding executor for file edits,
+reviewed diff, commit/push and PR creation under its current permissions and
+declared `repo.push`/`pull_request.create` effects. Current managed Project
+GitHub grants support `read_file` with `contents:read`; they do not permit writes
+or PR creation. Keep the named Core managed-write dependency rather than using
+a legacy token, another repository or a new grant. A read-only Codex mission
+node is not a repository writer. Do not claim dispatch, a commit or a PR from a
+proposed handoff alone.
+
+When `product.repository.reference` is exposed, provide the stable operation ID,
+current initiative ID/version timestamp, explicit repository/path, full 40-digit
+commit SHA, title and expected Markdown content digest from the proposal. It
+uses the current managed read grant to compare the exact file and saves/reads
+back a draft initiative permalink. Reuse the same operation on retries; it does
+not copy the document body into another store. An optional PR number supplies
+an unverified link: PR head/membership, merge, quality, acceptance, completion
+and customer outcomes require their own evidence. The attachment enters the
+existing quality loop and its budget controls; it is not a free evaluation.
+
+### Optional external document compatibility
+
+Use another document destination only when explicitly selected. Inspect the current OrgX connector
+catalog and account/tool grant for the target workspace; a plugin in this chat
+does not make it available to the deployed agent. Notion, Linear, Atlassian,
+PostHog and Intercom hosted-MCP names require actual discovery. Do not infer
+REST/SDK access from a hosted-MCP OAuth sign-in or claim that a Calendar probe
+verified Google Docs delivery.
+
+When Google Docs is explicitly selected and the runtime exposes the
+new tools, use `product.document.read({documentId})` for the exact body/revision.
+Use `product.document.sync({operation:{mode:create, operationId, title, folderId,
+content}})` to create a populated document in an explicitly selected existing
+folder, or `mode: revise` with `documentId`, `expectedRevision` and `content`.
+The stable operation ID identifies one intended effect. Resume with only
+`{operation:{mode:resume, operationId}}`; it loads the authenticated native
+checkpoint and never creates a replacement. Preserve returned Google links,
+body digest, native receipt and current blockers in the handoff.
+
+External delivery is separate from the internal draft episode. It needs current
+Google Workspace grants for `drive_create_file`, `docs_get_document` and
+`docs_batch_update`, a declared `document.write` effect, destination access and
+the existing per-call approval. No tool registration creates these permissions.
+An ambiguous create without a recorded remote ID stays held; do not choose a
+new operation ID to hide a retry. Completed operations verify only and preserve
+human edits. Rich, partial or suggested content needs separate review.
+
+`files.createDoc` is only an inline Markdown download (`persisted: false`).
+The actual document body must be read back before claiming delivery. Research
+can use the implemented `research.web_search` tool when execution credentials
+and budget permit; connected PostHog/Intercom evidence is preferable for claims
+about this product's customers. Synthetic provider responses prove transport
+and control flow, not live delivery, research quality or customer results.
+
+Missing evidence is a valid discovery draft when assumptions and an owned
+research action are explicit. Do not invent customer stories or interpret
+synthetic rehearsal as customer validation. Preserve negative and inconclusive
+learning and the resulting stop, wait or revise decision.
 
 Worked examples live in `examples/` — `prd-authentication.md` is the canonical PRD shape, `competitive-analysis.md` is the canonical analysis shape. When producing a new artifact, mirror their structure and specificity.
 
@@ -68,7 +194,7 @@ This section encodes the product thinking the agent must internalize. Every arti
 
 ### Frameworks
 
-**RICE Scoring** — Reach x Impact x Confidence / Effort. Quantitative prioritization. Use when you need to rank 5+ features against each other with heterogeneous stakeholder input. Reach = number of users affected per quarter. Impact = {3: massive, 2: high, 1: medium, 0.5: low, 0.25: minimal}. Confidence = percentage (100%, 80%, 50%). Effort = person-months. Final score enables direct comparison across unrelated features.
+**RICE Scoring** — Reach x Impact x Confidence / Effort. Compare candidates against the same objective, time period and reach unit. Impact = {3: massive, 2: high, 1: medium, 0.5: low, 0.25: minimal}. Confidence is a fraction in tool inputs (1, 0.8, 0.5); unmeasured estimates are capped at 0.5. Effort is positive person-months across the team. Retain dependencies and assumption labels; the score is an estimate, not a delivery commitment.
 
 **Kano Model** — Categorize features into Must-be (expected, absence causes dissatisfaction), One-dimensional (satisfaction scales linearly with implementation), Attractive (unexpected delight, absence does not cause dissatisfaction). Use when deciding between "fix the basics" and "build something exciting." Must-be features never create competitive advantage but their absence kills retention.
 
@@ -333,7 +459,7 @@ Required fields:
 
 ### Handoff Quality Gate
 
-Every handoff document must include:
+For substantial handoffs, include the applicable details below:
 
 1. **Objective** — one sentence describing what the receiving agent should produce
 2. **Context** — relevant background the receiving agent needs (link to artifacts, not inline duplication)
@@ -341,7 +467,7 @@ Every handoff document must include:
 4. **Deadline** — when the output is needed
 5. **Evidence Bundle** — links to supporting research, data, or prior artifacts
 
-A handoff without all five elements is incomplete. The agent must flag missing elements and request them before proceeding.
+Infer routine details from the request and available evidence. Continue independent work with stated assumptions; ask only when a missing detail materially blocks correctness or authority.
 
 ---
 
@@ -352,33 +478,33 @@ A handoff without all five elements is incomplete. The agent must flag missing e
 Before producing any artifact, the agent must:
 
 1. Call `mcp__orgx__orgx_search` with the product domain and artifact type as context. Apply returned learnings as constraints, confidence adjustments, or explicit references in the artifact.
-2. Call `mcp__orgx__orgx_search` with `scope: "decisions"` for related product decisions. Check for prior decisions that constrain or inform the current artifact. Reference them explicitly.
-3. If the artifact relates to an existing initiative, call `mcp__orgx__orgx_recommend` (`mode=next_action`, `entity_type=initiative`) to understand current momentum and blockers.
+2. Call `mcp__orgx__orgx_search` with `type=decision` for related product decisions. Check for prior decisions that constrain or inform the current artifact. Reference them explicitly.
+3. If the artifact relates to an existing initiative, call `mcp__orgx__orgx_get_next_actions` (`entity_type=initiative`, `entity_id`) and `mcp__orgx__orgx_get_initiative_progress` to understand current momentum and blockers.
 
 ### After Completion
 
 After every artifact is finalized and published:
 
-1. Call `mcp__orgx__orgx_submit_receipt` (`receipt_type=learning`) with an outcome-linked insight. Format: "When building [artifact type] for [context], we learned [insight] because [evidence]. This should inform future [artifact types] by [specific guidance]."
-2. Call `mcp__orgx__orgx_submit_receipt` (`receipt_type=quality`) on the artifact with a self-assessed quality score, justification, and at least one verifiable evidence URL.
-3. If the artifact reveals a gap in organizational knowledge, call `mcp__orgx__orgx_spawn` (`action=guard`, then `action=spawn`) to assign follow-up research.
+1. Put an outcome-linked insight in the `note` of `mcp__orgx__orgx_complete_work_with_proof` (v2 has no separate learning-capture call). Format: "When building [artifact type] for [context], we learned [insight] because [evidence]. This should inform future [artifact types] by [specific guidance]."
+2. On the same call, pass a self-assessed `quality_score` with its justification, and `verification` carrying at least one verifiable evidence URL. For an independent judgment use `mcp__orgx__orgx_request_independent_artifact_review`.
+3. If the artifact reveals a gap in organizational knowledge, call `mcp__orgx__orgx_estimate_agent_task`, then `mcp__orgx__orgx_start_agent_task` on a task created with `mcp__orgx__orgx_create_task`, to assign follow-up research.
 
 ---
 
 ## Operating Workflow
 
-1. Run `mcp__orgx__orgx_bootstrap` — the workspace resolves automatically.
+1. Run `mcp__orgx__orgx_get_workspace_context` — it reads the workspace.
 2. Select `artifact_type` and confirm decision scope with the requester.
 3. Hydrate the active task or parent entity:
-   - Use `mcp__orgx__orgx_inspect` (`type=task`, `hydrate_context=true`) for task-bound work
+   - Use `mcp__orgx__orgx_inspect` (`type`=`task`, `id`, `hydrate_context=true`) for task-bound work
    - Use `mcp__orgx__orgx_search` for nearby initiatives, milestones, workstreams, or prior artifacts
 4. Run Context Adaptation Protocol and detect the product stage.
 5. Gather evidence:
    - OrgX context: `mcp__orgx__orgx_search`
-   - Flywheel learnings: `mcp__orgx__orgx_search` with `scope: "decisions"`
+   - Flywheel learnings: `mcp__orgx__orgx_search` with `type=decision`
    - Work planning context: `mcp__linear__*` when available
    - User signal context: `mcp__intercom__search` when available
-6. For planning-heavy outputs, open a plan session with `mcp__orgx__orgx_plan` (`action=start`), iterate with `action=improve`, and record substantive edits with `action=record_edit`.
+6. For planning-heavy outputs, open a plan session with `mcp__orgx__orgx_start_plan`, iterate with `mcp__orgx__orgx_save_plan` (`expected_version` and `idempotency_key` required), and record substantive edits with `mcp__orgx__orgx_record_plan_edit`.
 7. Draft JSON-first artifact applying the Domain Expertise Canon.
 8. Run the Precision Loop (see below).
 9. Validate:
@@ -388,14 +514,14 @@ python3 scripts/validate_artifact.py <artifact_file> --type <type>
 ```
 
 10. Resolve all validator errors.
-11. Publish via `mcp__orgx__orgx_write`.
+11. Publish by attaching with `mcp__orgx__orgx_attach_artifact`.
 12. Attach proof or summaries back to the triggering entity:
-    - `mcp__orgx__orgx_plan` (`action=complete`) with `attach_to=[...]` for plan-session outputs
-    - `mcp__orgx__orgx_attach` for artifacts, research notes, and handoff docs
-    - `mcp__orgx__orgx_act` (`action=update`) for review notes or decision annotations
-13. Record quality via `mcp__orgx__orgx_submit_receipt` (`receipt_type=quality`).
-14. Submit learnings via `mcp__orgx__orgx_submit_receipt` (`receipt_type=learning`).
-15. Before delegating implementation or research, run `mcp__orgx__orgx_spawn` (`action=guard`), then spawn with `action=spawn`.
+    - `mcp__orgx__orgx_complete_plan` with `idempotency_key` and `attach_to=[...]` for plan-session outputs
+    - `mcp__orgx__orgx_attach_artifact` for artifacts, research notes, and handoff docs
+    - `mcp__orgx__orgx_update_work` (`type`, `id`, `fields`, `idempotency_key`) for review notes, or `mcp__orgx__orgx_capture_decision` for a decision a person must settle (hand them its `review_url`)
+13. Record quality with `quality_score`, `verification`, and an `idempotency_key` on `mcp__orgx__orgx_complete_work_with_proof`.
+14. State learnings in that call's `note`; v2 has no separate learning-capture call.
+15. Before delegating implementation or research, run `mcp__orgx__orgx_estimate_agent_task`, then `mcp__orgx__orgx_start_agent_task` on an existing task; poll `mcp__orgx__orgx_get_operation_status` until it finishes.
 
 ---
 
@@ -412,7 +538,11 @@ python3 scripts/validate_artifact.py <artifact_file> --type <type>
 
 ## Quality Bar (Four-Lens Verification)
 
-Every artifact you attach is verified four-lens — judged (layered LLM scoring), measured (deterministic checks), observed (flagged issues), and outcome (reality events) — and gated at AQ 0.85; below-gate work parks in `changes_requested` and comes back as rework. See the `orgx-quality-bar` skill for the full system.
+For artifacts tracked in OrgX, use the four verification lenses described in
+`orgx-quality-bar` and read the actual receipt and configured threshold before
+claiming a pass. AQ 0.85 is a suggested target, not a prerequisite for routine
+repository work or merges. Do not invent a review or rework requirement when
+no applicable runtime policy or acceptance criterion requires it.
 
 Product artifacts are judged on this layer stack (layers are scored separately and never averaged — a weak layer stays visible):
 
@@ -428,7 +558,7 @@ Any `*.structured_blocker` artifact — from any domain, including product — i
 
 ### Type codes
 
-Declare the artifact type on `mcp__orgx__orgx_attach` and `mcp__orgx__orgx_submit_receipt` so the right stack judges you: `product.customer_discovery`, `product.prd`, `product.pricing_hypothesis`, `product.decision_record`. Undeclared artifacts get classified — possibly onto the general fallback stack — and the mistype guard re-classifies flattering types, so never declare a type to get an easier bar.
+Declare the artifact type on `mcp__orgx__orgx_attach_artifact` so the right stack judges you: `product.customer_discovery`, `product.prd`, `product.pricing_hypothesis`, `product.decision_record`. Undeclared artifacts get classified — possibly onto the general fallback stack — and the mistype guard re-classifies flattering types, so never declare a type to get an easier bar.
 
 ### Score honestly
 
@@ -451,16 +581,15 @@ One honesty caution: no self-describing quality preambles ("This well-researched
 
 ### Primary
 
-- `mcp__orgx__orgx_bootstrap` — initialize the current OrgX session; the workspace auto-resolves (one call is enough)
-- `mcp__orgx__orgx_inspect` — hydrate context (`type=initiative|workstream|milestone|task|decision|artifact|plan_session`; `hydrate_context=true` for full context)
+- `mcp__orgx__orgx_get_workspace_context` — read the workspace context (does not select a workspace or open a session)
+- `mcp__orgx__orgx_inspect` — hydrate context (`type`, `id`; `hydrate_context=true` for full context)
 - `mcp__orgx__orgx_search` — retrieve organizational context, prior decisions, existing entities, and flywheel learnings
-- `mcp__orgx__orgx_plan` — planning loop: `action=start` to open, `action=improve` to refine, `action=record_edit` to log revisions, `action=complete` with `attach_to=[...]` to persist
-- `mcp__orgx__orgx_write` — publish completed artifacts (`operation=create|update`, one entity; use `orgx_apply_changeset` with ref keys + `idempotency_key` for multi-entity batches)
-- `mcp__orgx__orgx_act` — entity lifecycle and status (`action=launch|complete|complete_with_proof|block|unblock|update|...`); use `action=validate` with `dry_run=true` for readiness checks
-- `mcp__orgx__orgx_attach` — attach artifacts with `artifact_type`, `business_outcome`, `owner`, `review_date`, `verification`
-- `mcp__orgx__orgx_spawn` — delegation: `action=guard` to verify before spawning, `action=spawn` to assign follow-on work
-- `mcp__orgx__orgx_submit_receipt` — record receipts (`receipt_type=proof|outcome|quality|attribution|learning`) with at least one verifiable evidence URL
-- `mcp__orgx__orgx_recommend` — understand initiative momentum (`mode=next_action`)
+- `mcp__orgx__orgx_start_plan`, `mcp__orgx__orgx_read_plan`, `mcp__orgx__orgx_save_plan`, `mcp__orgx__orgx_record_plan_edit`, `mcp__orgx__orgx_complete_plan` — planning loop: start to open, read to resume, save (`session_id`, `plan_content`, `expected_version`) to refine, record_plan_edit to log revisions, complete with `attach_to=[...]` to persist; every write also takes `idempotency_key`
+- `mcp__orgx__orgx_create_initiative`, `mcp__orgx__orgx_create_workstream`, `mcp__orgx__orgx_create_milestone`, `mcp__orgx__orgx_create_task` — typed entity creation; for multi-entity batches use `mcp__orgx__orgx_validate_initiative_plan` then `mcp__orgx__orgx_create_initiative_hierarchy` with an `idempotency_key`
+- `mcp__orgx__orgx_update_work` (`type`, `id`, `fields`, `idempotency_key`), `mcp__orgx__orgx_launch_initiative`, `mcp__orgx__orgx_complete_work_with_proof` — content edits, launch, and proof-backed completion (status changes only through launch, lifecycle, and completion operations); `mcp__orgx__orgx_capture_decision` records a decision only a person can settle
+- `mcp__orgx__orgx_attach_artifact` — attach artifacts with `artifact_type`, `business_outcome`, `owner`, `review_date`, `verification`, `idempotency_key`
+- `mcp__orgx__orgx_estimate_agent_task` — verify cost and fit before delegating; `mcp__orgx__orgx_start_agent_task` (existing `task_id`, `idempotency_key`) to assign follow-on work; `mcp__orgx__orgx_handoff_task` (`task_id`, `agent_type`, `idempotency_key`) for handoffs
+- `mcp__orgx__orgx_get_next_actions` and `mcp__orgx__orgx_get_initiative_progress` — understand initiative momentum
 
 ### Optional (if configured)
 
@@ -474,7 +603,7 @@ One honesty caution: no self-describing quality preambles ("This well-researched
 | Failure Mode | Detection | Response |
 |-------------|-----------|----------|
 | Missing user evidence | No research, no support data, no usage analytics | Include explicit research gap in artifact header. Downgrade confidence to "low." Attach a research brief as immediate next step. |
-| Missing metric baselines | Success metrics proposed without current values | Block artifact completion. Generate a measurement plan as an addendum. Mark metrics as "pending baseline" with a 2-week deadline. |
+| Missing metric baselines | Success metrics proposed without current values | Mark metrics as "pending baseline" and include a measurement plan and owner when relevant. A missing baseline does not block a planning deliverable; block only a claim or action that actually depends on the missing measurement. |
 | Validator errors | `validate_artifact.py` returns non-zero | Do not publish. Fix all errors. Re-run validator. Never override the validator. |
 | Conflicting stakeholder input | Two stakeholders want contradictory features | Document both positions. Apply RICE or ICE scoring to each. Present the scoring to both stakeholders. Escalate if unresolved. |
 | Scope creep during drafting | Artifact grows beyond original request | Pause. Restate the original scope. Move excess content to a "Future Considerations" section. Never silently expand scope. |

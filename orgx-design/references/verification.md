@@ -3,6 +3,14 @@
 “Looks correct in code” is not a visual verdict. Verify the rendered experience
 and preserve enough evidence for the next audit to start from truth.
 
+## Scale verification to the change
+
+For focused maintenance, inspect the changed behavior, relevant viewport or
+interaction state, and likely regressions. Use the complete matrices below for
+new surfaces, substantial redesigns, or full audits. Missing browser access is
+a stated verification limit, not a reason to block unrelated authorized work.
+Do not claim a visual pass from source inspection alone.
+
 ## Evidence ladder
 
 Report each layer separately:
@@ -22,7 +30,7 @@ Never infer a later layer from an earlier one.
 
 ## Viewport matrix
 
-Minimum:
+For full-surface verification:
 
 | Viewport | Required checks |
 | --- | --- |
@@ -35,7 +43,7 @@ copy, names, paths, artifacts, or generated text.
 
 ## State matrix
 
-Capture or exercise every applicable state:
+Capture or exercise the states affected by the change. For a full audit, cover every applicable state:
 
 - cold loading and warm refresh;
 - empty/first use;
@@ -88,6 +96,7 @@ must not disappear from the registry.
 
 ## Durable audit artifact
 
-Update the canonical surface registry with disposition, evidence, exact
-viewport/state coverage, and the next unverified gap. Store screenshots or
-reports at stable paths and reference them from the registry or PR.
+For a full audit, update the canonical surface registry with disposition,
+evidence, exact viewport/state coverage, and the next unverified gap. For a
+focused change, record relevant checks and limits in the PR or task. Store
+screenshots or reports at stable paths when they help verify the change.

@@ -1,7 +1,7 @@
 name = "task-protocol"
-version = "2.0.0"
+version = "2.1.0"
 description = "Individual task execution protocol for OrgX with context hydration, plan-session handoff, evidence attachment, guarded delegation, and completion verification."
 entry_instructions = "SKILL.md"
-required_tools = ["mcp__orgx__orgx_bootstrap", "mcp__orgx__orgx_bootstrap", "mcp__orgx__orgx_inspect", "mcp__orgx__orgx_search", "mcp__orgx__orgx_act", "mcp__orgx__orgx_emit_activity", "mcp__orgx__orgx_write", "mcp__orgx__orgx_act", "mcp__orgx__orgx_spawn", "mcp__orgx__orgx_spawn", "mcp__orgx__orgx_spawn", "mcp__orgx__orgx_act", "mcp__orgx__orgx_plan", "mcp__orgx__orgx_plan", "mcp__orgx__orgx_plan", "mcp__orgx__orgx_plan"]
+required_tools = ["mcp__orgx__orgx_get_workspace_context", "mcp__orgx__orgx_inspect", "mcp__orgx__orgx_search", "mcp__orgx__orgx_start_agent_task", "mcp__orgx__orgx_update_work", "mcp__orgx__orgx_attach_artifact", "mcp__orgx__orgx_capture_decision", "mcp__orgx__orgx_open_decision_review", "mcp__orgx__orgx_pause_work", "mcp__orgx__orgx_resume_work", "mcp__orgx__orgx_estimate_agent_task", "mcp__orgx__orgx_handoff_task", "mcp__orgx__orgx_get_operation_status", "mcp__orgx__orgx_get_agent_status", "mcp__orgx__orgx_start_plan", "mcp__orgx__orgx_save_plan", "mcp__orgx__orgx_record_plan_edit", "mcp__orgx__orgx_complete_plan", "mcp__orgx__orgx_complete_work_with_proof", "mcp__orgx__orgx_request_independent_artifact_review"]
 required_scopes = []
 resources = []

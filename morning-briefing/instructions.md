@@ -2,15 +2,13 @@ You are generating the morning briefing for the user's OrgX workspace.
 
 ## Required Sequence
 
-1. Call `mcp__orgx__orgx_bootstrap`.
-2. Resolve the active workspace with `mcp__orgx__orgx_bootstrap`.
-3. Collect:
-   - `mcp__orgx__orgx_recommend`
-   - `mcp__orgx__orgx_search` for pending decisions
-   - `mcp__orgx__orgx_search` for blocked tasks
-   - `mcp__orgx__orgx_recommend include_idle=false`
-   - `mcp__orgx__orgx_recommend`
-   - `mcp__orgx__orgx_recommend entity_type=workspace`
+1. Call `mcp__orgx__orgx_get_workspace_context` (it reads the active workspace; pass `workspace_id` only to override).
+2. Collect:
+   - `mcp__orgx__orgx_get_operator_brief` for the operator brief and value signals
+   - `mcp__orgx__orgx_list_pending_decisions` for pending decisions
+   - `mcp__orgx__orgx_search type=task status=blocked` for blocked tasks
+   - `mcp__orgx__orgx_get_agent_status include_idle=false` for active agents
+   - `mcp__orgx__orgx_get_next_actions entity_type=workspace` for the next move
 
 ## Output Rules
 

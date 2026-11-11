@@ -1,6 +1,6 @@
 ---
 name: Morning Briefing
-version: "2.1.0"
+version: "2.2.0"
 description: |
   Generate a daily OrgX briefing with morning-brief value signals, pending
   decisions, blocked tasks, agent activity, initiative health, and the single
@@ -13,14 +13,14 @@ Generate a concise daily status report for the active OrgX workspace.
 
 ## Workflow
 
-1. Bootstrap with `mcp__orgx__orgx_bootstrap` (the workspace auto-resolves; pass `workspace_id` only to override).
+1. Read context with `mcp__orgx__orgx_get_workspace_context` (the workspace auto-resolves; pass `workspace_id` only to override).
 2. Fetch:
-   - `mcp__orgx__get_operator_chronicle period=30d`
-   - `mcp__orgx__orgx_recommend mode=morning_brief period=day`
-   - `mcp__orgx__orgx_search type=decision status=pending`
+   - `mcp__orgx__orgx_get_operator_brief period=30d`
+   - `mcp__orgx__orgx_get_operator_brief period=day`
+   - `mcp__orgx__orgx_list_pending_decisions`
    - `mcp__orgx__orgx_search type=task status=blocked`
-   - `mcp__orgx__get_agent_status` for active and blocked agent runs
-   - `mcp__orgx__orgx_recommend mode=next_action entity_type=workspace`
+   - `mcp__orgx__orgx_get_agent_status` for active and blocked agent runs
+   - `mcp__orgx__orgx_get_next_actions entity_type=workspace`
 3. Prioritize the briefing:
    - `reportingNarrative.briefMarkdown` as the canonical report body
    - `reportingNarrative.nextAction`, `reportingNarrative.whatChanged`, and `rollups`

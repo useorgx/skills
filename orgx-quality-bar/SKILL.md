@@ -1,6 +1,6 @@
 ---
 name: orgx-quality-bar
-version: "1.0.0"
+version: "1.1.0"
 description: |
   How OrgX judges artifacts — and how to produce work that passes honestly.
   Use whenever an agent writes, attaches, or reworks any artifact. Teaches the
@@ -19,6 +19,15 @@ The honesty contract: **no verdict without evidence**. A useful finding names
 the defect and supporting artifact span or observation. A holistic score without
 per-layer findings must not be reported as proof that every layer passed. Every
 claim of done carries its receipt.
+
+## Applicability
+
+Use this rubric for requested artifact review and for work actually evaluated
+in OrgX. It does not require a judge, a quality score, a receipt, or a new human
+approval before routine edits, PR updates, or an authorized merge. Respect
+repository checks and any actual enforced runtime requirement; report its exact
+failure and continue unrelated authorized work. Never claim a lens ran without
+its evaluation evidence.
 
 ## Client work
 
@@ -90,7 +99,7 @@ Type codes are `<domain>.<type_name>` (e.g. `sales.icp_offer_sequence`,
 measured checks apply — a mistyped artifact is judged on the wrong bar.
 
 - **Declare the type when you know it** — as `artifact_type` on
-  `orgx_attach` / `orgx_write` (artifact create) / `orgx_submit_receipt`.
+  `orgx_attach_artifact` / `orgx_complete_work_with_proof` (its `artifact` argument, plus the call's `idempotency_key`).
 - If you don't declare, a classifier infers the type. Generic outputs may be
   flagged `artifact_type_provisional: true` and judged on the general stack
   (fitness_to_intent, evidence, clarity, actionability) until promoted.
@@ -133,7 +142,7 @@ When an operator requests changes, your draft parks in `changes_requested`
 2. Change what the feedback names. Below-bar feedback is specific — layer,
    quoted evidence, reference comparison. Resubmitting near-identical work
    fails the same layers again.
-3. Produce a fresh artifact version; it supersedes on pass (≥ 0.85). Version
+3. Produce a fresh artifact version; use the actual configured acceptance criterion rather than assuming a fixed score. Version
    lineage records the chain (v1 → changes_requested → v2 → approved), so
    the iteration history is visible — make each version a real response.
 
@@ -158,16 +167,19 @@ Don't:
 - Grade-shop: re-running evaluation on unchanged content to fish for a higher
   score is visible in the audit trail (multi-eval with zero content change).
   Change the artifact or accept the score.
-- Pad receipts. `orgx_submit_receipt` with a `quality` receipt should carry a
-  self-assessed score you can defend layer by layer, plus at least one
-  verifiable URL in evidence.
+- Pad proof. The `quality_score` on `orgx_complete_work_with_proof` should be a
+  self-assessed score you can defend layer by layer, with `verification`
+  carrying at least one verifiable URL.
 
 ## Wiring It Into the Loop
 
 - Before writing: check the type code you'll produce and skim its layer stack.
-- On attach: `orgx_attach` (or `orgx_act action=complete_with_proof`) with
+- On attach: `orgx_attach_artifact` (or `orgx_complete_work_with_proof`) with
   `artifact_type`, `business_outcome`, `owner`, `verification`.
-- On completion: `orgx_submit_receipt receipt_type=proof|quality|outcome` with
-  evidence URLs; `verification_status` reflecting what actually ran.
+- On completion: `orgx_complete_work_with_proof` with `artifact`, `verification`, `idempotency_key`
+  (evidence URLs, reflecting what actually ran), `quality_score`, and a `note`
+  carrying learnings; v2 has no separate learning-capture call. For an
+  independent judgment use `orgx_request_independent_artifact_review`; a
+  portable Agent Work Receipt goes through `orgx_submit_work_receipt`.
 - On rework: respond to `metadata.rework_feedback`, then resubmit through the
   same attach path so lineage links the versions.

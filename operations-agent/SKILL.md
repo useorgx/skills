@@ -1,6 +1,6 @@
 ---
 name: orgx-operations-agent
-version: "2.1.0"
+version: "2.2.0"
 description: |
   Produce high-confidence operations artifacts for OrgX: incident analyses, operational playbooks, budget controls, capacity plans, vendor evaluations, SLO proposals, chaos test plans, migration checklists, and on-call rotation audits.
   Use when reliability, incident management, escalation readiness, or operational cost governance is required.
@@ -16,26 +16,72 @@ Apply [orgx-capability-mindset](../orgx-capability-mindset) before operations wo
 
 ## Quick Start
 
-1. Run `mcp__orgx__orgx_bootstrap` (it auto-resolves the workspace — no second call needed).
+1. Run `mcp__orgx__orgx_get_workspace_context` (it reads the workspace; `workspace_id` is optional and no second call is needed).
 2. Confirm the artifact or decision type and the target audience. If the request is task-bound, hydrate it with `mcp__orgx__orgx_inspect`; otherwise map related work with `mcp__orgx__orgx_search`.
-3. Pull precedent with `mcp__orgx__orgx_search` (prior incidents, playbooks, decisions, and learnings).
+3. Pull precedent with `mcp__orgx__orgx_search` (prior incidents, playbooks, and decisions).
 4. Before creating or delegating workstreams, milestones, or tasks, inspect the active parent scope and reuse matching siblings. Treat `reused`, `duplicate_prevented`, or `_dedup` results as success and continue on the returned canonical entity ID.
-5. For playbooks, migrations, or SLO programs, use the planning loop: `mcp__orgx__orgx_plan` (`action=start`), refine with `action=improve`, capture major revisions with `action=record_edit`, then finalize with `action=complete` and `attach_to=[...]`.
+5. For playbooks, migrations, or SLO programs, use the planning loop: `mcp__orgx__orgx_start_plan` (`title`, `idempotency_key`), resume with `mcp__orgx__orgx_read_plan`, refine with `mcp__orgx__orgx_save_plan` (`session_id`, `plan_content`, `expected_version`, `idempotency_key`), capture major revisions with `mcp__orgx__orgx_record_plan_edit`, then finalize with `mcp__orgx__orgx_complete_plan` and `attach_to`.
 6. Identify the operational maturity stage (see Context Adaptation Protocol) and calibrate depth.
 7. Produce the artifact using the contract below and return:
    - A concise summary (3-6 bullets)
    - The artifact body (JSON or structured Markdown)
    - 3 actionable next steps
 8. Run the Precision Loop before publishing.
-9. Attach the result back to the active task or initiative with `mcp__orgx__orgx_attach`, then record quality with `mcp__orgx__orgx_submit_receipt` (`receipt_type=quality`). When attaching, use the MCP artifact type that matches the work (`ops.operator_brief`, `ops.runbook`, `ops.budget_envelope`, or `ops.incident_status`) and include `metadata.artifact_contract` with `agent_type`, `company_stage`, `business_outcome`, `owner`, `review_date`, and `verification`.
-10. Before delegating operational follow-up work, run `mcp__orgx__orgx_spawn` (`action=guard`), then dispatch with `mcp__orgx__orgx_spawn` (`action=spawn`).
+9. Attach the result back to the active task or initiative with `mcp__orgx__orgx_attach_artifact`, then record quality with `quality_score`, `verification`, and an `idempotency_key` on `mcp__orgx__orgx_complete_work_with_proof` (or request an independent judgment with `mcp__orgx__orgx_request_independent_artifact_review`). When attaching, use the MCP artifact type that matches the work (`ops.operator_brief`, `ops.runbook`, `ops.budget_envelope`, or `ops.incident_status`) and pass `agent_type`, `company_stage`, `business_outcome`, `owner`, `review_date`, and `verification` as arguments.
+10. Before delegating operational follow-up work, run `mcp__orgx__orgx_estimate_agent_task` (`task`) — v2 has no separate guard call, so the estimate is the pre-dispatch check — then dispatch an existing task with `mcp__orgx__orgx_start_agent_task` (`task_id`, `idempotency_key`) or `mcp__orgx__orgx_handoff_task` (`task_id`, `agent_type`, `idempotency_key`). A started run is not a finished one: poll `mcp__orgx__orgx_get_operation_status`.
    - Omit `model_tier`, `provider`, and exact `model` for normal work so OrgX auto-routes by task complexity.
    - Use `model_tier=standard` and `budget_mode=cheapest_valid` only for controlled reliability validation runs, test initiatives, or explicit budget-constrained verification.
-   - Operations delegation must name the reliability/cost outcome, expected report/runbook/fix, and verification evidence before spawn.
+   - Operations delegation must name the reliability/cost outcome, expected report/runbook/fix, and verification evidence before dispatch.
 
 Deliver operational artifacts that reduce incident risk, improve response quality, and drive systematic reliability improvement.
 
 Worked examples live in `examples/` — `incident-analysis.md` is the canonical incident-report shape, `slo-proposal.md` is the canonical SLO-proposal shape. When producing a new artifact, mirror their structure, depth of root-cause analysis, and specificity of remediation.
+
+## Incident method, runtime integration and evidence limits
+
+The companion OrgX runtime integration extends the existing
+`operations.cause.recover` practice. In the `hopeatina/orgx` application
+repository, its source paths from the repository root are
+`orgx/lib/agents/expertPractices.ts`, `orgx/lib/agents/operations/`, and
+`orgx/lib/server/agentTools/operationsToolConfigs.ts`. These files are not
+included in this skill repository. Availability in an installed runtime must
+be checked against its actual schemas and version; publishing this skill
+does not install or qualify those tools.
+
+- `ops.incident.timeline.build` accepts an admitted `runId` for stored step
+  observations or a `packet` with workspace/service/environment, exact resource
+  IDs, frozen `asOf`, incident window, telemetry availability/completeness and
+  timestamped observations with credential-free provenance. Do not backfill
+  missing events. Keep provider terminal outcomes resource-specific.
+- `ops.playbook.generate` needs `runId`, `packet` and `proposal` (kind, owner,
+  exact target IDs, duration and cost ceilings, plus rollback for changes).
+  It saves a plan draft. Diagnosis and remediation have separate authority;
+  the plan never executes a change or grants permission. Keep central release
+  and infrastructure owners in control of their existing workflows.
+- `ops.response_template.generate` drafts current stakeholder status from the
+  same packet. It does not send a message. An unresolved incident stays open.
+- Read tools return bounded requester-owned OrgX records with source references.
+  They do not establish provider connectivity, full incident coverage, spend,
+  SLA compliance or a healthy service. Capacity and runbook coverage return an
+  explicit dependency until their actual adapters are qualified.
+- Reconcile an uncertain prior effect using its original identity and readback
+  before considering retry. An unconfirmed report save returns its attempted
+  artifact identity and frozen `retry` object. Read back that identity first;
+  if absent, replay the same tool with that object instead of refreshing data.
+- Recovery needs fresh, complete independent post-change observations covering
+  every affected resource with no contradictory failure. Supplied observations
+  remain unauthenticated; only the independent provider observer can establish
+  live verification. Agent completion events and saved artifacts do not do so.
+
+The companion application's isolated synthetic acceptance suite is
+`orgx/lib/agents/operations/practitioner.eval.spec.ts` in `hopeatina/orgx`,
+plus tool/registration tests. This repository's isolated validator regressions
+run with `python3 -B operations-agent/scripts/validate_ops.test.py`.
+Critical truthfulness, scope, uncertainty and authority cases must all pass;
+false recovery claims and mutation dispatches must remain zero. Record latency,
+failures and actual cost separately. This is source-level qualification, not a
+measured practitioner percentile. The legacy Python validator checks structure
+and timestamp integrity, not factual completeness or semantic correctness.
 
 ## Trigger Map
 
@@ -98,7 +144,7 @@ Always identify the Cynefin domain before recommending a response strategy. A Co
 Multiple defensive layers each have holes. Incidents happen when holes align across layers. Every incident analysis must identify which layers failed and which layers caught the problem. Never point to a single cause — always map the full alignment of failures.
 
 #### Five Whys
-Iterative root cause drilling. Ask "why" at least five times to get past surface-level symptoms. Stop when you reach a systemic or organizational cause, not an individual action. If the fifth "why" ends at a person ("because Bob forgot"), you stopped too early — ask why the system allowed that to happen.
+Iterative root cause drilling. Follow causal questions only as far as the evidence supports; state remaining causes as hypotheses. Stop when you reach a systemic or organizational cause, not an individual action. If a causal explanation ends at a person ("because Bob forgot"), you stopped too early — ask why the system allowed that to happen.
 
 #### SLI/SLO/SLA Triangle
 - **SLI (Service Level Indicator)**: A quantitative measurement of service behavior (e.g., request latency p99, error rate, throughput).
@@ -190,19 +236,19 @@ When producing any artifact, identify the applicable signals first and adjust ar
 
 ## Operating Workflow
 
-1. Run `mcp__orgx__orgx_bootstrap` (workspace scope resolves automatically).
+1. Run `mcp__orgx__orgx_get_workspace_context` (reads workspace scope).
 2. Pick `artifact_type` and define success condition.
 3. Hydrate the active task or parent entity:
-   - `mcp__orgx__orgx_inspect` (`type=task`, `hydrate_context=true`) for task-bound work
+   - `mcp__orgx__orgx_inspect` (`type=task`, `id`, `hydrate_context=true`) for task-bound work
    - `mcp__orgx__orgx_search` for surrounding initiatives, milestones, and prior incidents or playbooks
 4. Identify organizational maturity signals from Context Adaptation Protocol.
 5. Gather evidence:
    - OrgX context: `mcp__orgx__orgx_search`
-   - Prior learnings: `mcp__orgx__orgx_search`
+   - Prior decisions: `mcp__orgx__orgx_search` (`type=decision`)
    - Incident context: PagerDuty/observability tools when available
    - Cost data: cloud provider billing, FinOps tooling
    - Capacity data: APM, load balancer metrics, database metrics
-6. For programmatic operational plans, open a plan session with `mcp__orgx__orgx_plan` (`action=start`), refine with `action=improve`, and record major revisions with `action=record_edit`.
+6. For programmatic operational plans, open a plan session with `mcp__orgx__orgx_start_plan`, refine with `mcp__orgx__orgx_save_plan`, and record major revisions with `mcp__orgx__orgx_record_plan_edit`.
 7. Apply relevant frameworks from Domain Expertise Canon.
 8. Draft JSON-first artifact following the contract for the selected type.
 9. Run the Precision Loop (all 4 passes).
@@ -212,14 +258,14 @@ When producing any artifact, identify the applicable signals first and adjust ar
 python3 scripts/validate_ops.py <artifact_file> --type <artifact_type>
 ```
 
-11. Resolve all failed gates, then publish via `mcp__orgx__orgx_write`.
+11. Resolve all failed gates, then publish via `mcp__orgx__orgx_attach_artifact`.
 12. Attach proof or conclusions back to the active work:
-    - `mcp__orgx__orgx_plan` (`action=complete`) with `attach_to=[...]` for plan sessions
-    - `mcp__orgx__orgx_attach` for incidents, SLOs, budgets, and playbooks
-    - `mcp__orgx__orgx_act` (`action=flag_risk` or `action=update`) for escalation notes and state changes
-13. Submit learnings via `mcp__orgx__orgx_submit_receipt` (`receipt_type=learning`).
-14. Record measurable outcomes with `mcp__orgx__orgx_submit_receipt` (`receipt_type=outcome`) when the artifact closes a reliability or cost event.
-15. Record artifact quality with `mcp__orgx__orgx_submit_receipt` (`receipt_type=quality`, with a self-assessed score you can defend layer by layer and at least one verifiable evidence URL).
+    - `mcp__orgx__orgx_complete_plan` (`attach_to`, `idempotency_key`) for plan sessions
+    - `mcp__orgx__orgx_attach_artifact` for incidents, SLOs, budgets, and playbooks
+    - `mcp__orgx__orgx_update_work` (`type`, `id`, `fields`, `idempotency_key`) for escalation notes (content only; status changes go through `mcp__orgx__orgx_pause_work`, `mcp__orgx__orgx_resume_work`, `mcp__orgx__orgx_cancel_work`, or `mcp__orgx__orgx_complete_work_with_proof`); `mcp__orgx__orgx_capture_decision` when a risk needs a ruling (only a person settles it, from the decision's `review_url`)
+13. State learnings in the `note` of `mcp__orgx__orgx_complete_work_with_proof`. v2 has no separate learning-capture call; do not invent one.
+14. Record measurable outcomes with `mcp__orgx__orgx_complete_work_with_proof` when the artifact closes a reliability or cost event.
+15. Record artifact quality with `quality_score`, `verification`, and an `idempotency_key` on `mcp__orgx__orgx_complete_work_with_proof` (a self-assessed score you can defend layer by layer, with at least one verifiable evidence URL). Portable Agent Work Receipts go through `mcp__orgx__orgx_submit_work_receipt`.
 
 ---
 
@@ -454,7 +500,7 @@ Required fields:
 
 ## Precision Loop (Run Every Time)
 
-Run all four passes before publishing any artifact. Do not skip passes.
+Use the passes relevant to the requested artifact and its operational risk. Routine maintenance does not require a new runbook, full checklist, or unrelated schema validation.
 
 ### Pass 1: Completeness
 All mandatory fields for the artifact type are present and non-empty. Every field that references another entity (owner, service, escalation contact) resolves to a real person or team.
@@ -476,7 +522,11 @@ python3 scripts/validate_ops.py <artifact_file> --type <artifact_type>
 
 ## Quality Bar (Four-Lens Verification)
 
-Every artifact you attach is verified by a four-lens system — judged (layered LLM judge), measured (deterministic checks), observed (flagged issues that cap confidence), and outcome (reality events recorded separately) — and gated at AQ >= 0.85. Below-gate work parks in `changes_requested` and comes back as rework; see the `orgx-quality-bar` skill for the full system.
+For artifacts tracked in OrgX, use the four verification lenses described in
+`orgx-quality-bar` and read the actual receipt and configured threshold before
+claiming a pass. AQ 0.85 is a suggested target, not a prerequisite for routine
+repository work or merges. Do not invent a review or rework requirement when
+no applicable runtime policy or acceptance criterion requires it.
 
 ### Ops layer stack
 
@@ -492,7 +542,7 @@ This agent owns this bar for more than ops artifacts: any `*.structured_blocker`
 
 ### Declare the type
 
-Declare `artifact_type` on `mcp__orgx__orgx_attach` and on receipts so the right stack and measured checks apply: `ops.operator_brief`, `ops.runbook`, `ops.budget_envelope`, `ops.incident_status`. An undeclared artifact is classified for you and may be judged on the general fallback stack; a flattering type gets re-classified by the mistype guard and produces feedback you cannot act on.
+Declare `artifact_type` on `mcp__orgx__orgx_attach_artifact` and on receipts so the right stack and measured checks apply: `ops.operator_brief`, `ops.runbook`, `ops.budget_envelope`, `ops.incident_status`. An undeclared artifact is classified for you and may be judged on the general fallback stack; a flattering type gets re-classified by the mistype guard and produces feedback you cannot act on.
 
 ### Score honestly (ops)
 
@@ -560,36 +610,36 @@ When handing off to another agent, structure the handoff as:
 Every operations artifact should feed the organizational learning loop:
 
 ### After Incident Analysis
-- Submit key finding as learning: `mcp__orgx__orgx_submit_receipt` (`receipt_type=learning`)
+- State the key finding as a learning in the completion `note` of `mcp__orgx__orgx_complete_work_with_proof`
 - If this incident matches a previous pattern, reference the prior incident and note what was (or was not) fixed
 - Update the relevant runbook if the response uncovered gaps
-- Record outcome via `mcp__orgx__orgx_submit_receipt` (`receipt_type=outcome`) with measurable impact
+- Record the outcome via `mcp__orgx__orgx_complete_work_with_proof` with measurable impact
 
 ### After Playbook Creation
 - Link playbook to the alert or trigger condition it addresses
-- Submit learning about the operational gap that motivated the playbook
+- State the operational gap that motivated the playbook as a learning in the completion note
 - Schedule a test run of the playbook within 30 days
 
 ### After SLO Proposal
-- Submit learning about current measurement gaps
+- State the learning about current measurement gaps
 - Record which services lacked SLOs and what customer impact that caused
 - Feed SLO targets back to engineering agent as reliability requirements
 
 ### After Capacity Plan
-- Submit learning about growth trajectory accuracy (compare forecast to actuals at next review)
+- State the learning about growth trajectory accuracy (compare forecast to actuals at next review)
 - Feed cost projections to budget control artifact
 - If load test reveals issues, create incident analysis for the failure mode
 
 ### After Chaos Test
-- Submit every finding as a learning, whether the hypothesis was confirmed or disproved
+- State every finding as a learning in the completion note, whether the hypothesis was confirmed or disproved
 - Create playbook for any failure mode that had no existing runbook
 - Update capacity plan if the experiment revealed scaling limits
 
 ### Query Pattern
-Before producing any artifact, check for prior learnings:
+Before producing any artifact, check for prior incidents and decisions:
 
 ```
-mcp__orgx__orgx_search({ category: "operations", service: "<service_name>" })
+mcp__orgx__orgx_search({ query: "<service_name> incident", type: "decision" })
 ```
 
 Incorporate relevant prior learnings into the artifact. Reference them explicitly: "Prior incident INC-1234 identified this same connection pool issue; action item AI-5678 was to add connection pooling monitoring but remains open."
@@ -600,15 +650,17 @@ Incorporate relevant prior learnings into the artifact. Reference them explicitl
 
 ### Primary
 
-- `mcp__orgx__orgx_bootstrap` — initialize OrgX session scope and recommended workflow (auto-resolves the workspace)
-- `mcp__orgx__orgx_inspect` — hydrate context (`type=initiative | workstream | milestone | task | decision | artifact | plan_session`; `hydrate_context=true` for full context)
-- `mcp__orgx__orgx_search` — Retrieve organizational context, prior decisions, entity lists, and prior learnings before drafting
-- `mcp__orgx__orgx_plan` — tracked planning sessions for playbooks, migrations, and SLO programs (`action=start | resume | improve | record_edit | complete`; `complete` takes `attach_to=[...]`)
-- `mcp__orgx__orgx_write` — Publish or update one operational entity (`operation=create | update`); for multi-entity batches use `orgx_apply_changeset` with ref keys + `idempotency_key`
-- `mcp__orgx__orgx_attach` — attach artifacts and evidence (`artifact_type`, `artifact_url`, `description`, `owner`, `verification`, `metadata`)
-- `mcp__orgx__orgx_act` — update operational state (`action=complete_with_proof | flag_risk | block | unblock | update`, among others; `action=validate` with `dry_run=true` for readiness checks)
-- `mcp__orgx__orgx_spawn` — delegate operational follow-up (`action=guard` before `action=spawn`; also `estimate | handoff | classify`)
-- `mcp__orgx__orgx_submit_receipt` — feed the learning loop and score quality (`receipt_type=proof | outcome | quality | attribution | learning`; `verification_status=passed | failed | blocked | not_run`; evidence includes at least one verifiable URL)
+- `mcp__orgx__orgx_get_workspace_context` — read workspace scope (`workspace_id` optional; reads only)
+- `mcp__orgx__orgx_inspect` — hydrate context (`type`, `id`; `hydrate_context=true` for full context)
+- `mcp__orgx__orgx_search` — retrieve organizational context, prior decisions, and entity lists before drafting
+- `mcp__orgx__orgx_start_plan`, `mcp__orgx__orgx_read_plan`, `mcp__orgx__orgx_save_plan`, `mcp__orgx__orgx_record_plan_edit`, `mcp__orgx__orgx_complete_plan` — tracked planning sessions for playbooks, migrations, and SLO programs (`save_plan` takes `session_id`, `plan_content`, `expected_version`; `complete_plan` takes `attach_to`; every write also takes `idempotency_key`)
+- `mcp__orgx__orgx_create_task`, `mcp__orgx__orgx_create_milestone`, `mcp__orgx__orgx_update_work` — create or update one operational entity; a retried write reuses its `idempotency_key`
+- `mcp__orgx__orgx_attach_artifact` — attach artifacts and evidence (`artifact_type`, `location`, `description`, `owner`, `verification`, `idempotency_key`)
+- `mcp__orgx__orgx_complete_work_with_proof` — complete work with `artifact`, `verification`, `quality_score`, `note`, `idempotency_key`
+- `mcp__orgx__orgx_capture_decision`, `mcp__orgx__orgx_open_decision_review` — raise a decision; only a person settles it, from its `review_url`
+- `mcp__orgx__orgx_estimate_agent_task`, `mcp__orgx__orgx_start_agent_task`, `mcp__orgx__orgx_handoff_task` — delegate operational follow-up (estimate before dispatch)
+- `mcp__orgx__orgx_get_operation_status` — real state of a started run (`kind`, `id`); recheck after `next_poll_after_ms`
+- `mcp__orgx__orgx_request_independent_artifact_review`, `mcp__orgx__orgx_submit_work_receipt` — independent artifact judgment and portable Agent Work Receipts
 
 ### Optional (if configured)
 
@@ -649,5 +701,5 @@ Incorporate relevant prior learnings into the artifact. Reference them explicitl
 - Migration checklists include rollback procedure for every phase.
 - On-call audits include burnout indicators and compensation fairness assessment.
 - Artifact is persisted in OrgX with traceable evidence links.
-- Relevant learnings submitted to the flywheel via `mcp__orgx__orgx_submit_receipt` (`receipt_type=learning`).
+- Relevant learnings stated in the completion note of `mcp__orgx__orgx_complete_work_with_proof`.
 - Cross-agent handoffs dispatched if the artifact reveals work for another agent.

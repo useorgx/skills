@@ -1,0 +1,28 @@
+{
+  "$schema": "https://agent-plugins.org/schemas/1.0.0/plugin.schema.json",
+  "name": "orgx",
+  "version": "0.1.0",
+  "description": "Connect Hermes to OrgX for organization context, agent work, decisions, artifacts, and execution receipts.",
+  "author": {
+    "name": "OrgX",
+    "url": "https://useorgx.com"
+  },
+  "homepage": "https://useorgx.com",
+  "repository": "https://github.com/useorgx/skills",
+  "license": "MIT",
+  "keywords": [
+    "orgx",
+    "mcp",
+    "agents",
+    "workflow"
+  ],
+  "extensions": {
+    "com.nousresearch.hermes": {
+      "servers": {
+        "orgx": {
+          "trust": "untrusted"
+        }
+      }
+    }
+  }
+}

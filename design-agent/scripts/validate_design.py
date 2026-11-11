@@ -1,7 +1,8 @@
 #!/usr/bin/env python3
 """
 Validate OrgX design artifacts (accessibility audits, design tokens, component docs).
-Ensures all quality gates pass before artifacts are saved.
+Checks artifact structure and evidence references before artifacts are saved.
+Passing this validator does not establish rendered QA or WCAG conformance.
 
 Usage:
     python validate_design.py <file> --type <audit|tokens|component>
@@ -20,6 +21,90 @@ from pathlib import Path
 from typing import List, Dict, Any, Tuple
 
 
+def nonempty_text(value: Any) -> bool:
+    return isinstance(value, str) and bool(value.strip())
+
+
+def supported_color(value: Any) -> bool:
+    """Supported snapshot formats: #RRGGBB or comma-separated integer rgb()."""
+    if not isinstance(value, str):
+        return False
+    value = value.strip()
+    if re.fullmatch(r"#[0-9a-f]{6}", value, re.IGNORECASE):
+        return True
+    match = re.fullmatch(
+        r"rgb\(\s*([0-9]{1,3})\s*,\s*([0-9]{1,3})\s*,\s*([0-9]{1,3})\s*\)",
+        value, re.IGNORECASE,
+    )
+    return bool(match) and all(int(channel) <= 255 for channel in match.groups())
+
+
+def audit_counts_match(data: Dict[str, Any]) -> bool:
+    summary, issues = data.get("summary"), data.get("issues")
+    if not isinstance(summary, dict) or not isinstance(issues, list):
+        return False
+    if any(not isinstance(issue, dict) for issue in issues):
+        return False
+    expected = {"total_issues": len(issues)}
+    for severity in ("critical", "major", "minor"):
+        expected[f"{severity}_count"] = sum(
+            issue.get("severity") == severity for issue in issues
+        )
+    return all(type(summary.get(key)) is int and summary[key] == count
+               for key, count in expected.items())
+
+
+def screen_reader_evidence_matches(data: Dict[str, Any]) -> bool:
+    notes = data.get("testing_notes")
+    if not isinstance(notes, dict):
+        return False
+    readers = notes.get("screen_readers_tested")
+    if not isinstance(readers, list) or any(not nonempty_text(r) for r in readers):
+        return False
+    if len(set(readers)) != len(readers):
+        return False
+    evidence = notes.get("screen_reader_evidence", [])
+    if not isinstance(evidence, list):
+        return False
+    if not readers:
+        limitations = notes.get("limitations")
+        return (notes.get("screen_reader_status") == "not_tested" and not evidence
+                and isinstance(limitations, list)
+                and any(nonempty_text(reason) for reason in limitations))
+    revision = data.get("target_revision")
+    if notes.get("screen_reader_status") != "observed" or not nonempty_text(revision):
+        return False
+    if len(evidence) != len(readers):
+        return False
+    if any(not isinstance(record, dict) for record in evidence):
+        return False
+    return (sorted(record.get("technology", "") for record in evidence) == sorted(readers)
+            and all(record.get("target_revision") == revision
+                    and nonempty_text(record.get("evidence_ref"))
+                    and record.get("outcome") in ("pass", "fail")
+                    for record in evidence))
+
+
+def recommendations_match_findings(data: Dict[str, Any]) -> bool:
+    recommendations = data.get("recommendations")
+    return (isinstance(recommendations, list)
+            and all(nonempty_text(item) for item in recommendations)
+            and (not data.get("issues") or bool(recommendations)))
+
+
+def spacing_values_valid(data: Dict[str, Any]) -> bool:
+    spacing = data.get("tokens", {}).get("spacing", {})
+    if not isinstance(spacing, dict) or not spacing:
+        return False
+    for token in spacing.values():
+        value = token.get("value") if isinstance(token, dict) else token
+        if isinstance(value, bool) or not re.fullmatch(
+            r"(?:0|(?:[0-9]+(?:\.[0-9]+)?|\.[0-9]+)(?:px|rem|em))", str(value)
+        ):
+            return False
+    return True
+
+
 QUALITY_GATES = {
     "audit": [
         ("has_scope", "Audit scope is required",
@@ -28,6 +113,8 @@ QUALITY_GATES = {
          lambda d: d.get("wcag_level") in ["A", "AA", "AAA"]),
         ("has_summary", "Summary with issue counts required",
          lambda d: bool(d.get("summary")) and d.get("summary", {}).get("total_issues") is not None),
+        ("counts_match_findings", "Issue counts must be nonnegative integers matching findings and severities",
+         audit_counts_match),
         ("issues_have_severity", "All issues must have severity",
          lambda d: all(i.get("severity") in ["critical", "major", "minor"]
                       for i in d.get("issues", []))),
@@ -39,10 +126,10 @@ QUALITY_GATES = {
          lambda d: all(i.get("remediation") for i in d.get("issues", []))),
         ("has_testing_notes", "Testing notes (screen readers, browsers) required",
          lambda d: bool(d.get("testing_notes"))),
-        ("tested_screen_readers", "At least 1 screen reader must be tested",
-         lambda d: len(d.get("testing_notes", {}).get("screen_readers_tested", [])) >= 1),
-        ("has_recommendations", "At least 3 recommendations required",
-         lambda d: len(d.get("recommendations", [])) >= 3),
+        ("screen_reader_evidence", "Claimed screen-reader tests require matching evidence references and target revision; untested reports require explicit limitations",
+         screen_reader_evidence_matches),
+        ("has_recommendations", "Recommendations must address actual findings; an empty findings list does not require invented recommendations",
+         recommendations_match_findings),
     ],
     "tokens": [
         ("has_version", "Version is required", lambda d: bool(d.get("version"))),
@@ -54,13 +141,13 @@ QUALITY_GATES = {
          lambda d: len(d.get("tokens", {}).get("typography", {})) >= 2),
         ("colors_have_values", "All color tokens must have values",
          lambda d: all(c.get("value") for c in d.get("tokens", {}).get("color", {}).values())),
-        ("colors_valid_format", "Color values must be valid hex or RGB",
+        ("colors_valid_format", "Color values must be #RRGGBB or rgb() with three comma-separated integer channels from 0 to 255",
          lambda d: all(
-             re.match(r'^#[0-9A-Fa-f]{6}$|^rgb', str(c.get("value", "")))
+             supported_color(c.get("value"))
              for c in d.get("tokens", {}).get("color", {}).values()
          )),
-        ("spacing_has_scale", "Spacing must follow consistent scale",
-         lambda d: True),  # Would need numeric validation
+        ("spacing_values_valid", "Spacing values must be nonnegative CSS lengths (px, rem, em, or zero)",
+         spacing_values_valid),
         ("typography_complete", "Typography tokens must have fontFamily, fontSize",
          lambda d: all(
              t.get("fontFamily") and t.get("fontSize")
@@ -164,10 +251,14 @@ def parse_markdown_component(content: str) -> Dict[str, Any]:
 
 
 def validate(data: Dict[str, Any], artifact_type: str) -> List[Dict[str, str]]:
-    """Run all quality gates for the artifact type."""
+    """Run supported structural gates. Evidence contents require separate review."""
+    if artifact_type not in QUALITY_GATES:
+        return [{"gate": "unsupported_type", "message": f"No validator is implemented for {artifact_type!r}; supported types: {', '.join(QUALITY_GATES)}", "severity": "error"}]
+    if not isinstance(data, dict):
+        return [{"gate": "invalid_document", "message": "Artifact must be a JSON object", "severity": "error"}]
     errors = []
 
-    gates = QUALITY_GATES.get(artifact_type, [])
+    gates = QUALITY_GATES[artifact_type]
 
     for gate_id, message, check_fn in gates:
         try:

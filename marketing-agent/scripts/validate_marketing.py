@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 """
 Validate OrgX marketing artifacts (campaigns, content packs, email sequences).
-Ensures all quality gates pass before artifacts are saved.
+Checks artifact structure; source truth still requires independent evidence review.
 
 Usage:
     python validate_marketing.py <file> --type <campaign|content|sequence>
@@ -34,7 +34,10 @@ QUALITY_GATES = {
          lambda d: len(d.get("messaging_pillars", [])) >= 3),
         ("pillars_have_proof", "Each pillar must have proof points",
          lambda d: all(len(p.get("proof_points", [])) > 0 for p in d.get("messaging_pillars", []))),
-        ("has_channels", "At least 2 channels required", lambda d: len(d.get("channels", [])) >= 2),
+        ("has_channels", "At least 1 nonblank channel name required",
+         lambda d: isinstance(d.get("channels"), list)
+         and len(d["channels"]) >= 1
+         and all(isinstance(channel, str) and channel.strip() for channel in d["channels"])),
         ("has_success_metrics", "At least 3 success metrics required",
          lambda d: len(d.get("success_metrics", [])) >= 3),
         ("metrics_have_targets", "All metrics must have numeric targets",

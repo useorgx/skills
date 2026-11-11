@@ -1,6 +1,6 @@
 ---
 name: orgx-design-agent
-version: "2.1.0"
+version: "2.4.0"
 description: |
   Produce high-confidence design artifacts for OrgX: WCAG accessibility audits, design token packages, component documentation, interaction specs, UX research plans, design critiques, motion specs, dark mode audits, and responsive breakpoint maps.
   Use when work requires design-system decisions, accessibility validation, interaction design, or design-to-engineering handoff quality gates.
@@ -16,24 +16,62 @@ Apply [orgx-capability-mindset](../orgx-capability-mindset) before design work. 
 
 ## 1. Quick Start
 
-1. Run `mcp__orgx__orgx_bootstrap` (it auto-resolves the workspace).
+1. Run `mcp__orgx__orgx_get_workspace_context` (it reads the workspace; `workspace_id` is optional).
 2. Confirm the artifact or decision type and the target audience. If the request is task-bound, hydrate it with `mcp__orgx__orgx_inspect` (`hydrate_context=true`); otherwise map neighboring work with `mcp__orgx__orgx_search`.
-3. Pull prior design precedent, standards, and learnings with `mcp__orgx__orgx_search`.
+3. Pull prior design precedent, standards, and decisions with `mcp__orgx__orgx_search`.
 4. Before creating or delegating workstreams, milestones, or tasks, inspect the active parent scope and reuse matching siblings. Treat `reused`, `duplicate_prevented`, or `_dedup` results as success and continue on the returned canonical entity ID.
-5. For interaction specs, breakpoint plans, or design-system migrations, use the planning loop: `mcp__orgx__orgx_plan` (`action=start`), refine with `action=improve`, capture revisions with `action=record_edit`, then close with `action=complete` (`attach_to=[...]`).
+5. For interaction specs, breakpoint plans, or design-system migrations, use the planning loop: `mcp__orgx__orgx_start_plan` (`title`, `idempotency_key`), resume with `mcp__orgx__orgx_read_plan`, refine with `mcp__orgx__orgx_save_plan` (`session_id`, `plan_content`, `expected_version`, `idempotency_key`), capture revisions with `mcp__orgx__orgx_record_plan_edit`, then close with `mcp__orgx__orgx_complete_plan` (`attach_to`, `idempotency_key`).
 6. Identify the **context signal** (see Context Adaptation Protocol) and adjust depth accordingly.
 7. Produce the artifact using the contract below and return:
    - A concise summary (3-6 bullets)
    - The artifact body (JSON or structured Markdown)
    - 3 actionable next steps with owners and effort estimates
-8. Run the precision loop before delivery. Every artifact ships validator-clean.
-9. Attach the result back to the active entity with `mcp__orgx__orgx_attach`, then record quality with `mcp__orgx__orgx_submit_receipt` (`receipt_type=quality`). When attaching, declare the `artifact_type` that matches the work (`design.audit`, `design.component_spec`, or `design.token_package`) and include `metadata.artifact_contract` with `agent_type`, `company_stage`, `business_outcome`, `owner`, `review_date`, and `verification`.
-10. Before delegating downstream design or implementation work, run `mcp__orgx__orgx_spawn` (`action=guard`), then `mcp__orgx__orgx_spawn` (`action=spawn`).
+8. Run the precision loop before delivery. Apply the supported validator and record actual verification limits.
+9. Attach the result back to the active entity with `mcp__orgx__orgx_attach_artifact`, then record quality with `quality_score`, `verification`, and an `idempotency_key` on `mcp__orgx__orgx_complete_work_with_proof` (or request an independent judgment with `mcp__orgx__orgx_request_independent_artifact_review`). When attaching, declare the `artifact_type` that matches the work (`design.audit`, `design.component_spec`, or `design.token_package`) and pass `agent_type`, `company_stage`, `business_outcome`, `owner`, `review_date`, and `verification` as arguments.
+10. Before delegating downstream design or implementation work, run `mcp__orgx__orgx_estimate_agent_task` (`task`) — v2 has no separate guard call, so the estimate is the pre-dispatch check — then dispatch an existing task with `mcp__orgx__orgx_start_agent_task` (`task_id`, `idempotency_key`). A started run is not a finished one: poll `mcp__orgx__orgx_get_operation_status`.
    - Omit `model_tier`, `provider`, and exact `model` for normal work so OrgX auto-routes by task complexity.
    - Use `model_tier=standard` and `budget_mode=cheapest_valid` only for controlled reliability validation runs, test initiatives, or explicit budget-constrained verification.
    - Design delegation must name the target surface, expected spec/audit/token artifact, and validation method before spawn.
 
-Deliver design artifacts that are implementation-ready, accessibility-compliant, and validator-clean.
+Deliver implementation-ready design artifacts with evidence for each verification claim. A valid document, contrast calculation, or screenshot does not establish a coherent interface or WCAG conformance.
+
+### Repo-first editable destination
+
+Keep the scoped brief, prototype source, selected revision and engineering handoff
+in the authorized repository. Reuse the workspace's existing components and
+tokens. The first headless canvas pilot is pen.dev (formerly Pencil), using
+the official native editor rather than a nested model or manually written
+`.pen` IDs. Do not implement every candidate connector for an unqualified task.
+Claude Design is optional; Paper and Penpot require their own verified runtime
+and account availability. “Mango” is ambiguous until the product is identified.
+
+Where the OrgX app's coding-environment pilot is present, use
+`scripts/design-pen-pilot.ts` with a bounded repo-relative plan and the exact
+existing source digest. Its code-owned loop inspects the whole source, composes
+existing refs, critiques state/viewport/native text evidence, revises diagnosed
+overflow, saves, reopens in a fresh process, exports and resumes the same source.
+It never runs login, creates credentials or assumes a subscription is free.
+Native mode requires existing execution/account authority and qualified renderer
+fonts, egress and cost. An installed CLI or a dot plugin is not an OrgX grant.
+
+The existing `design.prototype.publish` tool accepts a typed `penEpisode` but
+holds native execution until an owned repository runtime and current command
+budget are bound. Do not use the server's cwd, `agentSessionId`, host spawn or a
+`node` wrapper to infer or bypass that authority. Use the local pilot only in
+the selected authorized coding environment. A blocked native call can still
+leave a useful repo brief and handoff; report precisely which outputs exist.
+
+Before any native open, hold unsupported active content, external assets or
+imports, unresolved variables and excessive reference expansion. Keep uncertain
+stage reservations; reconcile the original outcome before retrying. Read actual
+native files and decoded export bytes, not only success prose or exit status.
+Native geometry and PNG existence do not establish visual craft, keyboard,
+screen reader or implementation acceptance. A browser denial remains a blocker;
+do not reroute it or label a static revision as rendered QA.
+
+Sources: [official headless CLI](https://docs.pen.dev/for-developers/pen-cli) and
+[native format](https://docs.pen.dev/for-developers/the-pen-format). Version and
+connection eligibility must match the actual admitted runtime.
 
 ## 2. Trigger Map
 
@@ -82,7 +120,7 @@ These are rapid-fire diagnostic checks. When you observe the pattern, suspect th
 
 - No focus states visible: keyboard users are blocked. Add visible focus rings meeting 3:1 contrast ratio against adjacent colors.
 - Color-only status indication: colorblind users are excluded. Add an icon, text label, or pattern as a secondary indicator.
-- Touch target smaller than 44px: fat finger errors on mobile. Increase to 44x44px minimum; 48x48px recommended per WCAG 2.5.8.
+- Measure pointer targets and spacing. WCAG 2.2 SC 2.5.8 (AA) requires 24x24 CSS pixels with spacing and other exceptions; 44x44 is the enhanced SC 2.5.5 target. A team's 44/48px touch preference is a design constraint, not the AA requirement.
 - More than 5 top-level nav items: cognitive overload per Miller's Law. Group into categories, prioritize by frequency, or use progressive disclosure.
 - Modal stacked on modal: z-index conflicts, context loss, and accessibility nightmare. Redesign the flow to avoid stacking; use inline expansion or step-based flow instead.
 - Inconsistent spacing between siblings: visual noise that erodes trust. Audit against the 8pt grid and normalize gaps.
@@ -132,13 +170,13 @@ If inputs are incomplete, declare assumptions explicitly at the top of the artif
 
 ## 6. Operating Workflow
 
-1. **Bootstrap**: Run `mcp__orgx__orgx_bootstrap` (workspace scope resolves automatically).
-2. **Scope**: Confirm the artifact type and audience. If task-bound, load `mcp__orgx__orgx_inspect` (`type=task`, `hydrate_context=true`). Identify the context signal from the table above.
+1. **Workspace context**: Run `mcp__orgx__orgx_get_workspace_context` (reads workspace scope).
+2. **Scope**: Confirm the artifact type and audience. If task-bound, load `mcp__orgx__orgx_inspect` (`type=task`, `id`, `hydrate_context=true`). Identify the context signal from the table above.
 3. **Gather evidence**:
-   - Query existing OrgX artifacts, prior standards, decisions, and learnings with `mcp__orgx__orgx_search`
+   - Query existing OrgX artifacts, prior standards and decisions with `mcp__orgx__orgx_search`
    - Pull Figma context with `mcp__figma__*` when available
    - Review related artifacts from Engineering and Product agents for constraints
-4. **Plan when needed**: For interaction flows, token migrations, or breakpoint programs, open a plan session with `mcp__orgx__orgx_plan` (`action=start`), refine with `action=improve`, and record major revisions with `action=record_edit`.
+4. **Plan when needed**: For interaction flows, token migrations, or breakpoint programs, open a plan session with `mcp__orgx__orgx_start_plan`, refine with `mcp__orgx__orgx_save_plan`, and record major revisions with `mcp__orgx__orgx_record_plan_edit`.
 5. **Draft**: Produce the artifact directly in JSON (preferred) or Markdown with a fenced JSON block.
 6. **Self-review**: Run the Precision Loop (Section 12) against the draft.
 7. **Validate**:
@@ -147,14 +185,20 @@ If inputs are incomplete, declare assumptions explicitly at the top of the artif
 python3 scripts/validate_design.py <artifact_file> --type <artifact_type>
 ```
 
+The CLI supports only `audit`, `tokens`, and `component`. Other artifact types below require their stated evidence review; report CLI validation as unavailable. Its checks validate structure and reference consistency, not the contents of linked proof, tool access, rendered behavior, or accessibility conformance. Never invent tests to satisfy a template.
+
+Use the existing design system and retain source/revision references. For an interface handoff, cover loading, empty, error and recovery states, keyboard focus, status announcements and reflow. Attach observed results for the exact revision or state what remains untested. A screenshot establishes appearance at its captured state, not keyboard or screen-reader behavior.
+
+Primary references: [W3C evaluation tool limits](https://www.w3.org/WAI/test-evaluate/tools/selecting/), [target size](https://www.w3.org/WAI/WCAG22/Understanding/target-size-minimum.html), [320 CSS pixel reflow](https://www.w3.org/WAI/WCAG22/Understanding/reflow.html), [modal keyboard and focus behavior](https://www.w3.org/WAI/ARIA/apg/patterns/dialog-modal/) and [status messages](https://www.w3.org/WAI/WCAG22/Understanding/status-messages.html). Apply criteria to observed behavior; these sources do not certify the artifact.
+
 8. **Fix and re-validate**: Resolve every failed gate. Re-run validator until all gates pass.
-9. **Publish**: Save with `mcp__orgx__orgx_write` (`operation=create` or `operation=update`) and link related entities.
+9. **Publish**: Save with `mcp__orgx__orgx_attach_artifact` and link related entities with `mcp__orgx__orgx_update_work` (`type`, `id`, `fields`, `idempotency_key`).
 10. **Attach proof**:
-    - `mcp__orgx__orgx_plan` (`action=complete`, `attach_to=[...]`) for planning sessions
-    - `mcp__orgx__orgx_attach` (with `artifact_type`, `description`, `verification`) for audits, token packages, and component docs
-    - `mcp__orgx__orgx_act` (`action=update` with a `note`) for design review verdicts on other agents' work; settling a decision is the person's call, so hand them its `review_url` instead of approving or declining it
-11. **Record learnings and quality**: Submit learnings with `mcp__orgx__orgx_submit_receipt` (`receipt_type=learning`) and record quality with `receipt_type=quality`.
-12. **Handoff**: Before delegating downstream work, run `mcp__orgx__orgx_spawn` (`action=guard`), then notify or spawn downstream agents (`action=spawn` or `action=handoff`) per the Cross-Agent Handoff Contracts.
+    - `mcp__orgx__orgx_complete_plan` (`attach_to`, `idempotency_key`) for planning sessions
+    - `mcp__orgx__orgx_attach_artifact` (with `artifact_type`, `description`, `verification`, `idempotency_key`) for audits, token packages, and component docs
+    - `mcp__orgx__orgx_update_work` (`fields` carrying a note, `idempotency_key`) for design review verdicts on other agents' work; settling a decision is the person's call, so hand them its `review_url` instead of approving or declining it
+11. **Record learnings and quality**: State learnings in the `note` and record quality with `quality_score`, `verification`, and an `idempotency_key` on `mcp__orgx__orgx_complete_work_with_proof`. v2 has no separate learning-capture call; do not invent one.
+12. **Handoff**: Before delegating downstream work, run `mcp__orgx__orgx_estimate_agent_task`, then start or hand off downstream agents (`mcp__orgx__orgx_start_agent_task` or `mcp__orgx__orgx_handoff_task`) per the Cross-Agent Handoff Contracts.
 
 ## 7. Artifact Contracts
 
@@ -177,23 +221,25 @@ Required fields:
   - `impact`: Who is affected and how
   - `remediation`: Specific fix with code example where applicable
   - `effort`: `low` | `medium` | `high`
-- `testing_notes.screen_readers_tested[]`: At least one entry (VoiceOver, NVDA, JAWS)
-- `testing_notes.browsers_tested[]`: At least one entry
-- `testing_notes.tools_used[]`: Automated tools run (axe, Lighthouse, WAVE)
-- `recommendations[]`: At least three entries, ordered by impact
+- `testing_notes.screen_readers_tested[]`: Only technologies actually exercised; use `[]` when untested
+- `testing_notes.screen_reader_status`: `observed` or `not_tested`; untested reports require nonempty `limitations[]`
+- For each claimed test, `screen_reader_evidence[]` contains `technology`, `evidence_ref`, `target_revision`, and `outcome` (`pass` or `fail`); its revision must match the audit's `target_revision`
+- `testing_notes.browsers_tested[]` and `tools_used[]`: Only tools actually exercised; record unavailable checks as limitations
+- `recommendations[]`: Actions for observed findings, ordered by impact; an empty findings list may use `[]`
 - `pass_criteria`: Conditions under which this audit is considered resolved
 
 Minimum skeleton:
 
 ```json
 {
-  "scope": "Checkout flow — cart review through confirmation",
+  "scope": "Illustrative checkout fixture; not a live audit",
+  "target_revision": "fixture-v1",
   "wcag_level": "AA",
   "summary": {
-    "total_issues": 7,
-    "critical_count": 2,
-    "major_count": 3,
-    "minor_count": 2
+    "total_issues": 1,
+    "critical_count": 1,
+    "major_count": 0,
+    "minor_count": 0
   },
   "issues": [
     {
@@ -208,16 +254,17 @@ Minimum skeleton:
     }
   ],
   "testing_notes": {
-    "screen_readers_tested": ["VoiceOver on macOS"],
-    "browsers_tested": ["Chrome 120", "Safari 17"],
-    "tools_used": ["axe-core 4.8", "Lighthouse"]
+    "screen_readers_tested": [],
+    "screen_reader_status": "not_tested",
+    "screen_reader_evidence": [],
+    "limitations": ["Illustrative fixture; no screen reader, browser or automated scan was run"],
+    "browsers_tested": [],
+    "tools_used": []
   },
   "recommendations": [
-    "Fix all critical focus visibility issues before next release",
-    "Add skip-to-content link at page top",
-    "Implement live region announcements for cart total updates"
+    "Repair and retest the focus indicator on the exact implementation revision"
   ],
-  "pass_criteria": "Zero critical issues, zero major issues, all automated scans pass"
+  "pass_criteria": "Retest the focus defect, keyboard behavior and assistive technology on the exact revision; report untested scope"
 }
 ```
 
@@ -326,7 +373,7 @@ Minimum skeleton:
 }
 ```
 
-### Interaction Spec (`--type interaction`)
+### Interaction Spec (evidence review; no CLI validator)
 
 Required fields:
 
@@ -401,7 +448,7 @@ Minimum skeleton:
 }
 ```
 
-### UX Research Plan (`--type research-plan`)
+### UX Research Plan (evidence review; no CLI validator)
 
 Required fields:
 
@@ -463,7 +510,7 @@ Minimum skeleton:
 }
 ```
 
-### Design Critique (`--type critique`)
+### Design Critique (evidence review; no CLI validator)
 
 Required fields:
 
@@ -521,7 +568,7 @@ Minimum skeleton:
 }
 ```
 
-### Motion Spec (`--type motion`)
+### Motion Spec (evidence review; no CLI validator)
 
 Required fields:
 
@@ -597,7 +644,7 @@ Minimum skeleton:
 }
 ```
 
-### Dark Mode Audit (`--type dark-mode`)
+### Dark Mode Audit (evidence review; no CLI validator)
 
 Required fields:
 
@@ -663,7 +710,7 @@ Minimum skeleton:
 }
 ```
 
-### Responsive Breakpoint Map (`--type breakpoints`)
+### Responsive Breakpoint Map (evidence review; no CLI validator)
 
 Required fields:
 
@@ -749,11 +796,11 @@ Minimum skeleton:
 
 ### Handoff quality gates:
 
-Every handoff artifact must pass these checks before delivery:
+For substantial handoffs, use the applicable checks below. Missing optional template detail does not block routine work; fix concrete defects and satisfy actual payload schemas:
 
 1. All required fields present per the artifact contract
 2. No unresolved TODOs or placeholder content
-3. Validator passes with zero errors
+3. Supported structural validator passes; unsupported checks are named with their actual verification method
 4. Cross-references to related entities are linked
 5. Downstream agent's input requirements are met
 
@@ -763,7 +810,7 @@ The design agent improves over time by recording learnings and consuming them on
 
 ### Recording learnings:
 
-After every artifact delivery, submit a learning via `mcp__orgx__orgx_submit_receipt` (`receipt_type=learning`) with:
+After every artifact delivery, state a learning in the `note` of `mcp__orgx__orgx_complete_work_with_proof` (v2 has no separate learning-capture call) with:
 
 - `category`: `design_pattern` | `accessibility_fix` | `token_decision` | `research_finding` | `motion_pattern`
 - `observation`: What was decided and why
@@ -773,7 +820,7 @@ After every artifact delivery, submit a learning via `mcp__orgx__orgx_submit_rec
 
 ### Consuming learnings:
 
-At the start of every artifact, query `mcp__orgx__orgx_search` with:
+At the start of every artifact, query `mcp__orgx__orgx_search` for prior work and decisions with:
 
 - The component or flow name
 - The artifact type
@@ -792,17 +839,85 @@ Apply relevant prior learnings. Reference them explicitly (e.g., "Per learning L
 
 ## 10. Tooling
 
+### Executable handoff coverage
+
+The existing `design.accessibility.audit` tool accepts `{ handoff: ... }` for a
+bounded specification check. Its source schema is
+`lib/agents/design/handoff.ts`; a complete fictional example lives in
+`tests/fixtures/designHandoff.ts`. This checks supplied structure and produces
+requested inspection probes. `needs_verification` is not rendered QA.
+
+- Bind `workspaceId` and `target` (`artifactId`, design `revision`, candidate
+  `implementationRevision`, or `null` until code exists).
+- Supply `brief` (`problem`, `audience`, `evidenceIds`, `constraints`,
+  `assumptions`); versioned `sources` (`id`, `reference`, `revision`); and
+  `system` (`sourceId`, reused `components` with `id` and `sourceId`).
+- Each `journeys` entry has `id`, `goal`, `asynchronous`, `states`, and
+  `transitions`. States have `id`, `kind`, `componentIds`, `visibleContent`,
+  `primaryAction`, `keyboardBehavior`, and `screenReaderBehavior`. Async
+  journeys cover `idle`, `loading`, `empty`, `error`, `recovery`, `success`.
+  Transitions specify `from`, `to`, `action`, `preservesUserInput`, `retryPolicy`.
+- Supply `responsive` width/behavior entries at 320 CSS pixels and desktop,
+  `reducedMotion`, and `implementation` owner/acceptanceCriteria. Split scopes
+  exceeding 120 checks (states × declared widths × five check types) before
+  requesting inspection. A six-state journey at two widths needs 60 checks.
+- The trusted `DesignEvidenceReader` extension accepts exact source and
+  implementation revision probes. A caller cannot submit its own executed
+  observations through tool arguments. No live reader is wired by this change.
+- The legacy `design.prototype.publish` name records an existing link as an
+  unverified reference. It does not publish a design. Nested Figma exports
+  remain blocked until the shared owner supplies a workspace/resource-authorized
+  reader; the legacy user-level grant lookup is insufficient.
+- The additional `design.prototype.publish({ runId, episode: { plan, handoff } })`
+  path composes an editable draft through the existing managed Figma capability
+  boundary. `plan` names `episodeId`, `fileKey`, `parentNodeId`, `componentNodeId`,
+  `title`, and `scenes` (`id`, `kind`, `width`, `padding`, `gap`, existing
+  TEXT/BOOLEAN `properties`). Each scene ID is `journeyId/stateId/width` and
+  must cover the handoff's complete state/viewport product. No caller code or
+  caller QA observations are accepted.
+- The bounded episode creates existing component instances, reads the native
+  tree, critiques native overflow and opaque normal-text contrast, revises
+  overflow, requests a preview, saves the exact native revision, and resumes
+  through fresh readback without a new mutation. A preview URL establishes
+  neither rendered QA nor keyboard, screen-reader or implementation acceptance.
+  Keep those checks pending and request independent review of the actual artifact.
+- Canvas transports are shipped as candidate declarations. Current workspace,
+  file, project, active-run effect, connector/account and native cash admission
+  must all be established before invocation. This change grants none of them.
+  Unavailable, expired or revoked access and unknown outcomes return a held
+  result with the original target/stage; reconcile it instead of changing the
+  episode ID or retrying a mutation. Do not infer live Figma access, free
+  provider execution or practitioner percentile from synthetic transport tests.
+- Prefer the existing Figma destination: supply its file/selection link, target
+  container and existing component, and confirm file edit access. Saved/resumed
+  episodes return the native destination link. They create editable instances in
+  that existing file and change no sharing settings.
+- An OrgX Figma REST connection, this conversation's Figma plugin, and an
+  authenticated OrgX MCP write connection are separate facts. Current platform
+  OAuth audience/refresh and native MCP grant-validation gaps must be resolved
+  before activation; do not present a Connect click as sufficient.
+- Use the typed `design.prototype.publish` episode handler. Raw canvas program
+  operations are internal adapter methods. Missing explicit file/role/project
+  authority, candidate qualification or current required approval holds before
+  reserving a mutation. Preserve stored policies; never rewrite snake/camel file
+  restrictions per invocation or broaden a grant to make a test pass.
+- Microcopy requires a supplied `surface` and explicit action/subject `entries`.
+  Optional `voice` is caller-supplied; absent voice produces a neutral draft.
+  No OrgX brand voice or token palette is inherited by a client.
+
 ### Primary:
 
-- `mcp__orgx__orgx_bootstrap` — initialize OrgX session scope and recommended workflow (workspace auto-resolves)
-- `mcp__orgx__orgx_inspect` — hydrate task-bound context, attachments, and plan sessions (`hydrate_context=true`)
-- `mcp__orgx__orgx_search` — query existing design artifacts, prior decisions, and design-specific learnings before drafting
-- `mcp__orgx__orgx_plan` — tracked design planning: `action=start` to open, `action=improve` to refine, `action=record_edit` to capture revisions, `action=complete` (`attach_to=[...]`) to persist and attach
-- `mcp__orgx__orgx_write` — publish completed artifacts (`operation=create` | `operation=update`; use `orgx_apply_changeset` for multi-entity batches)
-- `mcp__orgx__orgx_attach` — attach artifacts with `artifact_type`, `description`, `verification` metadata
-- `mcp__orgx__orgx_act` — entity state changes and review notes (`action=update`; `action=validate dry_run=true` for readiness checks). Only a person settles a decision; give them its `review_url`
-- `mcp__orgx__orgx_submit_receipt` — record learnings (`receipt_type=learning`) and score quality (`receipt_type=quality`) for calibration
-- `mcp__orgx__orgx_spawn` — `action=guard` to verify delegation is allowed, then `action=spawn` for follow-on work
+- `mcp__orgx__orgx_get_workspace_context` — read workspace scope (`workspace_id` optional; reads only)
+- `mcp__orgx__orgx_inspect` — hydrate task-bound context, attachments, and plan sessions (`type`, `id`, `hydrate_context=true`)
+- `mcp__orgx__orgx_search` — query existing design artifacts and prior decisions before drafting
+- `mcp__orgx__orgx_start_plan`, `mcp__orgx__orgx_read_plan`, `mcp__orgx__orgx_save_plan`, `mcp__orgx__orgx_record_plan_edit`, `mcp__orgx__orgx_complete_plan` — tracked design planning (`save_plan` takes `session_id`, `plan_content`, `expected_version`; `complete_plan` takes `attach_to`; every write also takes `idempotency_key`)
+- `mcp__orgx__orgx_update_work` — update one entity or record a review note (`type`, `id`, `fields`); a retried write reuses its `idempotency_key`
+- `mcp__orgx__orgx_attach_artifact` — attach artifacts with `artifact_type`, `description`, `verification` metadata, plus `idempotency_key`
+- `mcp__orgx__orgx_complete_work_with_proof` — complete work with `artifact`, `verification`, `quality_score`, `note`, `idempotency_key`
+- `mcp__orgx__orgx_capture_decision`, `mcp__orgx__orgx_open_decision_review` — raise a decision; only a person settles it, so give them its `review_url`
+- `mcp__orgx__orgx_estimate_agent_task`, `mcp__orgx__orgx_start_agent_task`, `mcp__orgx__orgx_handoff_task` — estimate before dispatch, then start or hand off follow-on work
+- `mcp__orgx__orgx_get_operation_status` — real state of a started run (`kind`, `id`); recheck after `next_poll_after_ms`
+- `mcp__orgx__orgx_request_independent_artifact_review` — independent judgment of an artifact
 
 ### Optional (when configured):
 
@@ -813,7 +928,7 @@ Apply relevant prior learnings. Reference them explicitly (e.g., "Per learning L
 ### Validation:
 
 ```bash
-python3 scripts/validate_design.py <artifact_file> --type <audit|tokens|component|interaction|research-plan|critique|motion|dark-mode|breakpoints>
+python3 scripts/validate_design.py <artifact_file> --type <audit|tokens|component>
 ```
 
 ## 11. Failure Handling
@@ -823,7 +938,7 @@ python3 scripts/validate_design.py <artifact_file> --type <audit|tokens|componen
 | Missing design source (no Figma, no screenshots) | Request the source. If unavailable, proceed with stated assumptions and mark confidence as `low`. |
 | Figma tools unavailable | Continue with supplied evidence. Note confidence reduction in the artifact header. |
 | Validator fails | Do not publish. Fix every failed gate and re-run. Never override. |
-| Conflicting prior learnings | Present the conflict, state the resolution rationale, and update the learning with `mcp__orgx__orgx_submit_receipt` (`receipt_type=learning`). |
+| Conflicting prior learnings | Present the conflict, state the resolution rationale, and state the revised learning in the completion note of `mcp__orgx__orgx_complete_work_with_proof`. |
 | Ambiguous artifact type | Ask the requester to clarify. If no response within context, choose the most conservative type and note the assumption. |
 | Engineering says "not feasible" | Adapt the design to constraints. Document what was compromised and why. Record as a learning. |
 | Insufficient evidence for critique score | Mark the score as provisional, list what evidence is missing, and specify what would change the score. |
@@ -831,7 +946,7 @@ python3 scripts/validate_design.py <artifact_file> --type <audit|tokens|componen
 
 ## 12. Precision Loop (Run Every Artifact)
 
-Execute this checklist on every artifact before delivery. All passes must clear.
+Use the applicable checklist items before delivery. Block only on a real defect in scope or an enforced requirement.
 
 ### Pass 1 — Completeness
 
@@ -871,13 +986,17 @@ Execute this checklist on every artifact before delivery. All passes must clear.
 
 ### Pass 6 — Validator
 
-- Run `python3 scripts/validate_design.py` and confirm zero errors
-- No warnings that indicate missing recommended fields
-- Artifact is publication-ready
+- Run `python3 scripts/validate_design.py` for a supported type and confirm zero errors
+- Record unavailable validation and test limitations; review actual evidence independently
+- Verify delivery requirements separately; structural validation does not authorize publication
 
 ## 13. Quality Bar (Four-Lens Verification)
 
-Every artifact you attach is verified four-lens — judged (layered LLM scoring against pinned references), measured (deterministic checks), observed (flagged issues that cap confidence), and outcome (reality events recorded separately) — and gated at AQ 0.85. Below-gate work parks in `changes_requested` and comes back as rework; see the `orgx-quality-bar` skill for the full system.
+For artifacts tracked in OrgX, use the four verification lenses described in
+`orgx-quality-bar` and read the actual receipt and configured threshold before
+claiming a pass. AQ 0.85 is a suggested target, not a prerequisite for routine
+repository work or merges. Do not invent a review or rework requirement when
+no applicable runtime policy or acceptance criterion requires it.
 
 ### Design layer stack
 
@@ -906,7 +1025,7 @@ Any `*.structured_blocker` artifact — from any domain, including design — is
 
 ### Type codes
 
-Declare `artifact_type` on `mcp__orgx__orgx_attach` and receipts so the right stack judges you: `design.audit`, `design.critique`, `design.accessibility_audit`, `design.dark_mode_audit`, `design.component_spec`, `design.token_package`. A mistyped artifact is judged on the wrong bar, and the mistype guard re-classifies flattering types.
+Declare `artifact_type` on `mcp__orgx__orgx_attach_artifact` and receipts so the right stack judges you: `design.audit`, `design.critique`, `design.accessibility_audit`, `design.dark_mode_audit`, `design.component_spec`, `design.token_package`. A mistyped artifact is judged on the wrong bar, and the mistype guard re-classifies flattering types.
 
 ### Score honestly
 
@@ -929,10 +1048,10 @@ An artifact is done when all of the following are true:
 
 - Artifact type matches the request and conforms to its schema contract
 - All precision loop passes clear
-- Validator passes with zero errors
+- Supported structural validator passes; other required checks have explicit verification evidence or blockers
 - Findings and recommendations are specific, actionable, and evidence-backed
 - Public or revenue-facing work passes the GTM Outcome Gate or explicitly documents why it is not applicable
 - Downstream agent handoff requirements are met
-- Final artifact is saved via `mcp__orgx__orgx_write` and linked to related entities
-- At least one learning has been recorded via `mcp__orgx__orgx_submit_receipt`
+- Final artifact is attached via `mcp__orgx__orgx_attach_artifact` and linked to related entities
+- At least one learning has been stated in the completion note of `mcp__orgx__orgx_complete_work_with_proof`
 - Requester has received the summary with 3 next steps

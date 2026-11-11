@@ -23,8 +23,9 @@ npx add-skill useorgx/skills --list
 | [initiative-kickoff](./initiative-kickoff) | Create complete initiatives from a one-line goal                            |
 | [bulk-create](./bulk-create)               | Create multiple tasks from markdown checklists                              |
 | [nightly-recap](./nightly-recap)           | End-of-day activity summary                                                 |
+| [hand-over-a-responsibility](./hand-over-a-responsibility) | Set up an ongoing responsibility as a readable operating agreement, record work against it, and resume it from its brief; sales follow-ups as a drafts-only first path |
 | [orgx-capability-mindset](./orgx-capability-mindset) | Shared Software 3.0 judgment layer: verifier gates, agent-native outputs, jagged-risk routing, adversarial review, and MCP progress ledger |
-| [orgx-quality-bar](./orgx-quality-bar)     | How OrgX judges artifacts: four-lens verification, domain layer stacks, the AQ 0.85 gate, artifact type codes and the mistype guard, GTM sendability checks, and the rework loop |
+| [orgx-quality-bar](./orgx-quality-bar)     | How OrgX reviews artifacts: four-lens verification, domain layer stacks, configured acceptance criteria, artifact types, GTM sendability checks, and the rework loop |
 | [orgx-design](./orgx-design)               | Canonical OrgX product design system: full-surface audits, app and widget patterns, responsive/accessibility verification, cut protocol, and cross-tool drift control |
 | [product-agent](./product-agent)           | 100x product domain expert: PRDs, initiatives, canvases, research briefs, competitive analyses, prioritization matrices, pivot evaluations, dashboard specs, launch readiness |
 | [engineering-agent](./engineering-agent)   | 100x engineering domain expert: RFCs, ADRs, code reviews, postmortems, tech debt inventories, capacity plans, runbooks, migration playbooks, dependency audits, perf budgets |
@@ -40,7 +41,11 @@ npx add-skill useorgx/skills --list
 
 ## Requirements
 
-These skills require the [OrgX MCP server](https://mcp.useorgx.com) to be configured:
+OrgX entity, dispatch, and reporting workflows require the
+[OrgX MCP server](https://mcp.useorgx.com) to be configured. Routine repository
+edits, PR updates, and authorized merges can proceed with local tools and the
+repository's applicable checks; optional tracking is not a prerequisite.
+Existing user authorization carries forward without repeated approval prompts.
 
 ```json
 {
@@ -80,12 +85,31 @@ proof, recommendations, morning briefs, and skill improvement. Use local
 validator `--type` names inside each skill; use the MCP `artifact_type` values
 when saving the artifact to OrgX.
 
+## Idempotent Writes
+
+Every OrgX MCP write (`orgx_create_*`, `orgx_update_work`, the plan, lifecycle,
+dispatch, decision, artifact, and completion calls) requires `idempotency_key`;
+the server refuses a write without one with 400 `idempotency_key_required`.
+
+- Mint one key per intended change, e.g. `<skill>-<entity>-<purpose>-<uuid>`
+  (letters, digits, `.`, `_`, `:`, `/`, `-`; under 160 characters).
+- Reuse a key only to retry the identical input; changed input gets a new key.
+- On `outcome_unknown`, check `orgx_get_operation_status` and retry with the
+  SAME key. On `forbidden`, stop — never route around it through another tool.
+
+Agents may also see `approval_required`, `stale_version`, `stale_lease`,
+`budget_exhausted`, `rate_limited`, and `idempotency_key_conflict`. The full
+rule and what to do for each code live in
+[orgx-capability-mindset](./orgx-capability-mindset/SKILL.md#idempotent-writes).
+
 ## Quality Bar
 
-OrgX verifies every attached artifact with a four-lens system (judged,
-measured, observed, outcome) and gates shipping at AQ 0.85. The
-`artifact_type` you declare selects which domain layer stack judges the work,
-and below-gate artifacts come back as rework with layer-specific feedback.
+OrgX supports four verification lenses (judged, measured, observed, outcome).
+Use the actual evaluation receipt and configured acceptance criteria; AQ 0.85
+is a suggested target, not a universal shipping or merge requirement. The
+`artifact_type` selects the domain layer stack, and an evaluation can return
+layer-specific rework. Do not claim a lens ran without its evidence or require
+an artifact evaluation for unrelated repository work.
 [orgx-quality-bar](./orgx-quality-bar) documents the full system — every
 domain agent's Quality Bar section is derived from it.
 
@@ -97,7 +121,14 @@ Run the repo-level drift check before opening a PR or shipping skill changes:
 python3 scripts/check_skill_tool_drift.py
 ```
 
-The check fails on deprecated OrgX tool names, unknown `mcp__orgx__*` references, and high-value workflow gaps such as spawning without `orgx_spawn` or opening plan sessions without `orgx_plan`.
+The check fails on deprecated OrgX tool names, unknown `mcp__orgx__*` references, and high-value workflow gaps such as spawning without `orgx_start_agent_task` or opening plan sessions without `orgx_start_plan`.
+
+It also fails any example call to a write tool (listed under `write_tools` in
+`scripts/orgx-v2-catalog.json`) that omits `idempotency_key`. A call is a tool
+reference followed by its arguments — `tool(...)` / `tool {...}` in a code
+block, prose `tool` (`arg`, ...), `tool` with `arg`, an inline
+`tool arg=... arg=...`, a tool-list entry `tool` — takes `arg`, or a JSON
+object naming the tool. Plain prose mentions of a tool name are not calls.
 
 ## Skill Format
 
@@ -120,3 +151,12 @@ skill-name/
 ## License
 
 MIT
+
+## About OrgX
+
+[OrgX](https://useorgx.com) is proof for AI-delivered work — the operating record your agents and tools share. Agents in ChatGPT, Claude, Cursor, and Codex work from one record of decisions, approvals, and work receipts.
+
+- [OrgX FAQ](https://useorgx.com/faq): what it is, who it's for, and what it costs
+- [Agent work receipts](https://useorgx.com/agent-work-receipts): how finished agent work is checked and signed off
+- [Pricing](https://useorgx.com/pricing)
+- Hosted MCP server: [useorgx/orgx-mcp](https://github.com/useorgx/orgx-mcp)

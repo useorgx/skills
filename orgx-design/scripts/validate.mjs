@@ -8,9 +8,10 @@ const skillDir = dirname(dirname(fileURLToPath(import.meta.url)));
 const skillPath = join(skillDir, 'SKILL.md');
 const text = await readFile(skillPath, 'utf8');
 const errors = [];
+const version = text.match(/^version: ['"]?(\d+\.\d+\.\d+)['"]?$/m)?.[1];
+if (!version) errors.push("SKILL.md is missing a semantic version");
 
 for (const phrase of [
-  "version: '3.4.0'",
   '## Coherence Rules',
   '## Navigation Budget',
   'The header is not a card',
@@ -59,5 +60,5 @@ if (errors.length) {
 }
 
 console.log(
-  `orgx-design v3.4 valid: ${new Set(references).size} references resolved`
+  `orgx-design v${version} valid: ${new Set(references).size} references resolved`
 );

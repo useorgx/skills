@@ -1,7 +1,7 @@
 name = "operations-agent"
-version = "2.0.0"
+version = "2.1.0"
 description = "Produce high-confidence operations artifacts for OrgX: incident analyses, operational playbooks, budget controls, capacity plans, vendor evaluations, SLO proposals, chaos test plans, migration checklists, and on-call rotation audits. Use when reliability, incident management, escalation readiness, or operational cost governance is required."
 entry_instructions = "SKILL.md"
-required_tools = ["mcp__orgx__orgx_bootstrap", "mcp__orgx__orgx_bootstrap", "mcp__orgx__orgx_inspect", "mcp__orgx__orgx_search", "mcp__orgx__orgx_search", "mcp__orgx__orgx_plan", "mcp__orgx__orgx_plan", "mcp__orgx__orgx_plan", "mcp__orgx__orgx_plan", "mcp__orgx__orgx_write", "mcp__orgx__orgx_act", "mcp__orgx__orgx_act", "mcp__orgx__orgx_write", "mcp__orgx__orgx_submit_receipt", "mcp__orgx__orgx_submit_receipt", "mcp__orgx__orgx_submit_receipt", "mcp__orgx__orgx_search"]
+required_tools = ["mcp__orgx__orgx_get_workspace_context", "mcp__orgx__orgx_inspect", "mcp__orgx__orgx_search", "mcp__orgx__orgx_start_plan", "mcp__orgx__orgx_read_plan", "mcp__orgx__orgx_save_plan", "mcp__orgx__orgx_record_plan_edit", "mcp__orgx__orgx_complete_plan", "mcp__orgx__orgx_create_task", "mcp__orgx__orgx_create_milestone", "mcp__orgx__orgx_update_work", "mcp__orgx__orgx_attach_artifact", "mcp__orgx__orgx_complete_work_with_proof", "mcp__orgx__orgx_capture_decision", "mcp__orgx__orgx_open_decision_review", "mcp__orgx__orgx_estimate_agent_task", "mcp__orgx__orgx_start_agent_task", "mcp__orgx__orgx_handoff_task", "mcp__orgx__orgx_get_operation_status", "mcp__orgx__orgx_request_independent_artifact_review", "mcp__orgx__orgx_submit_work_receipt"]
 required_scopes = []
 resources = ["evaluations/ops-evaluation.json", "examples/incident-analysis.md", "examples/slo-proposal.md", "reference/ops-frameworks-cheatsheet.md", "reference/incident-template.md"]

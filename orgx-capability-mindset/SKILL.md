@@ -1,6 +1,6 @@
 ---
 name: orgx-capability-mindset
-version: "2.2.0"
+version: "2.4.0"
 description: |
   Shared Software 3.0 operating mindset for every OrgX agent. Use whenever an agent plans, implements, reviews, delegates, ships, or produces an artifact. Pushes capability by enforcing agent-native outputs, verifier-first execution, jagged-intelligence routing, adversarial review, durable progress artifacts, and human-governed decisions.
 ---
@@ -8,6 +8,21 @@ description: |
 # OrgX Capability Mindset
 
 Use this as the judgment layer above every domain skill. Skills define workflows. This skill decides whether the workflow is ambitious enough, verifiable enough, and safe enough to ship.
+
+## Scope and authority
+
+Apply the relevant guidance to the requested outcome. Routine repository work
+can proceed using the current user's authorization and available local tools;
+OrgX context, planning sessions, receipts, estimates, review agents, and quality
+scores are not additional prerequisites for edits, PR updates, or merges. Use
+the OrgX workflow below when the work is actually tracked or dispatched there.
+
+Do not request approval already granted in the conversation. Resolve routine,
+reversible implementation choices directly. Ask only when authority is missing
+for the concrete action, the scope materially changes, or an enforced runtime
+policy requires a person. Preserve actual access checks, branch protections,
+required CI, budget constraints, and data-integrity controls. A denied operation
+stays denied; continue other authorized work and report the specific blocker.
 
 ## Operating Frame
 
@@ -23,11 +38,11 @@ OrgX agents are not generic assistants. They are specialist execution agents ins
 
 Always bind the mindset to the current OrgX MCP surface.
 
-- Start with `mcp__orgx__orgx_bootstrap`; use its returned workspace and policy context as the initial scope.
-- Use sensors before actuators: `mcp__orgx__orgx_search`, `mcp__orgx__orgx_inspect`, `mcp__orgx__orgx_recommend`, and `mcp__orgx__orgx_plan` when the exact state or contract matters.
-- Use actuators deliberately: `mcp__orgx__orgx_write`, `mcp__orgx__orgx_act`, `mcp__orgx__orgx_attach`, `mcp__orgx__orgx_decide`, and `mcp__orgx__orgx_emit_activity`.
-- Use verification and flywheel receipts: `mcp__orgx__orgx_inspect` for completion evidence and `mcp__orgx__orgx_submit_receipt` for quality, outcomes, learnings, and loop validation.
-- Before delegation, run `mcp__orgx__orgx_spawn action=guard` (and `action=estimate` when cost matters); then dispatch with `mcp__orgx__orgx_spawn action=spawn` when allowed.
+- Start with `mcp__orgx__orgx_get_workspace_context`; use its returned workspace and policy context as the initial scope. It reads context; it does not select a workspace or create a session.
+- Use sensors before actuators: `mcp__orgx__orgx_search`, `mcp__orgx__orgx_inspect`, `mcp__orgx__orgx_get_next_actions`, and `mcp__orgx__orgx_read_plan` when the exact state or contract matters.
+- Use actuators deliberately: the typed create calls (`mcp__orgx__orgx_create_initiative`, `mcp__orgx__orgx_create_workstream`, `mcp__orgx__orgx_create_milestone`, `mcp__orgx__orgx_create_task`), `mcp__orgx__orgx_update_work`, the lifecycle calls (`mcp__orgx__orgx_launch_initiative`, `mcp__orgx__orgx_pause_work`, `mcp__orgx__orgx_resume_work`, `mcp__orgx__orgx_retry_work`, `mcp__orgx__orgx_cancel_work`), `mcp__orgx__orgx_attach_artifact`, and `mcp__orgx__orgx_capture_decision`. Progress is captured by the client's hooks; there is no call to emit activity.
+- Use verification receipts: `mcp__orgx__orgx_inspect` for completion evidence, and `mcp__orgx__orgx_complete_work_with_proof` (`quality_score`, `verification`, `idempotency_key`, and a `note` carrying learnings) to record outcomes. v2 has no separate learning-capture call. For an independent quality judgment call `mcp__orgx__orgx_request_independent_artifact_review`; for a portable Agent Work Receipt use `mcp__orgx__orgx_submit_work_receipt`.
+- Before authorized delegation, read `mcp__orgx__orgx_check_execution_readiness`, then estimate cost and routing with `mcp__orgx__orgx_estimate_agent_task`. Readiness is a snapshot; an estimate grants no effects, live access, permissions, or budget. Preserve explicit user model, provider, tier, and budget constraints in the estimate and dispatch. Resolve reported readiness blockers before dispatching with `mcp__orgx__orgx_start_agent_task` (an existing `task_id`, `idempotency_key`) or `mcp__orgx__orgx_handoff_task` when allowed; canonical dispatch still enforces actual capability, permission, budget, and lifecycle admission.
 
 Log the sensor-to-actuator transition in the work record. This is where stale state and hidden assumptions compound.
 
@@ -35,9 +50,50 @@ Log the sensor-to-actuator transition in the work record. This is where stale st
 
 Report the state OrgX actually holds, never the state you asked for.
 
-- **Only a person settles a decision.** `mcp__orgx__orgx_decide action=approve|reject` (and the `approve_decision` / `reject_decision` aliases) never approve or reject anything: they return where the person decides — the Approve button in the decisions widget for ordinary decisions in hosts that render it, otherwise the decision page in OrgX (`review_url`). Give the person the `review_url` and say the decision is waiting on them. Never say a decision was approved or rejected unless OrgX shows it settled. `orgx_widget_decide` is widget-only, driven by a single-use token the model never sees; never call it.
-- **Started is not done.** Spawning, delegating, launching, or raising a decision starts something. Report it as "started" or "waiting on <person>", keep the returned `run_id` / decision ID, and check before you claim an outcome. Where the connection exposes `mcp__orgx__orgx_command_status`, call it with `kind=decision|run|command` and that `id`: `state` is `queued`, `held`, `running`, `succeeded`, `failed`, `cancelled`, or `not_found`; `waiting_on` says whether a `person` or an `agent` holds it; check again after `next_poll_after_ms`, and treat `null` as final. Without it, read the entity with `mcp__orgx__orgx_inspect` or `mcp__orgx__get_agent_status`. Only `succeeded` plus proof counts as done.
-- **Retry writes with the same key.** OrgX stores the response for each `idempotency_key`: retrying the same write with the same key replays that response instead of duplicating work, so retry a write whose outcome you did not see rather than guessing or deduplicating by hand. Reusing a key with a different body is refused (422) — a different change needs a new key. A 409 means the first attempt is still in flight; wait, then retry with the same key.
+- **Only a person settles a human-gated OrgX decision.** This API restriction does not prohibit an authorized code-review verdict or merge and does not require filing routine implementation choices as decisions. `mcp__orgx__orgx_capture_decision` files the decision and returns where the person decides; `mcp__orgx__orgx_open_decision_review` returns the same place for an existing one — the Approve button in the decisions widget for ordinary decisions in hosts that render it, otherwise the decision page in OrgX (`review_url`). Give the person the `review_url` and say the decision is waiting on them. Never say a decision was approved or rejected unless OrgX shows it settled. `orgx_widget_decide` is widget-only, driven by a single-use token the model never sees; never call it.
+- **Started is not done.** Dispatching, delegating, launching, or raising a decision starts something. Report it as "started" or "waiting on <person>", keep the returned operation / run / decision ID, and check before you claim an outcome. Call `mcp__orgx__orgx_get_operation_status` with that `id` (and `kind` when known): `state` is `queued`, `held`, `running`, `succeeded`, `failed`, `cancelled`, or `not_found`; `waiting_on` says whether a `person` or an `agent` holds it; check again after `next_poll_after_ms`, and treat `null` as final. You can also read the entity with `mcp__orgx__orgx_inspect` or `mcp__orgx__orgx_get_agent_status`. Only `succeeded` plus proof counts as done.
+- **Retry writes with the same key.** Every write takes an `idempotency_key` (see Idempotent Writes below). OrgX stores the response for each key: retrying the same write with the same key replays that response instead of duplicating work, so retry a write whose outcome you did not see rather than guessing or deduplicating by hand. Reusing a key with a different body is refused (`idempotency_key_conflict`) — a different change needs a new key. A 409 means the first attempt is still in flight; wait, then retry with the same key.
+
+## Idempotent Writes
+
+Every OrgX write requires `idempotency_key`; a call without one is refused with
+400 `idempotency_key_required` and nothing is written. This covers
+`orgx_start_plan`, `orgx_save_plan`, `orgx_complete_plan`,
+`orgx_record_plan_edit`, `orgx_create_initiative_hierarchy`,
+`orgx_create_initiative`, `orgx_create_workstream`, `orgx_create_milestone`,
+`orgx_create_task`, `orgx_update_work`, `orgx_start_agent_task`,
+`orgx_handoff_task`, `orgx_launch_initiative`, `orgx_pause_work`,
+`orgx_resume_work`, `orgx_retry_work`, `orgx_cancel_work`,
+`orgx_capture_decision`, `orgx_attach_artifact`,
+`orgx_request_independent_artifact_review`, `orgx_complete_work_with_proof`,
+and `orgx_submit_work_receipt`.
+
+- **Mint one key per intended change**, before the first attempt:
+  `<skill>-<entity>-<purpose>-<uuid>`, for example
+  `task-protocol-task-complete-3f9c2a1e-6b7d-4c1a-9e2f-0a8b5c4d3e21`. Keep it to
+  letters, digits, `.`, `_`, `:`, `/`, and `-`, starting with a letter or digit,
+  and under 160 characters.
+- **Reuse a key only to retry the identical input** — after a timeout, a
+  dropped connection, `rate_limited`, or `outcome_unknown`. OrgX applies a keyed
+  write at most once and replays the original result.
+- **Changed input means a new key.** A corrected payload, a re-read
+  `expected_version`, or a second entity in a batch is a different change.
+  Never reuse a key from an example or from another call.
+
+Failures come back as a typed `error.code` with
+`details.suggested_next_calls`. Act on the code, not the message text:
+
+| Code | What it means | What to do |
+| --- | --- | --- |
+| `approval_required` | The write needs a recorded human approval first. | Do not approve it yourself. Surface the decision (`orgx_list_pending_decisions`, `orgx_open_decision_review`), give the person its `review_url`, and retry with the same key only after OrgX shows it approved. |
+| `stale_version` | The record changed since you read it; nothing was written. | Re-read (`orgx_read_plan` / `orgx_inspect`), reapply your change to the latest content, and retry with the returned `expected_version` and a new key. |
+| `stale_lease` | Your execution lease expired or another agent holds the work. | Inspect the work. Do not overwrite another agent's work — coordinate through a handoff. If your own lease lapsed, resume to reclaim it, then retry with a new key. |
+| `budget_exhausted` | The workspace or task budget does not cover the operation. | Do not retry until the budget resets or a person raises it; re-estimate a cheaper route with `orgx_estimate_agent_task` if the work allows. |
+| `rate_limited` | The request was not applied. | Wait `retry_after_seconds`, then retry the identical call with the same key. |
+| `outcome_unknown` | The write was sent but not confirmed; it may or may not have applied. | Check `orgx_get_operation_status` (or read the entity back), and if the change is absent retry the identical call with the SAME key. Never mint a new key here — that is how duplicates happen. |
+| `forbidden` | Your identity lacks the role or scope. | Stop. Report the missing permission to a person. Do not route around it through another tool. |
+| `idempotency_key_required` | The write had no key; nothing was written. | Mint a key for this change and resend. |
+| `idempotency_key_conflict` | The key was already used with different input. | Resend the original input if you meant to retry; otherwise use a new key. |
 
 ## Record Work as an Agent Work Receipt
 
@@ -46,32 +102,23 @@ Describe your own work in the vocabulary of `@useorgx/agent-work-receipt`
 had**, what you did, what changed, **how it was checked**, **where a human was
 needed**, and what it cost. It is account-free and schema-validated, so the same
 record works in any runtime. Full vocabulary and the mapping from
-`metadata.artifact_contract`: `reference/agent-work-receipt.md`.
+the artifact contract fields: `reference/agent-work-receipt.md`.
 
-Three rules follow from it, and they bind before the work starts:
+Use these rules when a receipt is requested or the runtime records one:
 
-- **Declare the checks before you build, and watch them fail first.**
-  `verification.checks` is evidence a skeptic can re-run — a command and its exit
-  code, or an HTTPS probe and its status. A check earns trust only by
-  discriminating: seen failing while the work is absent, passing once it is
-  present. One that is green the moment you write it — `test -f
-  the-file-I-just-wrote` — distinguishes nothing, and one that ends `|| echo
-  "FAIL"` exits 0 whatever happens, so it can never fail at all. If a criterion
-  turns out to be someone else's scope, narrow your *claim*; never edit the test
-  until it passes. `reference/agent-work-receipt.md` has the measured
-  anti-patterns. Where the OrgX hook shim is installed, `orgx-agent criteria set`
-  runs each command as you declare it and the Stop hook re-runs them before your
-  session may end; OrgX accepts the run as verified only when at least one check
-  went from failing to passing.
-- **Know your authority, and record where a human was needed.**
-  `authority.mode` is `manual`, `gated`, or `autopilot`. The autonomy floor stops
-  eight classes at the point of action — `merge`, `force_push`, `deploy`,
-  `publish`, `destructive`, `send`, `spend`, `prod_data` — and files an OrgX
-  decision (`decision_type: agent_action`) in the owner's inbox. Only a
-  signed-in human resolves it; no API key can, including yours. Approval covers
-  exactly that one command, once. Record the denial under
-  `human_interventions`, continue with other work, and never retry or route
-  around it.
+- **Use checks that establish the claimed outcome.** Prefer an existing relevant
+  check or a focused regression test. For a new bug fix, reproduce the failure
+  first when practical. Documentation and other reversible, low-impact edits
+  do not need an invented test or a forced failing run. Record the commands,
+  exit codes, and limits of what ran; never swallow a failure with `|| true` or
+  substitute file existence for behavioral proof. Where configured hooks enforce
+  criteria, follow their actual results rather than claiming a generic rule.
+- **Record the authority actually in force.** Include user or delegated
+  authorization and any enforced policy constraints. Do not invent a new
+  one-command approval requirement for merges or other already-authorized
+  actions. If the runtime returns `approval_required`, surface that specific
+  decision and its `review_url`; do not settle a human-only decision or bypass
+  an enforced denial. Record the intervention and continue independent work.
 - **State the rung you actually reached.** `outcome.status` is what changed, not
   what you meant to change. Files in a scratch directory are not a draft; a
   branch with commits is. A PR is not merged, merged is not deployed, and
@@ -87,14 +134,14 @@ not generic analysis. Before producing or delegating work, identify whether the
 workspace is acting like an `early_founder`, `founder_led_company`, or
 `operating_team`, then select the smallest artifact that advances the company.
 
-When attaching proof with `mcp__orgx__orgx_act` (`action=attach`) or
-`mcp__orgx__orgx_attach`, include these MCP artifact-contract fields either as
-top-level fields when the client supports them or under
-`metadata.artifact_contract`. They are the OrgX projection of the Agent Work
+When attaching proof with `mcp__orgx__orgx_attach_artifact`, pass these MCP
+artifact-contract fields as arguments (`artifact_type`, `agent_type`,
+`company_stage`, `business_outcome`, `owner`, `review_date`, `verification`). They are the OrgX projection of the Agent Work
 Receipt records — see `reference/agent-work-receipt.md` for the fuller shape and
 for the three records this projection leaves out (`authority`,
 `human_interventions`, `cost`):
 
+- `artifact_type`: the type code from the table below
 - `agent_type`: `engineering`, `sales`, `marketing`, `product`, `design`,
   `operations`, or `orchestrator`
 - `company_stage`: `early_founder`, `founder_led_company`, or `operating_team`
@@ -121,19 +168,18 @@ recommendations, proof cards, and morning briefs can reason across domains.
 The `artifact_type` also selects the layer stack OrgX's four-lens verification
 judges the artifact on — a mistyped artifact is judged on the wrong bar and
 may be flagged provisional by the mistype guard. See the `orgx-quality-bar`
-skill for the four lenses, domain layer stacks, the AQ 0.85 gate, GTM
+skill for the four lenses, domain layer stacks, configured acceptance criteria, GTM
 sendability checks, and the rework loop.
 Cost controls are execution constraints, not an agent mindset: use
 `model_tier=standard` plus `budget_mode=cheapest_valid` only for controlled
 reliability validation, test initiatives, or explicit budget pressure.
 When the user asks for cost comparison, budget fit, or cheapest-valid
-validation, call `mcp__orgx__orgx_spawn` with
-`action="estimate"` before dispatching work.
+validation, call `mcp__orgx__orgx_estimate_agent_task` before dispatching work.
 
-For loop validation, close each rung with a receipt that includes
+For loop validation, close each rung with a receipt (a completion note, or a `mcp__orgx__orgx_submit_work_receipt` receipt) that includes
 `loop_validation: true`, `validation_rung`, `artifact_type`, `agent_type`,
 `business_outcome`, `verification_status`, `model_tier`, `budget_mode`, and
-evidence. Treat `loop_validation.promotable=true` as the only promotion signal.
+evidence. Take `model_tier` and `budget_mode` from the `mcp__orgx__orgx_estimate_agent_task` you ran before dispatch. Treat `loop_validation.promotable=true` as the only promotion signal.
 
 ## Ten Principles
 
@@ -161,7 +207,7 @@ Classify the work before trusting the output:
 - **Edge-circuit**: architecture judgment, product taste, UX taste, threat modeling, identity/data matching, pricing, ambiguous stakeholder needs.
 - **Out-of-circuit**: missing context, hidden constraints, unverifiable outputs, taste-heavy decisions, irreversible side effects.
 
-For edge or out-of-circuit work, slow down, gather context, write a tighter spec, add a verifier, ask for approval, or route to a critic.
+For edge or out-of-circuit work, gather the missing context, tighten the spec, or add a relevant verifier. Ask for a decision only when the unresolved choice materially affects scope or requires authority the user has not granted.
 
 ### 6. Agentic Engineering, Not Vibe Coding
 
@@ -173,7 +219,7 @@ Read tools are sensors. Write tools are actuators. Never chain actuators on stal
 
 ### 8. Understanding Cannot Be Outsourced
 
-If context is thin, the right next step is synthesis, not more execution. Build the working understanding first, then run from it. Save reusable understanding with `mcp__orgx__orgx_submit_receipt`.
+If context is thin, the right next step is synthesis, not more execution. Build the working understanding first, then run from it. Save reusable understanding in the completion `note` of `mcp__orgx__orgx_complete_work_with_proof`.
 
 ### 9. Models Are Statistical Systems
 
@@ -185,7 +231,7 @@ Do not only ask how to do the old thing faster. Ask what was impossible before S
 
 ## Three Gates
 
-Run these at the insertion points below. They are not optional for substantial work.
+Use the applicable prompts below to improve substantial work. They are review aids, not extra approval or merge gates; omit sections that do not apply to the requested change.
 
 ### Software 3.0 Simplification Gate
 
@@ -201,10 +247,10 @@ If any answer is yes, compare the Software 3.0 path against the conventional pat
 
 ### Verifier Gate
 
-Run before completion. OrgX will independently verify attached artifacts with
-its four-lens system (judged, measured, observed, outcome) and gate at
-AQ 0.85 — the verifier gate below is how you pass that honestly on the first
-attempt rather than through rework cycles.
+Before completion, run the checks relevant to the changed behavior and the
+repository's required checks. For OrgX artifacts, consult the actual evaluation
+receipt and configured criteria; AQ 0.85 is guidance, not a universal merge gate.
+Do not wait for every lens or request an independent judge for routine work.
 
 | Domain | Verifier examples |
 | --- | --- |
@@ -234,9 +280,9 @@ Before completion, identify:
 6. `proof_asset`: the receipt, metric, artifact, or screenshot used in the pitch.
 7. `objection_coverage`: trust, privacy, pricing, reliability, and proof claims handled.
 
-If the artifact is not revenue-facing, say so explicitly. If it is
-revenue-facing and any item is missing, the artifact is incomplete, even when
-the visual design, code, or narrative is otherwise strong.
+Include these details when the requested deliverable changes the buyer path or
+launch mechanics. A routine bug fix, copy edit, or maintenance change does not
+require a new GTM plan; report any material gap relevant to its scope.
 
 ### Agent-Native Docs Gate
 
@@ -244,7 +290,7 @@ Run whenever producing setup, implementation, operating, or handoff documentatio
 
 ## Adversarial Review Pattern
 
-For high-impact artifacts, use a critic agent whose job is to break the work, not validate it.
+For high-impact artifacts, use an independent reviewer when it can resolve a concrete risk. Routine changes do not require another agent or a review ceremony.
 
 | Producer | Reviewer | Reviewer focus |
 | --- | --- | --- |
@@ -255,7 +301,7 @@ For high-impact artifacts, use a critic agent whose job is to break the work, no
 | Sales | Product | buyer feedback and ICP fit |
 | Any | Orchestrator | dependency, handoff, and open-decision quality |
 
-Use `mcp__orgx__orgx_spawn` for guard/estimate checks before review delegation. High-impact means user-facing, revenue-facing, security-sensitive, irreversible, or cross-domain.
+Use `mcp__orgx__orgx_estimate_agent_task` before review delegation. High-impact means user-facing, revenue-facing, security-sensitive, irreversible, or cross-domain.
 
 ## Per-Agent Emphasis
 
@@ -279,8 +325,8 @@ End substantial work with:
 - `Capability delta`: what the user or org can now do that they could not do before.
 - `Verifier / proof`: checks run, evidence links, durable artifacts, or why proof is blocked.
 - `GTM outcome`: buyer path, capture mechanic, attribution, follow-up owner, and conversion metric when the work is public or revenue-facing.
-- `Progress ledger`: activity emitted, artifacts attached, blockers or decisions created, outcomes or learnings recorded. Name each started run or raised decision by its real state (`running`, waiting on a person with its `review_url`, `succeeded`), never the hoped-for one.
+- `Progress ledger`: artifacts attached, blockers or decisions created, outcomes or learnings recorded in the completion note. Name each started run or raised decision by its real state (`running`, waiting on a person with its `review_url`, `succeeded`), never the hoped-for one.
 - `Risks or open decisions`: named, with severity and owner.
 - `Suggested next agent`: who should pick this up and why.
 
-If three or more gates/principles were skipped, reopen or pause the task instead of marking it complete.
+Complete when the requested acceptance criteria and applicable required checks are satisfied. State any real unresolved blocker; do not reopen or pause work because unrelated checklist sections were omitted.

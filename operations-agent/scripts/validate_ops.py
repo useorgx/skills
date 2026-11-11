@@ -29,8 +29,8 @@ QUALITY_GATES = {
          lambda d: bool(d.get("title", "").strip())),
         ("has_severity", "Severity must be P1-P4",
          lambda d: d.get("severity") in ["P1", "P2", "P3", "P4"]),
-        ("has_started_at", "Start time is required",
-         lambda d: bool(d.get("started_at"))),
+        ("has_started_at", "Start time must be an ISO timestamp with a timezone",
+         lambda d: is_timestamp(d.get("started_at"))),
         ("has_impact", "Impact description is required",
          lambda d: bool(d.get("impact", {}).get("description"))),
         ("impact_quantified", "Impact must be quantified (users affected)",
@@ -99,24 +99,62 @@ QUALITY_GATES = {
 }
 
 
-def is_chronological(timeline: List[Dict]) -> bool:
-    """Check if timeline events are in chronological order."""
-    if not timeline:
-        return True
+def parse_timestamp(value: Any) -> datetime:
+    """Parse an explicit instant, without guessing a date or timezone."""
+    if not isinstance(value, str) or not re.fullmatch(
+        r"\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}(?:\.\d{1,6})?"
+        r"(?:Z|[+-](?:[01]\d|2[0-3]):[0-5]\d)",
+        value,
+    ):
+        raise ValueError("Expected an ISO timestamp with an explicit timezone")
+    timestamp = datetime.fromisoformat(value.replace("Z", "+00:00"))
+    if timestamp.utcoffset() is None:
+        raise ValueError("Timestamp timezone is required")
+    return timestamp
+
+
+def is_timestamp(value: Any) -> bool:
     try:
-        timestamps = [datetime.fromisoformat(e["timestamp"].replace("Z", "+00:00"))
-                     for e in timeline if e.get("timestamp")]
-        return timestamps == sorted(timestamps)
+        parse_timestamp(value)
+        return True
     except (ValueError, TypeError):
-        return True  # Can't validate, assume OK
+        return False
+
+
+def is_chronological(timeline: List[Dict]) -> bool:
+    """Check every timestamp; unavailable or invalid chronology is not valid."""
+    if not isinstance(timeline, list) or not timeline:
+        return False
+    try:
+        timestamps = [parse_timestamp(event["timestamp"]) for event in timeline]
+        return timestamps == sorted(timestamps)
+    except (ValueError, TypeError, KeyError):
+        return False
 
 
 def is_blameless(data: Dict) -> bool:
-    """Check if language is blameless (no blame indicators)."""
-    blame_words = ["fault", "blame", "failed to", "should have", "mistake by",
-                   "negligence", "careless", "incompetent"]
-    text = json.dumps(data).lower()
-    return not any(word in text for word in blame_words)
+    """Flag likely personal blame; this heuristic is not a semantic review."""
+    def prose(value: Any):
+        if isinstance(value, str):
+            yield value
+        elif isinstance(value, dict):
+            for item in value.values():
+                yield from prose(item)
+        elif isinstance(value, list):
+            for item in value:
+                yield from prose(item)
+
+    # Technical phrases such as "fault injection", "default", and "the worker
+    # failed to connect" are observations, not evidence of personal blame.
+    patterns = [
+        r"\b(?:negligence|careless|incompetent|mistake by)\b",
+        r"\b(?:engineer|operator|developer|administrator|employee|responder|on-call)"
+        r"\s+(?:failed to|should have)\b",
+        r"\b(?:his|her|their)\s+fault\b",
+        r"\b(?:is|was|are|were)\s+(?:to blame|at fault)\b",
+    ]
+    return not any(re.search(pattern, text, re.IGNORECASE)
+                   for text in prose(data) for pattern in patterns)
 
 
 def has_variance_analysis(data: Dict) -> bool:
@@ -210,9 +248,21 @@ def parse_markdown_incident(content: str) -> Dict[str, Any]:
 
 def validate(data: Dict[str, Any], artifact_type: str) -> List[Dict[str, str]]:
     """Run all quality gates for the artifact type."""
+    if artifact_type not in QUALITY_GATES:
+        return [{
+            "gate": "supported_artifact_type",
+            "message": f"Unsupported artifact type: {artifact_type}",
+            "severity": "error",
+        }]
+    if not isinstance(data, dict):
+        return [{
+            "gate": "artifact_object",
+            "message": "Artifact must be a JSON object",
+            "severity": "error",
+        }]
     errors = []
 
-    gates = QUALITY_GATES.get(artifact_type, [])
+    gates = QUALITY_GATES[artifact_type]
 
     for gate_id, message, check_fn in gates:
         try:
