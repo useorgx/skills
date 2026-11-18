@@ -1,0 +1,7 @@
+name = "answer-engine-optimization"
+version = "1.0.0"
+description = "Audit AI citations and buyer shortlists, publish answers backed by first-hand evidence, and trace inaccurate brand claims to their sources."
+entry_instructions = "SKILL.md"
+required_tools = []
+required_scopes = []
+resources = []
