@@ -94,6 +94,9 @@ Worked examples live in `examples/` — `campaign-product-launch.md` is the cano
 
 ## Trigger Map
 
+For AI search visibility, buyer shortlists, citable answers or inaccurate brand
+facts, use [Answer engine optimization](../answer-engine-optimization/SKILL.md).
+
 Use this skill for:
 
 - Campaign strategy and brief creation
